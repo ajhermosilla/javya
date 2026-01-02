@@ -61,7 +61,7 @@ Javya consolidates this into one reliable tool.
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/javya.git
+git clone https://github.com/ajhermosilla/javya.git
 cd javya
 
 # Start all services
