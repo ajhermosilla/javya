@@ -1,0 +1,81 @@
+{
+  "app": {
+    "name": "Javya"
+  },
+  "songs": {
+    "title": "Canciones",
+    "addSong": "Agregar Canción",
+    "editSong": "Editar Canción",
+    "deleteSong": "Eliminar Canción",
+    "searchPlaceholder": "Buscar canciones...",
+    "noResults": "No se encontraron canciones",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar esta canción?"
+  },
+  "form": {
+    "name": "Nombre de la Canción",
+    "artist": "Artista",
+    "url": "URL de YouTube",
+    "originalKey": "Tono Original",
+    "preferredKey": "Tono Preferido",
+    "tempo": "Tempo (BPM)",
+    "mood": "Estado de Ánimo",
+    "themes": "Temas",
+    "lyrics": "Letra",
+    "chordproChart": "Acordes (ChordPro)",
+    "minBand": "Banda Mínima",
+    "notes": "Notas",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "saving": "Guardando...",
+    "required": "Requerido"
+  },
+  "keys": {
+    "C": "Do",
+    "C#": "Do#",
+    "D": "Re",
+    "D#": "Re#",
+    "E": "Mi",
+    "F": "Fa",
+    "F#": "Fa#",
+    "G": "Sol",
+    "G#": "Sol#",
+    "A": "La",
+    "A#": "La#",
+    "B": "Si"
+  },
+  "moods": {
+    "Joyful": "Alegre",
+    "Reflective": "Reflexivo",
+    "Triumphant": "Triunfante",
+    "Intimate": "Íntimo",
+    "Peaceful": "Pacífico",
+    "Energetic": "Enérgico",
+    "Hopeful": "Esperanzador",
+    "Solemn": "Solemne",
+    "Celebratory": "Festivo"
+  },
+  "themes": {
+    "Worship": "Adoración",
+    "Communion": "Comunión",
+    "Offering": "Ofrenda",
+    "Opening": "Apertura",
+    "Closing": "Cierre",
+    "Prayer": "Oración",
+    "Declaration": "Declaración",
+    "Thanksgiving": "Acción de Gracias",
+    "Faith": "Fe",
+    "Grace": "Gracia",
+    "Salvation": "Salvación",
+    "Baptism": "Bautismo",
+    "Christmas": "Navidad",
+    "Holy Week": "Semana Santa"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "retry": "Reintentar",
+    "back": "Volver",
+    "filter": "Filtrar",
+    "clearFilters": "Limpiar Filtros"
+  }
+}

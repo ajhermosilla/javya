@@ -1,0 +1,81 @@
+{
+  "app": {
+    "name": "Javya"
+  },
+  "songs": {
+    "title": "Songs",
+    "addSong": "Add Song",
+    "editSong": "Edit Song",
+    "deleteSong": "Delete Song",
+    "searchPlaceholder": "Search songs...",
+    "noResults": "No songs found",
+    "confirmDelete": "Are you sure you want to delete this song?"
+  },
+  "form": {
+    "name": "Song Name",
+    "artist": "Artist",
+    "url": "YouTube URL",
+    "originalKey": "Original Key",
+    "preferredKey": "Preferred Key",
+    "tempo": "Tempo (BPM)",
+    "mood": "Mood",
+    "themes": "Themes",
+    "lyrics": "Lyrics",
+    "chordproChart": "ChordPro Chart",
+    "minBand": "Minimum Band",
+    "notes": "Notes",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "required": "Required"
+  },
+  "keys": {
+    "C": "C",
+    "C#": "C#",
+    "D": "D",
+    "D#": "D#",
+    "E": "E",
+    "F": "F",
+    "F#": "F#",
+    "G": "G",
+    "G#": "G#",
+    "A": "A",
+    "A#": "A#",
+    "B": "B"
+  },
+  "moods": {
+    "Joyful": "Joyful",
+    "Reflective": "Reflective",
+    "Triumphant": "Triumphant",
+    "Intimate": "Intimate",
+    "Peaceful": "Peaceful",
+    "Energetic": "Energetic",
+    "Hopeful": "Hopeful",
+    "Solemn": "Solemn",
+    "Celebratory": "Celebratory"
+  },
+  "themes": {
+    "Worship": "Worship",
+    "Communion": "Communion",
+    "Offering": "Offering",
+    "Opening": "Opening",
+    "Closing": "Closing",
+    "Prayer": "Prayer",
+    "Declaration": "Declaration",
+    "Thanksgiving": "Thanksgiving",
+    "Faith": "Faith",
+    "Grace": "Grace",
+    "Salvation": "Salvation",
+    "Baptism": "Baptism",
+    "Christmas": "Christmas",
+    "Holy Week": "Holy Week"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "back": "Back",
+    "filter": "Filter",
+    "clearFilters": "Clear Filters"
+  }
+}
