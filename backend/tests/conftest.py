@@ -11,7 +11,13 @@ from app.database import Base, get_db
 from app.main import app
 
 # Test database URL - uses a separate test database
-TEST_DATABASE_URL = "postgresql+asyncpg://javya:change_me_in_production@localhost:5432/javya_test"
+# Uses 'db' hostname (Docker network) when running inside container
+import os
+
+TEST_DATABASE_URL = os.getenv(
+    "TEST_DATABASE_URL",
+    "postgresql+asyncpg://javya:change_me_in_production@db:5432/javya_test"
+)
 
 # Create test engine
 test_engine = create_async_engine(TEST_DATABASE_URL, echo=False)
