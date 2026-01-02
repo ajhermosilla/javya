@@ -1,27 +1,26 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl
+from pydantic import BaseModel, ConfigDict, Field
 
-from app.enums import Key, Mood, Theme
+from app.enums import MusicalKey, Mood, Theme
 
 
 class SongBase(BaseModel):
     """Base schema for Song with common fields."""
 
-    title: str = Field(..., min_length=1, max_length=255)
+    name: str = Field(..., min_length=1, max_length=255)
     artist: str | None = Field(None, max_length=255)
-    lyrics: str | None = None
-    chordpro: str | None = None
-    original_key: Key | None = None
-    tempo: int | None = Field(None, ge=20, le=300)
-    time_signature: str | None = Field(None, max_length=10)
+    url: str | None = Field(None, max_length=500)
+    original_key: MusicalKey | None = None
+    preferred_key: MusicalKey | None = None
+    tempo_bpm: int | None = Field(None, ge=20, le=300)
     mood: Mood | None = None
     themes: list[Theme] | None = None
-    ccli_number: str | None = Field(None, max_length=50)
-    youtube_url: str | None = Field(None, max_length=500)
+    lyrics: str | None = None
+    chordpro_chart: str | None = None
+    min_band: list[str] | None = None
     notes: str | None = None
-    language: str = Field("en", max_length=10)
 
 
 class SongCreate(SongBase):
@@ -30,22 +29,10 @@ class SongCreate(SongBase):
     pass
 
 
-class SongUpdate(BaseModel):
-    """Schema for updating a song. All fields are optional."""
+class SongUpdate(SongBase):
+    """Schema for updating a song (PUT - all fields required except name can be null)."""
 
-    title: str | None = Field(None, min_length=1, max_length=255)
-    artist: str | None = Field(None, max_length=255)
-    lyrics: str | None = None
-    chordpro: str | None = None
-    original_key: Key | None = None
-    tempo: int | None = Field(None, ge=20, le=300)
-    time_signature: str | None = Field(None, max_length=10)
-    mood: Mood | None = None
-    themes: list[Theme] | None = None
-    ccli_number: str | None = Field(None, max_length=50)
-    youtube_url: str | None = Field(None, max_length=500)
-    notes: str | None = None
-    language: str | None = Field(None, max_length=10)
+    pass
 
 
 class SongResponse(SongBase):

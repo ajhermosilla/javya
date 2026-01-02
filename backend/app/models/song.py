@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, String, Text, func
+from sqlalchemy import DateTime, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -18,19 +18,18 @@ class Song(Base):
         primary_key=True,
         default=uuid.uuid4,
     )
-    title: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     artist: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    lyrics: Mapped[str | None] = mapped_column(Text, nullable=True)
-    chordpro: Mapped[str | None] = mapped_column(Text, nullable=True)
+    url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     original_key: Mapped[str | None] = mapped_column(String(10), nullable=True)
-    tempo: Mapped[int | None] = mapped_column(nullable=True)
-    time_signature: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    preferred_key: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    tempo_bpm: Mapped[int | None] = mapped_column(Integer, nullable=True)
     mood: Mapped[str | None] = mapped_column(String(50), nullable=True)
     themes: Mapped[list[str] | None] = mapped_column(ARRAY(String), nullable=True)
-    ccli_number: Mapped[str | None] = mapped_column(String(50), nullable=True)
-    youtube_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    lyrics: Mapped[str | None] = mapped_column(Text, nullable=True)
+    chordpro_chart: Mapped[str | None] = mapped_column(Text, nullable=True)
+    min_band: Mapped[list[str] | None] = mapped_column(ARRAY(String(100)), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
-    language: Mapped[str] = mapped_column(String(10), default="en", nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
