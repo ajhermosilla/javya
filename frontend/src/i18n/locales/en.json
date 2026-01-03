@@ -97,8 +97,13 @@
     "editSetlist": "Edit Setlist",
     "deleteSetlist": "Delete Setlist",
     "noResults": "No setlists found",
-    "confirmDelete": "Are you sure you want to delete this setlist?",
-    "comingSoon": "Setlist builder coming soon..."
+    "confirmDelete": "Are you sure you want to delete this setlist?"
+  },
+  "setlistEditor": {
+    "addSongs": "Add Songs",
+    "songOrder": "Song Order",
+    "noSongs": "No songs added yet. Add songs from the right panel.",
+    "allSongsAdded": "All songs have been added"
   },
   "eventTypes": {
     "Sunday": "Sunday",

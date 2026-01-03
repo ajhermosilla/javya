@@ -97,8 +97,13 @@
     "editSetlist": "Editar Lista",
     "deleteSetlist": "Eliminar Lista",
     "noResults": "No se encontraron listas",
-    "confirmDelete": "¿Estás seguro de que deseas eliminar esta lista?",
-    "comingSoon": "Constructor de listas próximamente..."
+    "confirmDelete": "¿Estás seguro de que deseas eliminar esta lista?"
+  },
+  "setlistEditor": {
+    "addSongs": "Agregar Canciones",
+    "songOrder": "Orden de Canciones",
+    "noSongs": "Aún no hay canciones. Agrega canciones desde el panel derecho.",
+    "allSongsAdded": "Todas las canciones han sido agregadas"
   },
   "eventTypes": {
     "Sunday": "Domingo",

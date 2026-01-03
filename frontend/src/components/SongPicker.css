@@ -1,0 +1,95 @@
+.song-picker {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+}
+
+.picker-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.picker-header h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.875rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.picker-search {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.picker-search:focus {
+  outline: none;
+  border-color: #646cff;
+}
+
+.picker-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.picker-loading,
+.picker-empty {
+  padding: 2rem;
+  text-align: center;
+  color: #999;
+  font-size: 0.875rem;
+}
+
+.picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s;
+}
+
+.picker-item:hover {
+  background-color: #f8f9fa;
+}
+
+.picker-item:last-child {
+  border-bottom: none;
+}
+
+.picker-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.picker-item-name {
+  font-size: 0.9375rem;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.picker-item-artist {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.picker-item-add {
+  font-size: 1.25rem;
+  color: #646cff;
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}

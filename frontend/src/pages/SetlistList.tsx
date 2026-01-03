@@ -3,16 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { useSetlists } from '../hooks/useSetlists';
 import { SetlistCard } from '../components/SetlistCard';
 import { SetlistForm } from '../components/SetlistForm';
+import { SetlistEditor } from '../components/SetlistEditor';
 import { setlistsApi } from '../api/setlists';
 import type { Setlist, SetlistCreate } from '../types/setlist';
 import './SetlistList.css';
 
-type View = 'list' | 'create' | 'edit';
+type View = 'list' | 'create' | 'edit' | 'editor';
 
 export function SetlistList() {
   const { t } = useTranslation();
   const [view, setView] = useState<View>('list');
   const [editingSetlist, setEditingSetlist] = useState<Setlist | undefined>();
+  const [selectedSetlistId, setSelectedSetlistId] = useState<string | null>(null);
 
   const { setlists, loading, error, refetch } = useSetlists();
 
@@ -36,9 +38,16 @@ export function SetlistList() {
     setView('edit');
   };
 
+  const handleOpenEditor = (setlist: Setlist) => {
+    setSelectedSetlistId(setlist.id);
+    setView('editor');
+  };
+
   const handleCancel = () => {
     setView('list');
     setEditingSetlist(undefined);
+    setSelectedSetlistId(null);
+    refetch();
   };
 
   if (view === 'create') {
@@ -59,6 +68,10 @@ export function SetlistList() {
         />
       </div>
     );
+  }
+
+  if (view === 'editor' && selectedSetlistId) {
+    return <SetlistEditor setlistId={selectedSetlistId} onBack={handleCancel} />;
   }
 
   if (error) {
@@ -89,7 +102,7 @@ export function SetlistList() {
             <SetlistCard
               key={setlist.id}
               setlist={setlist}
-              onClick={() => handleEdit(setlist)}
+              onClick={() => handleOpenEditor(setlist)}
               onEdit={() => handleEdit(setlist)}
               onDelete={refetch}
             />
