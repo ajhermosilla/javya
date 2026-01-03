@@ -17,6 +17,12 @@
   color: #1a1a1a;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .add-button {
   background-color: #646cff;
   color: white;
