@@ -80,7 +80,13 @@
     "retry": "Retry",
     "back": "Back",
     "filter": "Filter",
-    "clearFilters": "Clear Filters"
+    "clearFilters": "Clear Filters",
+    "select": "Select..."
+  },
+  "setlistForm": {
+    "serviceDate": "Service Date",
+    "eventType": "Event Type",
+    "description": "Description"
   },
   "detail": {
     "watchVideo": "Watch on YouTube"
