@@ -61,7 +61,7 @@ Javya consolidates this into one reliable tool.
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/javya.git
+git clone https://github.com/ajhermosilla/javya.git
 cd javya
 
 # Start all services
@@ -126,7 +126,7 @@ MIT License — use it freely, even commercially. See [LICENSE](LICENSE) for det
 
 ## Acknowledgments
 
-- Built for the worship team at [Your Church], Asunción, Paraguay
+- Built for the worship team at ICE Renuevo, Asunción, Paraguay
 - Name inspired by Guaraní language and culture
 - ChordPro format by [chordpro.org](https://www.chordpro.org/)
 
