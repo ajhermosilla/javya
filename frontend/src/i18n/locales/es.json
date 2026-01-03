@@ -2,6 +2,10 @@
   "app": {
     "name": "Javya"
   },
+  "nav": {
+    "songs": "Canciones",
+    "setlists": "Listas"
+  },
   "songs": {
     "title": "Canciones",
     "addSong": "Agregar Canción",
@@ -80,5 +84,22 @@
   },
   "detail": {
     "watchVideo": "Ver en YouTube"
+  },
+  "setlists": {
+    "title": "Listas",
+    "addSetlist": "Agregar Lista",
+    "editSetlist": "Editar Lista",
+    "deleteSetlist": "Eliminar Lista",
+    "noResults": "No se encontraron listas",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar esta lista?",
+    "comingSoon": "Constructor de listas próximamente..."
+  },
+  "eventTypes": {
+    "Sunday": "Domingo",
+    "Wednesday": "Miércoles",
+    "Youth": "Jóvenes",
+    "Special": "Especial",
+    "Retreat": "Retiro",
+    "Other": "Otro"
   }
 }

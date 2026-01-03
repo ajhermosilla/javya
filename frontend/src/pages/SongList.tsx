@@ -5,7 +5,6 @@ import { SongCard } from '../components/SongCard';
 import { SongForm } from '../components/SongForm';
 import { SearchBar } from '../components/SearchBar';
 import { FilterBar } from '../components/FilterBar';
-import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { SongDetail } from '../components/SongDetail';
 import { songsApi } from '../api/songs';
 import type { Song, SongCreate, SongFilters, MusicalKey, Mood, Theme } from '../types/song';
@@ -113,12 +112,9 @@ export function SongList() {
     <div className="song-list-page">
       <header className="page-header">
         <h1>{t('songs.title')}</h1>
-        <div className="header-actions">
-          <LanguageSwitcher />
-          <button className="add-button" onClick={() => setView('create')}>
-            {t('songs.addSong')}
-          </button>
-        </div>
+        <button className="add-button" onClick={() => setView('create')}>
+          {t('songs.addSong')}
+        </button>
       </header>
 
       <div className="filters-section">
