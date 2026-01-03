@@ -46,7 +46,7 @@ services:
     container_name: javya-frontend
     restart: unless-stopped
     environment:
-      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+      VITE_API_URL: ${VITE_API_URL:-}
     ports:
       - "${FRONTEND_PORT:-5173}:5173"
     volumes:
