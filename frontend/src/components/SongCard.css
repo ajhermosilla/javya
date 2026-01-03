@@ -1,0 +1,111 @@
+.song-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.song-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.song-card-header {
+  margin-bottom: 1rem;
+}
+
+.song-name {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.25rem;
+  color: #1a1a1a;
+}
+
+.song-artist {
+  margin: 0;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.song-card-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.key-tag {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.mood-tag {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.tempo-tag {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.song-themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.theme-tag {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+  font-size: 0.6875rem;
+}
+
+.song-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.edit-button,
+.delete-button {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.edit-button {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+.edit-button:hover {
+  background-color: #e0e0e0;
+}
+
+.delete-button {
+  background-color: #ffebee;
+  border: 1px solid #ffcdd2;
+  color: #c62828;
+}
+
+.delete-button:hover {
+  background-color: #ffcdd2;
+}

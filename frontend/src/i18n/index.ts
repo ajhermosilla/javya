@@ -16,7 +16,7 @@ i18n
     lng: localStorage.getItem('language') || 'en',
     fallbackLng: 'en',
     interpolation: {
-      escapeValue: false, // React already escapes values
+      escapeValue: false,
     },
   });
 
