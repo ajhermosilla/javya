@@ -5,10 +5,11 @@ import './SongCard.css';
 
 interface SongCardProps {
   song: Song;
+  onEdit: () => void;
   onDelete: () => void;
 }
 
-export function SongCard({ song, onDelete }: SongCardProps) {
+export function SongCard({ song, onEdit, onDelete }: SongCardProps) {
   const { t } = useTranslation();
 
   const handleDelete = async () => {
@@ -56,7 +57,9 @@ export function SongCard({ song, onDelete }: SongCardProps) {
       )}
 
       <div className="song-card-actions">
-        <button className="edit-button">{t('songs.editSong')}</button>
+        <button className="edit-button" onClick={onEdit}>
+          {t('songs.editSong')}
+        </button>
         <button className="delete-button" onClick={handleDelete}>
           {t('songs.deleteSong')}
         </button>

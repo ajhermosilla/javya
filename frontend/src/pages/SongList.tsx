@@ -2,13 +2,19 @@ import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSongs } from '../hooks/useSongs';
 import { SongCard } from '../components/SongCard';
+import { SongForm } from '../components/SongForm';
 import { SearchBar } from '../components/SearchBar';
 import { FilterBar } from '../components/FilterBar';
-import type { SongFilters, MusicalKey, Mood, Theme } from '../types/song';
+import { songsApi } from '../api/songs';
+import type { Song, SongCreate, SongFilters, MusicalKey, Mood, Theme } from '../types/song';
 import './SongList.css';
+
+type View = 'list' | 'create' | 'edit';
 
 export function SongList() {
   const { t } = useTranslation();
+  const [view, setView] = useState<View>('list');
+  const [editingSong, setEditingSong] = useState<Song | undefined>();
   const [search, setSearch] = useState('');
   const [keyFilter, setKeyFilter] = useState<MusicalKey | undefined>();
   const [moodFilter, setMoodFilter] = useState<Mood | undefined>();
@@ -32,6 +38,47 @@ export function SongList() {
 
   const hasFilters = search || keyFilter || moodFilter || themeFilter;
 
+  const handleCreate = async (data: SongCreate) => {
+    await songsApi.create(data);
+    setView('list');
+    refetch();
+  };
+
+  const handleUpdate = async (data: SongCreate) => {
+    if (editingSong) {
+      await songsApi.update(editingSong.id, data);
+      setView('list');
+      setEditingSong(undefined);
+      refetch();
+    }
+  };
+
+  const handleEdit = (song: Song) => {
+    setEditingSong(song);
+    setView('edit');
+  };
+
+  const handleCancel = () => {
+    setView('list');
+    setEditingSong(undefined);
+  };
+
+  if (view === 'create') {
+    return (
+      <div className="song-list-page">
+        <SongForm onSubmit={handleCreate} onCancel={handleCancel} />
+      </div>
+    );
+  }
+
+  if (view === 'edit' && editingSong) {
+    return (
+      <div className="song-list-page">
+        <SongForm song={editingSong} onSubmit={handleUpdate} onCancel={handleCancel} />
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="error-container">
@@ -45,7 +92,9 @@ export function SongList() {
     <div className="song-list-page">
       <header className="page-header">
         <h1>{t('songs.title')}</h1>
-        <button className="add-button">{t('songs.addSong')}</button>
+        <button className="add-button" onClick={() => setView('create')}>
+          {t('songs.addSong')}
+        </button>
       </header>
 
       <div className="filters-section">
@@ -76,7 +125,12 @@ export function SongList() {
       ) : (
         <div className="songs-grid">
           {songs.map(song => (
-            <SongCard key={song.id} song={song} onDelete={refetch} />
+            <SongCard
+              key={song.id}
+              song={song}
+              onEdit={() => handleEdit(song)}
+              onDelete={refetch}
+            />
           ))}
         </div>
       )}
