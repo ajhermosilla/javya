@@ -77,5 +77,8 @@
     "back": "Back",
     "filter": "Filter",
     "clearFilters": "Clear Filters"
+  },
+  "detail": {
+    "watchVideo": "Watch on YouTube"
   }
 }

@@ -6,15 +6,17 @@ import { SongForm } from '../components/SongForm';
 import { SearchBar } from '../components/SearchBar';
 import { FilterBar } from '../components/FilterBar';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
+import { SongDetail } from '../components/SongDetail';
 import { songsApi } from '../api/songs';
 import type { Song, SongCreate, SongFilters, MusicalKey, Mood, Theme } from '../types/song';
 import './SongList.css';
 
-type View = 'list' | 'create' | 'edit';
+type View = 'list' | 'detail' | 'create' | 'edit';
 
 export function SongList() {
   const { t } = useTranslation();
   const [view, setView] = useState<View>('list');
+  const [selectedSong, setSelectedSong] = useState<Song | undefined>();
   const [editingSong, setEditingSong] = useState<Song | undefined>();
   const [search, setSearch] = useState('');
   const [keyFilter, setKeyFilter] = useState<MusicalKey | undefined>();
@@ -54,6 +56,11 @@ export function SongList() {
     }
   };
 
+  const handleView = (song: Song) => {
+    setSelectedSong(song);
+    setView('detail');
+  };
+
   const handleEdit = (song: Song) => {
     setEditingSong(song);
     setView('edit');
@@ -61,6 +68,7 @@ export function SongList() {
 
   const handleCancel = () => {
     setView('list');
+    setSelectedSong(undefined);
     setEditingSong(undefined);
   };
 
@@ -76,6 +84,18 @@ export function SongList() {
     return (
       <div className="song-list-page">
         <SongForm song={editingSong} onSubmit={handleUpdate} onCancel={handleCancel} />
+      </div>
+    );
+  }
+
+  if (view === 'detail' && selectedSong) {
+    return (
+      <div className="song-list-page">
+        <SongDetail
+          song={selectedSong}
+          onBack={handleCancel}
+          onEdit={() => handleEdit(selectedSong)}
+        />
       </div>
     );
   }
@@ -132,6 +152,7 @@ export function SongList() {
             <SongCard
               key={song.id}
               song={song}
+              onClick={() => handleView(song)}
               onEdit={() => handleEdit(song)}
               onDelete={refetch}
             />

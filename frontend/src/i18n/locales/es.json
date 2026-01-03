@@ -77,5 +77,8 @@
     "back": "Volver",
     "filter": "Filtrar",
     "clearFilters": "Limpiar Filtros"
+  },
+  "detail": {
+    "watchVideo": "Ver en YouTube"
   }
 }

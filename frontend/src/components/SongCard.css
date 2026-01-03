@@ -13,6 +13,11 @@
 
 .song-card-header {
   margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.song-card-header:hover .song-name {
+  color: #646cff;
 }
 
 .song-name {
