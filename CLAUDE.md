@@ -6,17 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Javya is an open-source worship planning platform for church teams. It helps manage songs, build setlists, and export presentations. The name comes from Guaraní "javy'a" meaning "let us rejoice together."
 
-## Current Status: v0.1 Complete
+## Current Status: v0.2 Complete
 
 ### Features
-- Backend API with full Song CRUD
-- React frontend with song management UI
-- Search and filter (by key, mood, theme)
-- Song detail view with lyrics/ChordPro display
-- Language switcher (English/Spanish)
-- PostgreSQL with async SQLAlchemy
-- Docker Compose setup
-- Comprehensive test suite
+- **Songs**: Full CRUD, search/filter, detail view with lyrics/ChordPro
+- **Setlists**: Create setlists with drag-and-drop song ordering
+- **Navigation**: Collapsible sidebar menu
+- **i18n**: English and Spanish with language switcher
+- **Backend**: FastAPI + async SQLAlchemy + PostgreSQL
+- **Frontend**: React + Vite + TypeScript + dnd-kit
+- **Deployment**: Docker Compose
 
 ## Tech Stack
 

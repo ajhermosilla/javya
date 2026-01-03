@@ -25,14 +25,14 @@ Javya consolidates this into one reliable tool.
 
 ## Features
 
-### v0.1 (Current)
+### v0.2 (Current)
 - [x] Song database with lyrics, chords, keys, mood, and themes
 - [x] ChordPro chart storage
 - [x] Search and filter songs
 - [x] Multi-language support (English, Spanish)
+- [x] Setlist builder with drag-and-drop
 
 ### Roadmap
-- [ ] **v0.2** — Setlist builder with drag-and-drop
 - [ ] **v0.3** — Export to Quelea/FreeShow presentation software
 - [ ] **v0.4** — Team availability and scheduling
 
