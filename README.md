@@ -67,7 +67,7 @@ cd javya
 # Start all services
 docker compose up -d
 
-# Frontend: http://localhost:3000
+# Frontend: http://localhost:5173
 # Backend API: http://localhost:8000
 # API Docs: http://localhost:8000/docs
 ```

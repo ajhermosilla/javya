@@ -6,18 +6,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Javya is an open-source worship planning platform for church teams. It helps manage songs, build setlists, and export presentations. The name comes from Guaraní "javy'a" meaning "let us rejoice together."
 
-## Current Status: v0.1
+## Current Status: v0.1 Complete
 
-### Completed
+### Features
 - Backend API with full Song CRUD
+- React frontend with song management UI
 - Search and filter (by key, mood, theme)
+- Song detail view with lyrics/ChordPro display
+- Language switcher (English/Spanish)
 - PostgreSQL with async SQLAlchemy
 - Docker Compose setup
 - Comprehensive test suite
-- i18n structure (English, Spanish)
-
-### In Progress
-- React frontend (not yet scaffolded)
 
 ## Tech Stack
 
@@ -34,7 +33,7 @@ Javya is an open-source worship planning platform for church teams. It helps man
 ```bash
 docker compose up -d
 ```
-- Frontend: http://localhost:3000
+- Frontend: http://localhost:5173
 - Backend API: http://localhost:8000
 - API Docs: http://localhost:8000/docs
 
@@ -95,12 +94,22 @@ tests/               # Pytest test suite
 ### Frontend Structure (`frontend/`)
 ```
 src/
+├── api/             # API client and endpoints
+│   ├── client.ts    # Fetch wrapper with error handling
+│   └── songs.ts     # Songs API methods
 ├── components/      # Reusable UI components
-├── pages/           # Page components
-├── api/             # API client
+│   ├── SongCard     # Song card with metadata
+│   ├── SongDetail   # Full song view with lyrics
+│   ├── SongForm     # Create/edit form
+│   ├── SearchBar    # Search input
+│   ├── FilterBar    # Key/mood/theme filters
+│   └── LanguageSwitcher
+├── pages/
+│   └── SongList     # Main page with list/detail/form views
+├── hooks/
+│   └── useSongs.ts  # Data fetching hook
 ├── i18n/            # Translations (en, es)
-├── hooks/           # Custom React hooks
-├── types/           # TypeScript types
+└── types/           # TypeScript types
 ```
 
 ### Key Patterns
