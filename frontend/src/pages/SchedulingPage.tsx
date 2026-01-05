@@ -51,9 +51,11 @@ export function SchedulingPage() {
   // Fetch users for assignment editor
   useEffect(() => {
     if (isAdminOrLeader) {
-      setUsersError(null);
       api.get<User[]>('/api/v1/users/')
-        .then(setUsers)
+        .then((data) => {
+          setUsers(data);
+          setUsersError(null);
+        })
         .catch((err) => {
           console.error(err);
           setUsersError(t('scheduling.usersLoadError'));
