@@ -78,6 +78,7 @@
     "loading": "Cargando...",
     "error": "Ocurrió un error",
     "deleteFailed": "Error al eliminar. Por favor, intenta de nuevo.",
+    "saveFailed": "Error al guardar. Los cambios han sido revertidos.",
     "retry": "Reintentar",
     "back": "Volver",
     "filter": "Filtrar",
@@ -107,7 +108,10 @@
     "allSongsAdded": "Todas las canciones han sido agregadas",
     "exportFreeshow": "FreeShow",
     "exportQuelea": "Quelea",
-    "exporting": "Exportando..."
+    "exporting": "Exportando...",
+    "exportFailed": "Error al exportar",
+    "songsWithoutLyrics": "Las siguientes canciones no tienen letra",
+    "continueExport": "¿Continuar con la exportación de todos modos?"
   },
   "eventTypes": {
     "Sunday": "Domingo",

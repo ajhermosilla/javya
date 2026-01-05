@@ -37,7 +37,11 @@ export const setlistsApi = {
   exportFreeshow: async (id: string, filename: string) => {
     const response = await fetch(`${BASE_PATH}/${id}/export/freeshow`);
     if (!response.ok) {
-      throw new Error('Export failed');
+      const status = response.status;
+      if (status === 404) {
+        throw new Error('Setlist not found');
+      }
+      throw new Error(`Export failed (${status})`);
     }
     const blob = await response.blob();
     downloadBlob(blob, `${filename}.project`);
@@ -46,7 +50,11 @@ export const setlistsApi = {
   exportQuelea: async (id: string, filename: string) => {
     const response = await fetch(`${BASE_PATH}/${id}/export/quelea`);
     if (!response.ok) {
-      throw new Error('Export failed');
+      const status = response.status;
+      if (status === 404) {
+        throw new Error('Setlist not found');
+      }
+      throw new Error(`Export failed (${status})`);
     }
     const blob = await response.blob();
     downloadBlob(blob, `${filename}.qsch`);

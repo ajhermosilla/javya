@@ -34,6 +34,7 @@ export function SetlistEditor({ setlistId, onBack }: SetlistEditorProps) {
   const { t } = useTranslation();
   const { setlist, loading, refetch } = useSetlist(setlistId);
   const [songs, setSongs] = useState<SetlistSong[]>([]);
+  const [lastSavedSongs, setLastSavedSongs] = useState<SetlistSong[]>([]);
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -48,6 +49,7 @@ export function SetlistEditor({ setlistId, onBack }: SetlistEditorProps) {
   useEffect(() => {
     if (setlist?.songs) {
       setSongs(setlist.songs);
+      setLastSavedSongs(setlist.songs);
       setHasChanges(false);
     }
   }, [setlist]);
@@ -110,6 +112,10 @@ export function SetlistEditor({ setlistId, onBack }: SetlistEditorProps) {
       setHasChanges(false);
     } catch (error) {
       console.error('Failed to save setlist:', error);
+      // Rollback to last saved state
+      setSongs(lastSavedSongs);
+      setHasChanges(false);
+      alert(t('common.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -117,6 +123,16 @@ export function SetlistEditor({ setlistId, onBack }: SetlistEditorProps) {
 
   const handleExport = async (format: ExportFormat) => {
     if (!setlist) return;
+
+    // Check for songs without lyrics
+    const songsWithoutLyrics = songs.filter((s) => !s.song?.lyrics?.trim());
+    if (songsWithoutLyrics.length > 0) {
+      const names = songsWithoutLyrics.map((s) => s.song?.name || '?').join(', ');
+      const proceed = window.confirm(
+        `${t('setlistEditor.songsWithoutLyrics')}: ${names}\n\n${t('setlistEditor.continueExport')}`
+      );
+      if (!proceed) return;
+    }
 
     setExporting(true);
     try {
@@ -127,6 +143,8 @@ export function SetlistEditor({ setlistId, onBack }: SetlistEditorProps) {
       }
     } catch (error) {
       console.error('Failed to export setlist:', error);
+      const message = error instanceof Error ? error.message : t('common.error');
+      alert(`${t('setlistEditor.exportFailed')}: ${message}`);
     } finally {
       setExporting(false);
     }

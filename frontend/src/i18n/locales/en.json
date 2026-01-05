@@ -78,6 +78,7 @@
     "loading": "Loading...",
     "error": "An error occurred",
     "deleteFailed": "Failed to delete. Please try again.",
+    "saveFailed": "Failed to save. Changes have been reverted.",
     "retry": "Retry",
     "back": "Back",
     "filter": "Filter",
@@ -107,7 +108,10 @@
     "allSongsAdded": "All songs have been added",
     "exportFreeshow": "FreeShow",
     "exportQuelea": "Quelea",
-    "exporting": "Exporting..."
+    "exporting": "Exporting...",
+    "exportFailed": "Export failed",
+    "songsWithoutLyrics": "The following songs have no lyrics",
+    "continueExport": "Continue with export anyway?"
   },
   "eventTypes": {
     "Sunday": "Sunday",

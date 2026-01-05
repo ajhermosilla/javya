@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.enums import EventType
 from app.schemas.song import SongResponse
@@ -37,6 +37,13 @@ class SetlistBase(BaseModel):
     description: str | None = None
     service_date: date | None = None
     event_type: EventType | None = None
+
+    @field_validator("name")
+    @classmethod
+    def name_not_whitespace(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Name cannot be empty or whitespace only")
+        return v.strip()
 
 
 class SetlistCreate(SetlistBase):

@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.enums import MusicalKey, Mood, Theme
 
@@ -10,6 +10,14 @@ class SongBase(BaseModel):
     """Base schema for Song with common fields."""
 
     name: str = Field(..., min_length=1, max_length=255)
+
+    @field_validator("name")
+    @classmethod
+    def name_not_whitespace(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Name cannot be empty or whitespace only")
+        return v.strip()
+
     artist: str | None = Field(None, max_length=255)
     url: str | None = Field(None, max_length=500)
     original_key: MusicalKey | None = None
