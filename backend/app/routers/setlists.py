@@ -159,6 +159,9 @@ async def update_setlist(
 
     await db.commit()
 
+    # Expire cached objects to ensure fresh data on reload
+    db.expire_all()
+
     # Reload with songs
     result = await db.execute(
         select(Setlist)

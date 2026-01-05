@@ -94,3 +94,22 @@ def sample_song_data_minimal() -> dict[str, Any]:
     return {
         "name": "Simple Song",
     }
+
+
+@pytest.fixture
+def sample_setlist_data() -> dict[str, Any]:
+    """Sample setlist data for testing."""
+    return {
+        "name": "Sunday Service",
+        "description": "Regular Sunday morning worship",
+        "service_date": "2025-01-12",
+        "event_type": "Sunday",
+    }
+
+
+@pytest.fixture
+def sample_setlist_data_minimal() -> dict[str, Any]:
+    """Minimal setlist data (only required fields)."""
+    return {
+        "name": "Quick Setlist",
+    }
