@@ -109,6 +109,25 @@ jobs:
           sudo rm -rf /usr/local/share/boost
           df -h
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Create Playwright auth directory
+        working-directory: frontend
+        run: mkdir -p playwright/.auth
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
       - name: Start application
         run: docker compose up -d --wait
 
@@ -122,31 +141,6 @@ jobs:
           echo "Waiting for frontend..."
           timeout 60 bash -c 'until curl -s http://localhost:5173 > /dev/null; do sleep 2; done'
           echo "Services are ready!"
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Create Playwright auth directory
-        working-directory: frontend
-        run: mkdir -p playwright/.auth
-
-      - name: Debug npm environment
-        working-directory: frontend
-        run: |
-          node --version
-          npm --version
-          npm cache clean --force
-          ls -la
-
-      - name: Install dependencies
-        working-directory: frontend
-        run: npm ci
-
-      - name: Install Playwright browsers
-        working-directory: frontend
-        run: npx playwright install --with-deps chromium
 
       - name: Run E2E tests
         working-directory: frontend
