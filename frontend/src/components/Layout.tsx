@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Sidebar } from './Sidebar';
 import './Layout.css';
 
-type Page = 'songs' | 'setlists' | 'availability';
+type Page = 'songs' | 'setlists' | 'availability' | 'scheduling';
 
 interface LayoutProps {
   currentPage: Page;

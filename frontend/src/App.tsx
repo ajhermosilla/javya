@@ -6,10 +6,11 @@ import { Layout } from './components/Layout'
 import { SongList } from './pages/SongList'
 import { SetlistList } from './pages/SetlistList'
 import { AvailabilityPage } from './pages/AvailabilityPage'
+import { SchedulingPage } from './pages/SchedulingPage'
 import { LoginPage } from './pages/LoginPage'
 import './App.css'
 
-type Page = 'songs' | 'setlists' | 'availability';
+type Page = 'songs' | 'setlists' | 'availability' | 'scheduling';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState<Page>('songs');
@@ -19,6 +20,7 @@ function AppContent() {
       {currentPage === 'songs' && <SongList />}
       {currentPage === 'setlists' && <SetlistList />}
       {currentPage === 'availability' && <AvailabilityPage />}
+      {currentPage === 'scheduling' && <SchedulingPage />}
     </Layout>
   )
 }

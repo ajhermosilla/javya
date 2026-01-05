@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import './Sidebar.css';
 
-type Page = 'songs' | 'setlists' | 'availability';
+type Page = 'songs' | 'setlists' | 'availability' | 'scheduling';
 
 interface SidebarProps {
   currentPage: Page;
@@ -50,6 +50,13 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
         >
           <span className="nav-icon">📅</span>
           {!collapsed && <span className="nav-label">{t('nav.availability')}</span>}
+        </button>
+        <button
+          className={`nav-item ${currentPage === 'scheduling' ? 'active' : ''}`}
+          onClick={() => onNavigate('scheduling')}
+        >
+          <span className="nav-icon">👥</span>
+          {!collapsed && <span className="nav-label">{t('nav.scheduling')}</span>}
         </button>
       </nav>
 

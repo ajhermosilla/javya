@@ -42,6 +42,12 @@ class Setlist(Base):
         order_by="SetlistSong.position",
         cascade="all, delete-orphan",
     )
+    assignments = relationship(
+        "SetlistAssignment",
+        backref="setlist",
+        lazy="selectin",
+        cascade="all, delete-orphan",
+    )
 
     @property
     def song_count(self) -> int:

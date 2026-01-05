@@ -1,0 +1,107 @@
+.scheduling-page {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.scheduling-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.scheduling-page h1 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.view-toggle {
+  display: flex;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.toggle-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+}
+
+.toggle-btn:not(:last-child) {
+  border-right: 1px solid var(--border-color);
+}
+
+.toggle-btn:hover {
+  background: var(--bg-hover);
+}
+
+.toggle-btn.active {
+  background: var(--accent-color);
+  color: white;
+}
+
+.scheduling-page .calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.scheduling-page .nav-button {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.scheduling-page .nav-button:hover {
+  background: var(--bg-hover);
+}
+
+.scheduling-page .month-name {
+  font-size: 1.25rem;
+  font-weight: 500;
+  min-width: 200px;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.scheduling-page .loading,
+.scheduling-page .error {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
+.scheduling-page .error {
+  color: #ef4444;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .scheduling-page .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .view-toggle {
+    width: 100%;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    text-align: center;
+  }
+}

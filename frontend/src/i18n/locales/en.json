@@ -5,7 +5,8 @@
   "nav": {
     "songs": "Songs",
     "setlists": "Setlists",
-    "availability": "Availability"
+    "availability": "Availability",
+    "scheduling": "Scheduling"
   },
   "auth": {
     "tagline": "Worship planning for church teams",
@@ -185,5 +186,43 @@
         "monthly": "Monthly"
       }
     }
+  },
+  "scheduling": {
+    "title": "Scheduling",
+    "calendarView": "Calendar",
+    "listView": "List",
+    "noSetlists": "No setlists for this period",
+    "noAssignments": "No team assignments yet",
+    "noDate": "No date set",
+    "songs": "songs",
+    "more": "more",
+    "editTeam": "Edit Team",
+    "editAssignments": "Edit Assignments",
+    "addAssignment": "Add Assignment",
+    "currentAssignments": "Current Assignments",
+    "role": "Role",
+    "teamMember": "Team Member",
+    "selectUser": "Select team member...",
+    "notes": "Notes",
+    "notesPlaceholder": "Optional notes for this assignment...",
+    "addMember": "Add Member",
+    "confirmed": "Confirmed",
+    "pending": "Pending",
+    "markConfirmed": "Mark as confirmed",
+    "markPending": "Mark as pending",
+    "addFailed": "Failed to add assignment",
+    "deleteFailed": "Failed to delete assignment",
+    "confirmFailed": "Failed to update confirmation status"
+  },
+  "serviceRoles": {
+    "worship_leader": "Worship Leader",
+    "vocalist": "Vocalist",
+    "guitarist": "Guitarist",
+    "bassist": "Bassist",
+    "drummer": "Drummer",
+    "keys": "Keys",
+    "sound": "Sound",
+    "projection": "Projection",
+    "other": "Other"
   }
 }

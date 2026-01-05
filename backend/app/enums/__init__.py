@@ -4,6 +4,7 @@ from app.enums.theme import Theme
 from app.enums.event_type import EventType
 from app.enums.role import UserRole
 from app.enums.availability import AvailabilityStatus, PatternType
+from app.enums.service_role import ServiceRole
 
 __all__ = [
     "MusicalKey",
@@ -13,4 +14,5 @@ __all__ = [
     "UserRole",
     "AvailabilityStatus",
     "PatternType",
+    "ServiceRole",
 ]

@@ -5,7 +5,8 @@
   "nav": {
     "songs": "Canciones",
     "setlists": "Listas",
-    "availability": "Disponibilidad"
+    "availability": "Disponibilidad",
+    "scheduling": "Programación"
   },
   "auth": {
     "tagline": "Planificación de adoración para equipos de iglesia",
@@ -185,5 +186,43 @@
         "monthly": "Mensual"
       }
     }
+  },
+  "scheduling": {
+    "title": "Programación",
+    "calendarView": "Calendario",
+    "listView": "Lista",
+    "noSetlists": "No hay listas para este período",
+    "noAssignments": "Sin asignaciones de equipo",
+    "noDate": "Sin fecha definida",
+    "songs": "canciones",
+    "more": "más",
+    "editTeam": "Editar Equipo",
+    "editAssignments": "Editar Asignaciones",
+    "addAssignment": "Agregar Asignación",
+    "currentAssignments": "Asignaciones Actuales",
+    "role": "Rol",
+    "teamMember": "Miembro del Equipo",
+    "selectUser": "Seleccionar miembro...",
+    "notes": "Notas",
+    "notesPlaceholder": "Notas opcionales para esta asignación...",
+    "addMember": "Agregar Miembro",
+    "confirmed": "Confirmado",
+    "pending": "Pendiente",
+    "markConfirmed": "Marcar como confirmado",
+    "markPending": "Marcar como pendiente",
+    "addFailed": "Error al agregar asignación",
+    "deleteFailed": "Error al eliminar asignación",
+    "confirmFailed": "Error al actualizar confirmación"
+  },
+  "serviceRoles": {
+    "worship_leader": "Líder de Adoración",
+    "vocalist": "Vocalista",
+    "guitarist": "Guitarrista",
+    "bassist": "Bajista",
+    "drummer": "Baterista",
+    "keys": "Teclados",
+    "sound": "Sonido",
+    "projection": "Proyección",
+    "other": "Otro"
   }
 }

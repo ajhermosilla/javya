@@ -1,0 +1,107 @@
+.team-roster {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.team-roster.compact {
+  gap: 0.5rem;
+}
+
+.role-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.team-roster.compact .role-group {
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.role-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  min-width: 100px;
+  flex-shrink: 0;
+  padding-top: 0.25rem;
+}
+
+.team-roster.compact .role-label {
+  min-width: 80px;
+  font-size: 0.7rem;
+  padding-top: 0;
+}
+
+.members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.member-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.member-chip:disabled {
+  cursor: default;
+}
+
+.member-chip:not(:disabled):hover {
+  background: var(--bg-hover);
+}
+
+.member-chip.confirmed {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.member-chip.pending {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.team-roster.compact .member-chip {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.member-name {
+  color: var(--text-primary);
+}
+
+.status-badge {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+}
+
+.status-badge.confirmed {
+  background: #22c55e;
+  color: white;
+}
+
+.status-badge.pending {
+  background: #f59e0b;
+  color: white;
+}
+
+.empty-roster {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-style: italic;
+  margin: 0;
+}

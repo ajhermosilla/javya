@@ -70,6 +70,12 @@ export const api = {
 
   delete: (endpoint: string) =>
     request<void>(endpoint, { method: 'DELETE' }),
+
+  patch: <T>(endpoint: string, data: unknown) =>
+    request<T>(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
 };
 
 export { ApiError };

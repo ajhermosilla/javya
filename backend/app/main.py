@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import auth, songs, setlists, users, availability
+from app.routers import auth, songs, setlists, users, availability, scheduling
 
 app = FastAPI(
     title="Javya API",
@@ -27,6 +27,7 @@ app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
 app.include_router(songs.router, prefix="/api/v1/songs", tags=["songs"])
 app.include_router(setlists.router, prefix="/api/v1/setlists", tags=["setlists"])
 app.include_router(availability.router, prefix="/api/v1", tags=["availability"])
+app.include_router(scheduling.router, prefix="/api/v1/scheduling", tags=["scheduling"])
 
 
 @app.get("/health", tags=["health"])

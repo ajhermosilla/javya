@@ -26,6 +26,15 @@ from app.schemas.availability import (
     DateRangeQuery,
     BulkAvailabilityCreate,
 )
+from app.schemas.setlist_assignment import (
+    SetlistAssignmentCreate,
+    SetlistAssignmentUpdate,
+    SetlistAssignmentResponse,
+    SetlistAssignmentWithUser,
+    SetlistAssignmentConfirm,
+    TeamMemberAvailability,
+    MyAssignmentResponse,
+)
 
 __all__ = [
     # Song
@@ -56,4 +65,12 @@ __all__ = [
     "AvailabilityPatternResponse",
     "DateRangeQuery",
     "BulkAvailabilityCreate",
+    # Setlist Assignments
+    "SetlistAssignmentCreate",
+    "SetlistAssignmentUpdate",
+    "SetlistAssignmentResponse",
+    "SetlistAssignmentWithUser",
+    "SetlistAssignmentConfirm",
+    "TeamMemberAvailability",
+    "MyAssignmentResponse",
 ]

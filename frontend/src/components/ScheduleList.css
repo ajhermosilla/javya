@@ -1,0 +1,134 @@
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.schedule-list.empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.schedule-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.schedule-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.schedule-card .card-header:hover {
+  background: var(--bg-hover);
+}
+
+.schedule-card .card-info {
+  flex: 1;
+}
+
+.schedule-card .setlist-name {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.schedule-card .setlist-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.schedule-card .service-date {
+  font-weight: 500;
+}
+
+.schedule-card .event-type-badge {
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.schedule-card .event-type-badge.sunday {
+  background: #3b82f6;
+  color: white;
+}
+
+.schedule-card .event-type-badge.wednesday {
+  background: #8b5cf6;
+  color: white;
+}
+
+.schedule-card .event-type-badge.youth {
+  background: #ec4899;
+  color: white;
+}
+
+.schedule-card .event-type-badge.special {
+  background: #f59e0b;
+  color: white;
+}
+
+.schedule-card .event-type-badge.retreat {
+  background: #22c55e;
+  color: white;
+}
+
+.schedule-card .event-type-badge.other {
+  background: #6b7280;
+  color: white;
+}
+
+.schedule-card .song-count {
+  color: var(--text-muted);
+}
+
+.schedule-card .edit-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.schedule-card .edit-btn:hover {
+  background: var(--bg-hover);
+}
+
+.schedule-card .card-body {
+  padding: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .schedule-card .card-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .schedule-card .edit-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
