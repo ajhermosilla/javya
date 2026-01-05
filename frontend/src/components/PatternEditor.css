@@ -26,6 +26,16 @@
   margin-bottom: 1rem;
 }
 
+.validation-error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
 .form-row {
   display: flex;
   gap: 1rem;

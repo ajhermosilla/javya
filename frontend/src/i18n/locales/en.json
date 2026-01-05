@@ -181,6 +181,7 @@
       "notePlaceholder": "Optional note...",
       "activate": "Activate",
       "deactivate": "Deactivate",
+      "endDateBeforeStart": "End date must be after start date",
       "types": {
         "weekly": "Weekly",
         "biweekly": "Biweekly",

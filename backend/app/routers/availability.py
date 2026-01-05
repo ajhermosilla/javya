@@ -4,6 +4,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import and_, delete, select
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_active_user, require_role
@@ -72,38 +73,38 @@ async def set_bulk_availability(
     current_user: Annotated[User, Depends(get_current_active_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> list[Availability]:
-    """Set availability for multiple dates at once."""
-    results = []
-    for entry in bulk.entries:
-        # Check if entry already exists
-        result = await db.execute(
-            select(Availability).where(
-                and_(
-                    Availability.user_id == current_user.id,
-                    Availability.date == entry.date,
-                )
-            )
-        )
-        existing = result.scalar_one_or_none()
+    """Set availability for multiple dates at once using upsert to handle race conditions."""
+    dates = [entry.date for entry in bulk.entries]
 
-        if existing:
-            existing.status = entry.status.value
-            existing.note = entry.note
-            results.append(existing)
-        else:
-            db_availability = Availability(
-                user_id=current_user.id,
-                date=entry.date,
-                status=entry.status.value,
-                note=entry.note,
-            )
-            db.add(db_availability)
-            results.append(db_availability)
+    # Use PostgreSQL upsert to atomically insert or update
+    for entry in bulk.entries:
+        stmt = insert(Availability).values(
+            user_id=current_user.id,
+            date=entry.date,
+            status=entry.status.value,
+            note=entry.note,
+        )
+        stmt = stmt.on_conflict_do_update(
+            constraint="uq_availability_user_date",
+            set_={
+                "status": stmt.excluded.status,
+                "note": stmt.excluded.note,
+            },
+        )
+        await db.execute(stmt)
 
     await db.commit()
-    for r in results:
-        await db.refresh(r)
-    return results
+
+    # Fetch all results
+    result = await db.execute(
+        select(Availability).where(
+            and_(
+                Availability.user_id == current_user.id,
+                Availability.date.in_(dates),
+            )
+        )
+    )
+    return list(result.scalars().all())
 
 
 @router.get("/me", response_model=list[AvailabilityResponse])

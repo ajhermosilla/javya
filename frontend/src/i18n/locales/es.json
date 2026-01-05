@@ -181,6 +181,7 @@
       "notePlaceholder": "Nota opcional...",
       "activate": "Activar",
       "deactivate": "Desactivar",
+      "endDateBeforeStart": "La fecha de fin debe ser posterior a la fecha de inicio",
       "types": {
         "weekly": "Semanal",
         "biweekly": "Quincenal",

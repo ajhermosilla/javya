@@ -29,6 +29,7 @@ export function PatternEditor({
   const { t } = useTranslation();
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<AvailabilityPatternCreate>({
     pattern_type: 'weekly',
@@ -46,13 +47,26 @@ export function PatternEditor({
     t('availability.weekdays.sun'),
   ];
 
+  const validateDates = (): boolean => {
+    if (formData.start_date && formData.end_date) {
+      if (formData.end_date < formData.start_date) {
+        setValidationError(t('availability.patterns.endDateBeforeStart'));
+        return false;
+      }
+    }
+    setValidationError(null);
+    return true;
+  };
+
   const handleCreate = async () => {
+    if (!validateDates()) return;
     await onCreate(formData);
     setIsCreating(false);
     setFormData({ pattern_type: 'weekly', day_of_week: 0, status: 'available' });
   };
 
   const handleUpdate = async (id: string) => {
+    if (!validateDates()) return;
     await onUpdate(id, formData);
     setEditingId(null);
     setFormData({ pattern_type: 'weekly', day_of_week: 0, status: 'available' });
@@ -80,6 +94,9 @@ export function PatternEditor({
 
   const renderForm = (onSubmit: () => void, submitLabel: string) => (
     <div className="pattern-form">
+      {validationError && (
+        <div className="validation-error">{validationError}</div>
+      )}
       <div className="form-row">
         <label>
           {t('availability.patterns.dayOfWeek')}
@@ -189,6 +206,7 @@ export function PatternEditor({
           onClick={() => {
             setIsCreating(false);
             setEditingId(null);
+            setValidationError(null);
             setFormData({ pattern_type: 'weekly', day_of_week: 0, status: 'available' });
           }}
         >
