@@ -7,12 +7,12 @@ test.describe('Navigation', () => {
     // Should start on songs page
     await expect(page.locator('h1')).toContainText('Songs');
 
-    // Navigate to setlists
-    await page.getByRole('link', { name: /setlists/i }).click();
+    // Navigate to setlists (sidebar uses buttons, not links)
+    await page.getByRole('button', { name: /setlists/i }).click();
     await expect(page.locator('h1')).toContainText('Setlists');
 
     // Navigate back to songs
-    await page.getByRole('link', { name: /songs/i }).click();
+    await page.getByRole('button', { name: /songs/i }).click();
     await expect(page.locator('h1')).toContainText('Songs');
   });
 
