@@ -1,15 +1,23 @@
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth.dependencies import require_role
 from app.database import get_db
-from app.enums import MusicalKey, Mood, Theme
+from app.enums import MusicalKey, Mood, Theme, UserRole
 from app.models.song import Song
+from app.models.user import User
 from app.schemas.song import SongCreate, SongResponse, SongUpdate
 
 router = APIRouter()
+
+
+def escape_like_pattern(value: str) -> str:
+    """Escape special LIKE pattern characters to prevent SQL injection."""
+    return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
 
 @router.post("/", response_model=SongResponse, status_code=status.HTTP_201_CREATED)
@@ -52,8 +60,10 @@ async def list_songs(
     query = select(Song)
 
     if search:
+        escaped_search = escape_like_pattern(search)
         query = query.where(
-            Song.name.ilike(f"%{search}%") | Song.artist.ilike(f"%{search}%")
+            Song.name.ilike(f"%{escaped_search}%", escape="\\")
+            | Song.artist.ilike(f"%{escaped_search}%", escape="\\")
         )
 
     if key:
@@ -128,6 +138,7 @@ async def update_song(
 @router.delete("/{song_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_song(
     song_id: UUID,
+    _current_user: Annotated[User, Depends(require_role(UserRole.ADMIN, UserRole.LEADER))],
     db: AsyncSession = Depends(get_db),
 ) -> None:
     """Delete a song by ID."""

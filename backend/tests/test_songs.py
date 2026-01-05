@@ -5,6 +5,20 @@ import pytest
 from httpx import AsyncClient
 
 
+async def get_admin_headers(client: AsyncClient) -> dict[str, str]:
+    """Register first user (becomes admin) and return auth headers."""
+    await client.post(
+        "/api/v1/auth/register",
+        json={"email": "admin@test.com", "name": "Admin", "password": "testpassword123"},
+    )
+    login_response = await client.post(
+        "/api/v1/auth/login",
+        data={"username": "admin@test.com", "password": "testpassword123"},
+    )
+    token = login_response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
 class TestCreateSong:
     """Tests for POST /api/v1/songs/ endpoint."""
 
@@ -313,11 +327,12 @@ class TestDeleteSong:
     async def test_delete_song_success(
         self, client: AsyncClient, sample_song_data: dict[str, Any]
     ) -> None:
-        """Test deleting a song."""
+        """Test deleting a song (requires admin/leader auth)."""
+        headers = await get_admin_headers(client)
         create_response = await client.post("/api/v1/songs/", json=sample_song_data)
         song_id = create_response.json()["id"]
 
-        response = await client.delete(f"/api/v1/songs/{song_id}")
+        response = await client.delete(f"/api/v1/songs/{song_id}", headers=headers)
 
         assert response.status_code == 204
 
@@ -328,15 +343,17 @@ class TestDeleteSong:
     @pytest.mark.asyncio
     async def test_delete_song_not_found(self, client: AsyncClient) -> None:
         """Test deleting a non-existent song returns 404."""
+        headers = await get_admin_headers(client)
         fake_id = str(uuid4())
 
-        response = await client.delete(f"/api/v1/songs/{fake_id}")
+        response = await client.delete(f"/api/v1/songs/{fake_id}", headers=headers)
 
         assert response.status_code == 404
 
     @pytest.mark.asyncio
     async def test_delete_song_invalid_id(self, client: AsyncClient) -> None:
         """Test deleting with invalid UUID format."""
-        response = await client.delete("/api/v1/songs/not-a-uuid")
+        headers = await get_admin_headers(client)
+        response = await client.delete("/api/v1/songs/not-a-uuid", headers=headers)
 
         assert response.status_code == 422

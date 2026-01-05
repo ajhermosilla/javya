@@ -114,6 +114,11 @@ async def get_my_availability(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> list[Availability]:
     """Get current user's availability for a date range."""
+    if start_date > end_date:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="start_date must be before or equal to end_date",
+        )
     result = await db.execute(
         select(Availability)
         .where(
@@ -138,6 +143,11 @@ async def get_team_availability(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> list[dict]:
     """Get team availability for a date range (admin/leader only)."""
+    if start_date > end_date:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="start_date must be before or equal to end_date",
+        )
     result = await db.execute(
         select(Availability, User)
         .join(User, Availability.user_id == User.id)

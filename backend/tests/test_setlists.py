@@ -6,6 +6,20 @@ from httpx import AsyncClient
 from sqlalchemy.exc import IntegrityError
 
 
+async def get_admin_headers(client: AsyncClient) -> dict[str, str]:
+    """Register first user (becomes admin) and return auth headers."""
+    await client.post(
+        "/api/v1/auth/register",
+        json={"email": "admin@test.com", "name": "Admin", "password": "testpassword123"},
+    )
+    login_response = await client.post(
+        "/api/v1/auth/login",
+        data={"username": "admin@test.com", "password": "testpassword123"},
+    )
+    token = login_response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
 class TestCreateSetlist:
     """Tests for POST /api/v1/setlists/ endpoint."""
 
@@ -417,11 +431,12 @@ class TestDeleteSetlist:
     async def test_delete_setlist_success(
         self, client: AsyncClient, sample_setlist_data: dict[str, Any]
     ) -> None:
-        """Test deleting a setlist."""
+        """Test deleting a setlist (requires admin/leader auth)."""
+        headers = await get_admin_headers(client)
         create_response = await client.post("/api/v1/setlists/", json=sample_setlist_data)
         setlist_id = create_response.json()["id"]
 
-        response = await client.delete(f"/api/v1/setlists/{setlist_id}")
+        response = await client.delete(f"/api/v1/setlists/{setlist_id}", headers=headers)
 
         assert response.status_code == 204
 
@@ -437,6 +452,7 @@ class TestDeleteSetlist:
         sample_song_data: dict[str, Any],
     ) -> None:
         """Test deleting a setlist removes setlist-song associations but not songs."""
+        headers = await get_admin_headers(client)
         # Create a song
         song_response = await client.post("/api/v1/songs/", json=sample_song_data)
         song_id = song_response.json()["id"]
@@ -450,7 +466,7 @@ class TestDeleteSetlist:
         setlist_id = create_response.json()["id"]
 
         # Delete setlist
-        await client.delete(f"/api/v1/setlists/{setlist_id}")
+        await client.delete(f"/api/v1/setlists/{setlist_id}", headers=headers)
 
         # Song should still exist
         song_response = await client.get(f"/api/v1/songs/{song_id}")
@@ -459,16 +475,18 @@ class TestDeleteSetlist:
     @pytest.mark.asyncio
     async def test_delete_setlist_not_found(self, client: AsyncClient) -> None:
         """Test deleting a non-existent setlist returns 404."""
+        headers = await get_admin_headers(client)
         fake_id = str(uuid4())
 
-        response = await client.delete(f"/api/v1/setlists/{fake_id}")
+        response = await client.delete(f"/api/v1/setlists/{fake_id}", headers=headers)
 
         assert response.status_code == 404
 
     @pytest.mark.asyncio
     async def test_delete_setlist_invalid_id(self, client: AsyncClient) -> None:
         """Test deleting with invalid UUID format."""
-        response = await client.delete("/api/v1/setlists/not-a-uuid")
+        headers = await get_admin_headers(client)
+        response = await client.delete("/api/v1/setlists/not-a-uuid", headers=headers)
 
         assert response.status_code == 422
 

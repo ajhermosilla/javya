@@ -109,7 +109,8 @@
     "save": "Save",
     "cancel": "Cancel",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "close": "Close"
   },
   "setlistForm": {
     "serviceDate": "Service Date",
@@ -213,7 +214,8 @@
     "addFailed": "Failed to add assignment",
     "deleteFailed": "Failed to delete assignment",
     "confirmFailed": "Failed to update confirmation status",
-    "usersLoadError": "Failed to load team members. Assignment editing may be limited."
+    "usersLoadError": "Failed to load team members. Assignment editing may be limited.",
+    "editorError": "Something went wrong while loading the assignment editor. Please try again."
   },
   "serviceRoles": {
     "worship_leader": "Worship Leader",

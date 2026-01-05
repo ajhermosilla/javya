@@ -42,6 +42,14 @@ async function request<T>(
   const response = await fetch(url, config);
 
   if (!response.ok) {
+    // Handle token expiry - clear token and redirect to login
+    if (response.status === 401) {
+      clearStoredToken();
+      // Only redirect if not already on login page
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
+    }
     const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
     throw new ApiError(response.status, error.detail || 'Request failed');
   }

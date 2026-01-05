@@ -5,6 +5,7 @@ import { useCalendar } from '../hooks/useScheduling';
 import { ScheduleCalendar } from '../components/ScheduleCalendar';
 import { ScheduleList } from '../components/ScheduleList';
 import { SetlistAssignmentEditor } from '../components/SetlistAssignmentEditor';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../api/client';
 import type { CalendarSetlist } from '../types/scheduling';
@@ -172,14 +173,33 @@ export function SchedulingPage() {
       )}
 
       {editingSetlist && isAdminOrLeader && user && (
-        <SetlistAssignmentEditor
-          setlistId={editingSetlist.id}
-          setlistName={editingSetlist.name}
-          serviceDate={editingSetlist.service_date}
-          users={users}
-          currentUserId={user.id}
-          onClose={handleCloseEditor}
-        />
+        <ErrorBoundary
+          fallback={
+            <div className="assignment-editor-overlay" onClick={handleCloseEditor}>
+              <div className="assignment-editor error-state" onClick={(e) => e.stopPropagation()}>
+                <header className="editor-header">
+                  <h2>{t('common.error')}</h2>
+                  <button className="close-btn" onClick={handleCloseEditor}>
+                    &times;
+                  </button>
+                </header>
+                <div className="editor-body">
+                  <p>{t('scheduling.editorError')}</p>
+                  <button onClick={handleCloseEditor}>{t('common.close')}</button>
+                </div>
+              </div>
+            </div>
+          }
+        >
+          <SetlistAssignmentEditor
+            setlistId={editingSetlist.id}
+            setlistName={editingSetlist.name}
+            serviceDate={editingSetlist.service_date}
+            users={users}
+            currentUserId={user.id}
+            onClose={handleCloseEditor}
+          />
+        </ErrorBoundary>
       )}
     </div>
   );

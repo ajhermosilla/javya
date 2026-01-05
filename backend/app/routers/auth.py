@@ -30,6 +30,8 @@ async def register(
         )
 
     # Check if this is the first user (will be admin)
+    # Note: There's a small race condition window here, but it's acceptable for first-user setup
+    # In production, the first admin is typically seeded or created via CLI
     count_result = await db.execute(select(func.count()).select_from(User))
     user_count = count_result.scalar()
     role = UserRole.ADMIN if user_count == 0 else UserRole.MEMBER

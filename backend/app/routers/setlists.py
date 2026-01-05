@@ -36,6 +36,11 @@ from app.services.export_quelea import generate_quelea_schedule
 router = APIRouter()
 
 
+def escape_like_pattern(value: str) -> str:
+    """Escape special LIKE pattern characters to prevent SQL injection."""
+    return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
 def sanitize_filename(name: str, fallback_id: UUID) -> str:
     """Create a safe filename from a name, using ID as fallback for uniqueness."""
     safe_name = "".join(c for c in name if c.isalnum() or c in " -_").strip()
@@ -94,7 +99,8 @@ async def list_setlists(
     query = select(Setlist)
 
     if search:
-        query = query.where(Setlist.name.ilike(f"%{search}%"))
+        escaped_search = escape_like_pattern(search)
+        query = query.where(Setlist.name.ilike(f"%{escaped_search}%", escape="\\"))
 
     if event_type:
         query = query.where(Setlist.event_type == event_type.value)
@@ -187,6 +193,7 @@ async def update_setlist(
 @router.delete("/{setlist_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_setlist(
     setlist_id: UUID,
+    _current_user: Annotated[User, Depends(require_role(UserRole.ADMIN, UserRole.LEADER))],
     db: AsyncSession = Depends(get_db),
 ) -> None:
     """Delete a setlist by ID (songs are cascade deleted)."""

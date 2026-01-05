@@ -109,7 +109,8 @@
     "save": "Guardar",
     "cancel": "Cancelar",
     "edit": "Editar",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "close": "Cerrar"
   },
   "setlistForm": {
     "serviceDate": "Fecha del Servicio",
@@ -213,7 +214,8 @@
     "addFailed": "Error al agregar asignación",
     "deleteFailed": "Error al eliminar asignación",
     "confirmFailed": "Error al actualizar confirmación",
-    "usersLoadError": "Error al cargar miembros del equipo. La edición de asignaciones puede estar limitada."
+    "usersLoadError": "Error al cargar miembros del equipo. La edición de asignaciones puede estar limitada.",
+    "editorError": "Algo salió mal al cargar el editor de asignaciones. Por favor, intenta de nuevo."
   },
   "serviceRoles": {
     "worship_leader": "Líder de Adoración",

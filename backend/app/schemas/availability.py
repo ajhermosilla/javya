@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.enums import AvailabilityStatus, PatternType
 
@@ -56,6 +56,13 @@ class AvailabilityPatternBase(BaseModel):
     start_date: date | None = None
     end_date: date | None = None
     note: str | None = Field(None, max_length=500)
+
+    @model_validator(mode="after")
+    def validate_date_range(self) -> "AvailabilityPatternBase":
+        """Validate that end_date is after start_date if both are provided."""
+        if self.start_date and self.end_date and self.end_date < self.start_date:
+            raise ValueError("end_date must be after or equal to start_date")
+        return self
 
 
 class AvailabilityPatternCreate(AvailabilityPatternBase):
