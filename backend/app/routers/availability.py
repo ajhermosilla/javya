@@ -280,11 +280,11 @@ async def update_pattern(
 
     # Update only provided fields explicitly
     if pattern_update.pattern_type is not None:
-        pattern.pattern_type = pattern_update.pattern_type
+        pattern.pattern_type = pattern_update.pattern_type.value
     if pattern_update.day_of_week is not None:
         pattern.day_of_week = pattern_update.day_of_week
     if pattern_update.status is not None:
-        pattern.status = pattern_update.status
+        pattern.status = pattern_update.status.value
     if pattern_update.start_date is not None:
         pattern.start_date = pattern_update.start_date
     if pattern_update.end_date is not None:

@@ -502,6 +502,7 @@ class TestExportSetlist:
         sample_song_data: dict[str, Any],
     ) -> None:
         """Test exporting a setlist to FreeShow format."""
+        headers = await get_admin_headers(client)
         # Create song with lyrics
         song_response = await client.post("/api/v1/songs/", json=sample_song_data)
         song_id = song_response.json()["id"]
@@ -514,7 +515,7 @@ class TestExportSetlist:
         create_response = await client.post("/api/v1/setlists/", json=setlist_data)
         setlist_id = create_response.json()["id"]
 
-        response = await client.get(f"/api/v1/setlists/{setlist_id}/export/freeshow")
+        response = await client.get(f"/api/v1/setlists/{setlist_id}/export/freeshow", headers=headers)
 
         assert response.status_code == 200
         assert response.headers["content-type"] == "application/json"
@@ -531,10 +532,11 @@ class TestExportSetlist:
         self, client: AsyncClient, sample_setlist_data: dict[str, Any]
     ) -> None:
         """Test exporting an empty setlist returns 400 error."""
+        headers = await get_admin_headers(client)
         create_response = await client.post("/api/v1/setlists/", json=sample_setlist_data)
         setlist_id = create_response.json()["id"]
 
-        response = await client.get(f"/api/v1/setlists/{setlist_id}/export/freeshow")
+        response = await client.get(f"/api/v1/setlists/{setlist_id}/export/freeshow", headers=headers)
 
         assert response.status_code == 400
         assert "empty setlist" in response.json()["detail"].lower()
@@ -542,9 +544,10 @@ class TestExportSetlist:
     @pytest.mark.asyncio
     async def test_export_freeshow_not_found(self, client: AsyncClient) -> None:
         """Test exporting a non-existent setlist returns 404."""
+        headers = await get_admin_headers(client)
         fake_id = str(uuid4())
 
-        response = await client.get(f"/api/v1/setlists/{fake_id}/export/freeshow")
+        response = await client.get(f"/api/v1/setlists/{fake_id}/export/freeshow", headers=headers)
 
         assert response.status_code == 404
 
@@ -556,6 +559,7 @@ class TestExportSetlist:
         sample_song_data: dict[str, Any],
     ) -> None:
         """Test exporting a setlist to Quelea format."""
+        headers = await get_admin_headers(client)
         # Create song with lyrics
         song_response = await client.post("/api/v1/songs/", json=sample_song_data)
         song_id = song_response.json()["id"]
@@ -568,7 +572,7 @@ class TestExportSetlist:
         create_response = await client.post("/api/v1/setlists/", json=setlist_data)
         setlist_id = create_response.json()["id"]
 
-        response = await client.get(f"/api/v1/setlists/{setlist_id}/export/quelea")
+        response = await client.get(f"/api/v1/setlists/{setlist_id}/export/quelea", headers=headers)
 
         assert response.status_code == 200
         assert response.headers["content-type"] == "application/zip"
@@ -581,9 +585,10 @@ class TestExportSetlist:
     @pytest.mark.asyncio
     async def test_export_quelea_not_found(self, client: AsyncClient) -> None:
         """Test exporting a non-existent setlist returns 404."""
+        headers = await get_admin_headers(client)
         fake_id = str(uuid4())
 
-        response = await client.get(f"/api/v1/setlists/{fake_id}/export/quelea")
+        response = await client.get(f"/api/v1/setlists/{fake_id}/export/quelea", headers=headers)
 
         assert response.status_code == 404
 
@@ -592,6 +597,7 @@ class TestExportSetlist:
         self, client: AsyncClient, sample_song_data: dict[str, Any]
     ) -> None:
         """Test that export filename is sanitized."""
+        headers = await get_admin_headers(client)
         # Create setlist with special characters in name
         song_response = await client.post("/api/v1/songs/", json=sample_song_data)
         song_id = song_response.json()["id"]
@@ -603,7 +609,7 @@ class TestExportSetlist:
         create_response = await client.post("/api/v1/setlists/", json=setlist_data)
         setlist_id = create_response.json()["id"]
 
-        response = await client.get(f"/api/v1/setlists/{setlist_id}/export/freeshow")
+        response = await client.get(f"/api/v1/setlists/{setlist_id}/export/freeshow", headers=headers)
 
         # Check filename doesn't contain special characters
         disposition = response.headers["content-disposition"]

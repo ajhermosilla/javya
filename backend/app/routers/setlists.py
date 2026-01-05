@@ -213,6 +213,7 @@ async def delete_setlist(
 @router.get("/{setlist_id}/export/freeshow")
 async def export_setlist_freeshow(
     setlist_id: UUID,
+    current_user: Annotated[User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ) -> Response:
     """Export a setlist to FreeShow .show format."""
@@ -253,6 +254,7 @@ async def export_setlist_freeshow(
 @router.get("/{setlist_id}/export/quelea")
 async def export_setlist_quelea(
     setlist_id: UUID,
+    current_user: Annotated[User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ) -> Response:
     """Export a setlist to Quelea .qsch schedule format."""

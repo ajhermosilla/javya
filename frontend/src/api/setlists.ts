@@ -1,4 +1,4 @@
-import { api } from './client';
+import { api, getStoredToken } from './client';
 import type { Setlist, SetlistCreate, SetlistUpdate } from '../types/setlist';
 
 const BASE_PATH = '/api/v1/setlists';
@@ -43,9 +43,17 @@ export const setlistsApi = {
   delete: (id: string) => api.delete(`${BASE_PATH}/${id}`),
 
   exportFreeshow: async (id: string, filename: string) => {
-    const response = await fetch(`${BASE_PATH}/${id}/export/freeshow`);
+    const token = getStoredToken();
+    const headers: HeadersInit = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    const response = await fetch(`${BASE_PATH}/${id}/export/freeshow`, { headers });
     if (!response.ok) {
       const status = response.status;
+      if (status === 401) {
+        throw new Error('Authentication required');
+      }
       if (status === 404) {
         throw new Error('Setlist not found');
       }
@@ -56,9 +64,17 @@ export const setlistsApi = {
   },
 
   exportQuelea: async (id: string, filename: string) => {
-    const response = await fetch(`${BASE_PATH}/${id}/export/quelea`);
+    const token = getStoredToken();
+    const headers: HeadersInit = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    const response = await fetch(`${BASE_PATH}/${id}/export/quelea`, { headers });
     if (!response.ok) {
       const status = response.status;
+      if (status === 401) {
+        throw new Error('Authentication required');
+      }
       if (status === 404) {
         throw new Error('Setlist not found');
       }
