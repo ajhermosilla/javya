@@ -23,7 +23,7 @@ import type { SetlistSong, SetlistSongCreate } from '../types/setlist';
 import type { Song } from '../types/song';
 import './SetlistEditor.css';
 
-type ExportFormat = 'freeshow';
+type ExportFormat = 'freeshow' | 'quelea';
 
 interface SetlistEditorProps {
   setlistId: string;
@@ -122,6 +122,8 @@ export function SetlistEditor({ setlistId, onBack }: SetlistEditorProps) {
     try {
       if (format === 'freeshow') {
         await setlistsApi.exportFreeshow(setlist.id, setlist.name);
+      } else if (format === 'quelea') {
+        await setlistsApi.exportQuelea(setlist.id, setlist.name);
       }
     } catch (error) {
       console.error('Failed to export setlist:', error);
@@ -163,6 +165,13 @@ export function SetlistEditor({ setlistId, onBack }: SetlistEditorProps) {
             disabled={exporting || songs.length === 0}
           >
             {exporting ? t('setlistEditor.exporting') : t('setlistEditor.exportFreeshow')}
+          </button>
+          <button
+            className="export-button"
+            onClick={() => handleExport('quelea')}
+            disabled={exporting || songs.length === 0}
+          >
+            {exporting ? t('setlistEditor.exporting') : t('setlistEditor.exportQuelea')}
           </button>
           <button
             className="save-button"

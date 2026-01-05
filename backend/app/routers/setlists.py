@@ -18,6 +18,7 @@ from app.schemas.setlist import (
     SetlistDetailResponse,
 )
 from app.services.export_freeshow import generate_freeshow_project
+from app.services.export_quelea import generate_quelea_schedule
 
 router = APIRouter()
 
@@ -206,6 +207,41 @@ async def export_setlist_freeshow(
     return Response(
         content=json.dumps(freeshow_data, indent=2),
         media_type="application/json",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"'
+        },
+    )
+
+
+@router.get("/{setlist_id}/export/quelea")
+async def export_setlist_quelea(
+    setlist_id: UUID,
+    db: AsyncSession = Depends(get_db),
+) -> Response:
+    """Export a setlist to Quelea .qsch schedule format."""
+    result = await db.execute(
+        select(Setlist)
+        .options(selectinload(Setlist.songs).selectinload(SetlistSong.song))
+        .where(Setlist.id == setlist_id)
+    )
+    setlist = result.scalar_one_or_none()
+
+    if not setlist:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Setlist with id {setlist_id} not found",
+        )
+
+    # Generate Quelea schedule ZIP
+    quelea_data = generate_quelea_schedule(setlist)
+
+    # Create filename from setlist name
+    safe_name = "".join(c for c in setlist.name if c.isalnum() or c in " -_").strip()
+    filename = f"{safe_name or 'setlist'}.qsch"
+
+    return Response(
+        content=quelea_data,
+        media_type="application/zip",
         headers={
             "Content-Disposition": f'attachment; filename="{filename}"'
         },

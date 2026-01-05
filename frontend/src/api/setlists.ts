@@ -30,4 +30,20 @@ export const setlistsApi = {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   },
+
+  exportQuelea: async (id: string, filename: string) => {
+    const response = await fetch(`${BASE_PATH}/${id}/export/quelea`);
+    if (!response.ok) {
+      throw new Error('Export failed');
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}.qsch`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  },
 };

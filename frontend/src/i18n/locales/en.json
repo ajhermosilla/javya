@@ -104,7 +104,8 @@
     "songOrder": "Song Order",
     "noSongs": "No songs added yet. Add songs from the right panel.",
     "allSongsAdded": "All songs have been added",
-    "exportFreeshow": "Export to FreeShow",
+    "exportFreeshow": "FreeShow",
+    "exportQuelea": "Quelea",
     "exporting": "Exporting..."
   },
   "eventTypes": {

@@ -104,7 +104,8 @@
     "songOrder": "Orden de Canciones",
     "noSongs": "Aún no hay canciones. Agrega canciones desde el panel derecho.",
     "allSongsAdded": "Todas las canciones han sido agregadas",
-    "exportFreeshow": "Exportar a FreeShow",
+    "exportFreeshow": "FreeShow",
+    "exportQuelea": "Quelea",
     "exporting": "Exportando..."
   },
   "eventTypes": {
