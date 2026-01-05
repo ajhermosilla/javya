@@ -212,7 +212,8 @@
     "markPending": "Mark as pending",
     "addFailed": "Failed to add assignment",
     "deleteFailed": "Failed to delete assignment",
-    "confirmFailed": "Failed to update confirmation status"
+    "confirmFailed": "Failed to update confirmation status",
+    "usersLoadError": "Failed to load team members. Assignment editing may be limited."
   },
   "serviceRoles": {
     "worship_leader": "Worship Leader",

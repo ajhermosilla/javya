@@ -212,7 +212,8 @@
     "markPending": "Marcar como pendiente",
     "addFailed": "Error al agregar asignación",
     "deleteFailed": "Error al eliminar asignación",
-    "confirmFailed": "Error al actualizar confirmación"
+    "confirmFailed": "Error al actualizar confirmación",
+    "usersLoadError": "Error al cargar miembros del equipo. La edición de asignaciones puede estar limitada."
   },
   "serviceRoles": {
     "worship_leader": "Líder de Adoración",

@@ -32,6 +32,8 @@ export function SetlistAssignmentEditor({
   const [selectedUserId, setSelectedUserId] = useState('');
   const [notes, setNotes] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [addingAssignment, setAddingAssignment] = useState(false);
+  const [operationInProgress, setOperationInProgress] = useState<string | null>(null);
 
   const {
     assignments,
@@ -49,13 +51,14 @@ export function SetlistAssignmentEditor({
   );
 
   const handleAddAssignment = async () => {
-    if (!selectedUserId) {
-      setError(t('scheduling.selectUser'));
+    if (!selectedUserId || addingAssignment) {
+      if (!selectedUserId) setError(t('scheduling.selectUser'));
       return;
     }
 
     try {
       setError(null);
+      setAddingAssignment(true);
       const data: SetlistAssignmentCreate = {
         user_id: selectedUserId,
         service_role: selectedRole,
@@ -66,22 +69,32 @@ export function SetlistAssignmentEditor({
       setNotes('');
     } catch (err) {
       setError(err instanceof Error ? err.message : t('scheduling.addFailed'));
+    } finally {
+      setAddingAssignment(false);
     }
   };
 
   const handleDeleteAssignment = async (assignmentId: string) => {
+    if (operationInProgress) return;
     try {
+      setOperationInProgress(`delete-${assignmentId}`);
       await deleteAssignment(assignmentId);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('scheduling.deleteFailed'));
+    } finally {
+      setOperationInProgress(null);
     }
   };
 
   const handleToggleConfirm = async (assignmentId: string, currentConfirmed: boolean) => {
+    if (operationInProgress) return;
     try {
+      setOperationInProgress(`confirm-${assignmentId}`);
       await confirmAssignment(assignmentId, !currentConfirmed);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('scheduling.confirmFailed'));
+    } finally {
+      setOperationInProgress(null);
     }
   };
 
@@ -166,15 +179,16 @@ export function SetlistAssignmentEditor({
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder={t('scheduling.notesPlaceholder')}
+                  maxLength={500}
                 />
               </div>
 
               <button
                 className="add-btn"
                 onClick={handleAddAssignment}
-                disabled={!selectedUserId}
+                disabled={!selectedUserId || addingAssignment}
               >
-                {t('scheduling.addMember')}
+                {addingAssignment ? t('common.loading') : t('scheduling.addMember')}
               </button>
             </div>
           </section>
@@ -205,13 +219,18 @@ export function SetlistAssignmentEditor({
                           onClick={() =>
                             handleToggleConfirm(assignment.id, assignment.confirmed)
                           }
+                          disabled={operationInProgress !== null}
                           title={
                             assignment.confirmed
                               ? t('scheduling.markPending')
                               : t('scheduling.markConfirmed')
                           }
                         >
-                          {assignment.confirmed ? t('scheduling.confirmed') : t('scheduling.pending')}
+                          {operationInProgress === `confirm-${assignment.id}`
+                            ? '...'
+                            : assignment.confirmed
+                              ? t('scheduling.confirmed')
+                              : t('scheduling.pending')}
                         </button>
                       ) : (
                         <span className={`status-badge ${assignment.confirmed ? 'confirmed' : 'pending'}`}>
@@ -221,9 +240,10 @@ export function SetlistAssignmentEditor({
                       <button
                         className="delete-btn"
                         onClick={() => handleDeleteAssignment(assignment.id)}
+                        disabled={operationInProgress !== null}
                         title={t('common.delete')}
                       >
-                        &times;
+                        {operationInProgress === `delete-${assignment.id}` ? '...' : '\u00D7'}
                       </button>
                     </div>
                   </li>

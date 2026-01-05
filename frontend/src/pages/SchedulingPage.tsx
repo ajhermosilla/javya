@@ -37,6 +37,7 @@ export function SchedulingPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('calendar');
   const [editingSetlist, setEditingSetlist] = useState<CalendarSetlist | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [usersError, setUsersError] = useState<string | null>(null);
 
   const { startDate, endDate } = useMemo(
     () => getMonthRange(currentYear, currentMonth),
@@ -50,11 +51,15 @@ export function SchedulingPage() {
   // Fetch users for assignment editor
   useEffect(() => {
     if (isAdminOrLeader) {
+      setUsersError(null);
       api.get<User[]>('/api/v1/users/')
         .then(setUsers)
-        .catch(console.error);
+        .catch((err) => {
+          console.error(err);
+          setUsersError(t('scheduling.usersLoadError'));
+        });
     }
-  }, [isAdminOrLeader]);
+  }, [isAdminOrLeader, t]);
 
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
@@ -144,6 +149,10 @@ export function SchedulingPage() {
           &rarr;
         </button>
       </div>
+
+      {usersError && (
+        <div className="warning-banner">{usersError}</div>
+      )}
 
       {viewMode === 'calendar' ? (
         <ScheduleCalendar
