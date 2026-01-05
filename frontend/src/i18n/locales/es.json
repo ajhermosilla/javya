@@ -4,7 +4,8 @@
   },
   "nav": {
     "songs": "Canciones",
-    "setlists": "Listas"
+    "setlists": "Listas",
+    "availability": "Disponibilidad"
   },
   "auth": {
     "tagline": "Planificación de adoración para equipos de iglesia",
@@ -102,7 +103,12 @@
     "back": "Volver",
     "filter": "Filtrar",
     "clearFilters": "Limpiar Filtros",
-    "select": "Seleccionar..."
+    "select": "Seleccionar...",
+    "create": "Crear",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar"
   },
   "setlistForm": {
     "serviceDate": "Fecha del Servicio",
@@ -139,5 +145,45 @@
     "Special": "Especial",
     "Retreat": "Retiro",
     "Other": "Otro"
+  },
+  "availability": {
+    "title": "Mi Disponibilidad",
+    "teamTitle": "Disponibilidad del Equipo",
+    "showPatterns": "Mostrar Patrones",
+    "hidePatterns": "Ocultar Patrones",
+    "clickToChange": "Haz clic en un día para cambiar tu disponibilidad",
+    "status": {
+      "available": "Disponible",
+      "unavailable": "No disponible",
+      "maybe": "Tal vez"
+    },
+    "weekdays": {
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mié",
+      "thu": "Jue",
+      "fri": "Vie",
+      "sat": "Sáb",
+      "sun": "Dom"
+    },
+    "patterns": {
+      "title": "Patrones Recurrentes",
+      "add": "Agregar Patrón",
+      "empty": "No hay patrones definidos. Crea un patrón para establecer disponibilidad recurrente.",
+      "dayOfWeek": "Día",
+      "patternType": "Frecuencia",
+      "status": "Estado",
+      "startDate": "Fecha de Inicio",
+      "endDate": "Fecha de Fin",
+      "note": "Nota",
+      "notePlaceholder": "Nota opcional...",
+      "activate": "Activar",
+      "deactivate": "Desactivar",
+      "types": {
+        "weekly": "Semanal",
+        "biweekly": "Quincenal",
+        "monthly": "Mensual"
+      }
+    }
   }
 }

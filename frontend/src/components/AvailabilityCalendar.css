@@ -1,0 +1,132 @@
+.availability-calendar {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.weekday {
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: none;
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  padding: 0.5rem;
+}
+
+.calendar-day:nth-child(7n) {
+  border-right: none;
+}
+
+.calendar-day:hover {
+  background: var(--bg-hover);
+}
+
+.calendar-day.other-month {
+  background: var(--bg-secondary);
+}
+
+.calendar-day.other-month .day-number {
+  color: var(--text-muted);
+}
+
+.calendar-day.today {
+  background: var(--bg-accent);
+}
+
+.calendar-day.today .day-number {
+  font-weight: 700;
+  color: var(--accent-color);
+}
+
+.day-number {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-indicator.available {
+  background-color: #22c55e;
+}
+
+.status-indicator.unavailable {
+  background-color: #ef4444;
+}
+
+.status-indicator.maybe {
+  background-color: #f59e0b;
+}
+
+/* Status background colors for the entire day cell */
+.calendar-day.status-available {
+  background: rgba(34, 197, 94, 0.15);
+}
+
+.calendar-day.status-available:hover {
+  background: rgba(34, 197, 94, 0.25);
+}
+
+.calendar-day.status-unavailable {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.calendar-day.status-unavailable:hover {
+  background: rgba(239, 68, 68, 0.25);
+}
+
+.calendar-day.status-maybe {
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.calendar-day.status-maybe:hover {
+  background: rgba(245, 158, 11, 0.25);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .weekday {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .day-number {
+    font-size: 0.75rem;
+  }
+
+  .status-indicator {
+    width: 6px;
+    height: 6px;
+  }
+}

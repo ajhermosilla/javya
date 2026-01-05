@@ -4,7 +4,8 @@
   },
   "nav": {
     "songs": "Songs",
-    "setlists": "Setlists"
+    "setlists": "Setlists",
+    "availability": "Availability"
   },
   "auth": {
     "tagline": "Worship planning for church teams",
@@ -102,7 +103,12 @@
     "back": "Back",
     "filter": "Filter",
     "clearFilters": "Clear Filters",
-    "select": "Select..."
+    "select": "Select...",
+    "create": "Create",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete"
   },
   "setlistForm": {
     "serviceDate": "Service Date",
@@ -139,5 +145,45 @@
     "Special": "Special",
     "Retreat": "Retreat",
     "Other": "Other"
+  },
+  "availability": {
+    "title": "My Availability",
+    "teamTitle": "Team Availability",
+    "showPatterns": "Show Patterns",
+    "hidePatterns": "Hide Patterns",
+    "clickToChange": "Click on a day to change your availability",
+    "status": {
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "maybe": "Maybe"
+    },
+    "weekdays": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "patterns": {
+      "title": "Recurring Patterns",
+      "add": "Add Pattern",
+      "empty": "No patterns defined. Create a pattern to set recurring availability.",
+      "dayOfWeek": "Day",
+      "patternType": "Frequency",
+      "status": "Status",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "note": "Note",
+      "notePlaceholder": "Optional note...",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "types": {
+        "weekly": "Weekly",
+        "biweekly": "Biweekly",
+        "monthly": "Monthly"
+      }
+    }
   }
 }

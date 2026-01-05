@@ -1,0 +1,111 @@
+.availability-page {
+  padding: 1rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.availability-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.availability-page h1 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.nav-button {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.nav-button:hover {
+  background: var(--bg-hover);
+}
+
+.month-name {
+  font-size: 1.25rem;
+  font-weight: 500;
+  min-width: 200px;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.legend {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.legend-color.available {
+  background-color: #22c55e;
+}
+
+.legend-color.unavailable {
+  background-color: #ef4444;
+}
+
+.legend-color.maybe {
+  background-color: #f59e0b;
+}
+
+.help-text {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.btn-secondary {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-hover);
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
+.error {
+  color: #ef4444;
+}

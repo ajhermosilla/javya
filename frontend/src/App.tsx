@@ -5,10 +5,11 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import { Layout } from './components/Layout'
 import { SongList } from './pages/SongList'
 import { SetlistList } from './pages/SetlistList'
+import { AvailabilityPage } from './pages/AvailabilityPage'
 import { LoginPage } from './pages/LoginPage'
 import './App.css'
 
-type Page = 'songs' | 'setlists';
+type Page = 'songs' | 'setlists' | 'availability';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState<Page>('songs');
@@ -17,6 +18,7 @@ function AppContent() {
     <Layout currentPage={currentPage} onNavigate={setCurrentPage}>
       {currentPage === 'songs' && <SongList />}
       {currentPage === 'setlists' && <SetlistList />}
+      {currentPage === 'availability' && <AvailabilityPage />}
     </Layout>
   )
 }
