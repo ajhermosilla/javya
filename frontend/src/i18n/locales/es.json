@@ -103,7 +103,9 @@
     "addSongs": "Agregar Canciones",
     "songOrder": "Orden de Canciones",
     "noSongs": "Aún no hay canciones. Agrega canciones desde el panel derecho.",
-    "allSongsAdded": "Todas las canciones han sido agregadas"
+    "allSongsAdded": "Todas las canciones han sido agregadas",
+    "exportFreeshow": "Exportar a FreeShow",
+    "exporting": "Exportando..."
   },
   "eventTypes": {
     "Sunday": "Domingo",

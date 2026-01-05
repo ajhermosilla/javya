@@ -103,7 +103,9 @@
     "addSongs": "Add Songs",
     "songOrder": "Song Order",
     "noSongs": "No songs added yet. Add songs from the right panel.",
-    "allSongsAdded": "All songs have been added"
+    "allSongsAdded": "All songs have been added",
+    "exportFreeshow": "Export to FreeShow",
+    "exporting": "Exporting..."
   },
   "eventTypes": {
     "Sunday": "Sunday",

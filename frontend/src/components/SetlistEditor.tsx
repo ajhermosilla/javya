@@ -23,6 +23,8 @@ import type { SetlistSong, SetlistSongCreate } from '../types/setlist';
 import type { Song } from '../types/song';
 import './SetlistEditor.css';
 
+type ExportFormat = 'freeshow';
+
 interface SetlistEditorProps {
   setlistId: string;
   onBack: () => void;
@@ -33,6 +35,7 @@ export function SetlistEditor({ setlistId, onBack }: SetlistEditorProps) {
   const { setlist, loading, refetch } = useSetlist(setlistId);
   const [songs, setSongs] = useState<SetlistSong[]>([]);
   const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
   const sensors = useSensors(
@@ -112,6 +115,21 @@ export function SetlistEditor({ setlistId, onBack }: SetlistEditorProps) {
     }
   };
 
+  const handleExport = async (format: ExportFormat) => {
+    if (!setlist) return;
+
+    setExporting(true);
+    try {
+      if (format === 'freeshow') {
+        await setlistsApi.exportFreeshow(setlist.id, setlist.name);
+      }
+    } catch (error) {
+      console.error('Failed to export setlist:', error);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (loading || !setlist) {
     return (
       <div className="setlist-editor">
@@ -138,13 +156,22 @@ export function SetlistEditor({ setlistId, onBack }: SetlistEditorProps) {
             )}
           </div>
         </div>
-        <button
-          className="save-button"
-          onClick={handleSave}
-          disabled={!hasChanges || saving}
-        >
-          {saving ? t('form.saving') : t('form.save')}
-        </button>
+        <div className="editor-header-actions">
+          <button
+            className="export-button"
+            onClick={() => handleExport('freeshow')}
+            disabled={exporting || songs.length === 0}
+          >
+            {exporting ? t('setlistEditor.exporting') : t('setlistEditor.exportFreeshow')}
+          </button>
+          <button
+            className="save-button"
+            onClick={handleSave}
+            disabled={!hasChanges || saving}
+          >
+            {saving ? t('form.saving') : t('form.save')}
+          </button>
+        </div>
       </header>
 
       <div className="editor-content">

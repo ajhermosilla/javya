@@ -14,4 +14,20 @@ export const setlistsApi = {
     api.put<Setlist>(`${BASE_PATH}/${id}`, data),
 
   delete: (id: string) => api.delete(`${BASE_PATH}/${id}`),
+
+  exportFreeshow: async (id: string, filename: string) => {
+    const response = await fetch(`${BASE_PATH}/${id}/export/freeshow`);
+    if (!response.ok) {
+      throw new Error('Export failed');
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}.project`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  },
 };

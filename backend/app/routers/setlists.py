@@ -1,7 +1,9 @@
+import json
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select, func
+from fastapi.responses import Response
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -15,6 +17,7 @@ from app.schemas.setlist import (
     SetlistResponse,
     SetlistDetailResponse,
 )
+from app.services.export_freeshow import generate_freeshow_project
 
 router = APIRouter()
 
@@ -172,3 +175,38 @@ async def delete_setlist(
 
     await db.delete(setlist)
     await db.commit()
+
+
+@router.get("/{setlist_id}/export/freeshow")
+async def export_setlist_freeshow(
+    setlist_id: UUID,
+    db: AsyncSession = Depends(get_db),
+) -> Response:
+    """Export a setlist to FreeShow .show format."""
+    result = await db.execute(
+        select(Setlist)
+        .options(selectinload(Setlist.songs).selectinload(SetlistSong.song))
+        .where(Setlist.id == setlist_id)
+    )
+    setlist = result.scalar_one_or_none()
+
+    if not setlist:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Setlist with id {setlist_id} not found",
+        )
+
+    # Generate FreeShow project
+    freeshow_data = generate_freeshow_project(setlist)
+
+    # Create filename from setlist name
+    safe_name = "".join(c for c in setlist.name if c.isalnum() or c in " -_").strip()
+    filename = f"{safe_name or 'setlist'}.project"
+
+    return Response(
+        content=json.dumps(freeshow_data, indent=2),
+        media_type="application/json",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"'
+        },
+    )
