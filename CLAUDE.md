@@ -6,11 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Javya is an open-source worship planning platform for church teams. It helps manage songs, build setlists, and export presentations. The name comes from Guaraní "javy'a" meaning "let us rejoice together."
 
-## Current Status: v0.2 Complete
+## Current Status: v0.3 Complete
 
 ### Features
 - **Songs**: Full CRUD, search/filter, detail view with lyrics/ChordPro
 - **Setlists**: Create setlists with drag-and-drop song ordering
+- **Export**: Export setlists to FreeShow (.project) and Quelea (.qsch)
 - **Navigation**: Collapsible sidebar menu
 - **i18n**: English and Spanish with language switcher
 - **Backend**: FastAPI + async SQLAlchemy + PostgreSQL
@@ -74,6 +75,17 @@ docker compose exec frontend npm run dev
 | PUT | `/{id}` | Update song |
 | DELETE | `/{id}` | Delete song |
 
+### Setlists (`/api/v1/setlists`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | List setlists (supports `?search=`, `?event_type=`) |
+| POST | `/` | Create setlist with songs |
+| GET | `/{id}` | Get setlist with songs |
+| PUT | `/{id}` | Update setlist and songs |
+| DELETE | `/{id}` | Delete setlist |
+| GET | `/{id}/export/freeshow` | Export to FreeShow (.project) |
+| GET | `/{id}/export/quelea` | Export to Quelea (.qsch) |
+
 ## Architecture
 
 ### Backend Structure (`backend/`)
@@ -85,7 +97,8 @@ app/
 ├── models/          # SQLAlchemy ORM models
 ├── schemas/         # Pydantic request/response
 ├── routers/         # API route handlers
-├── enums/           # MusicalKey, Mood, Theme
+├── services/        # Business logic (export generators)
+├── enums/           # MusicalKey, Mood, Theme, EventType
 alembic/             # Database migrations
 tests/               # Pytest test suite
 ```
@@ -95,18 +108,22 @@ tests/               # Pytest test suite
 src/
 ├── api/             # API client and endpoints
 │   ├── client.ts    # Fetch wrapper with error handling
-│   └── songs.ts     # Songs API methods
+│   ├── songs.ts     # Songs API methods
+│   └── setlists.ts  # Setlists API methods (CRUD + export)
 ├── components/      # Reusable UI components
+│   ├── Layout       # App layout with sidebar
+│   ├── Sidebar      # Navigation sidebar
 │   ├── SongCard     # Song card with metadata
 │   ├── SongDetail   # Full song view with lyrics
 │   ├── SongForm     # Create/edit form
-│   ├── SearchBar    # Search input
-│   ├── FilterBar    # Key/mood/theme filters
+│   ├── SetlistCard  # Setlist card
+│   ├── SetlistForm  # Create/edit setlist form
+│   ├── SetlistEditor # Drag-and-drop song ordering + export
 │   └── LanguageSwitcher
 ├── pages/
-│   └── SongList     # Main page with list/detail/form views
-├── hooks/
-│   └── useSongs.ts  # Data fetching hook
+│   ├── SongList     # Songs page with list/detail/form views
+│   └── SetlistList  # Setlists page
+├── hooks/           # Data fetching hooks
 ├── i18n/            # Translations (en, es)
 └── types/           # TypeScript types
 ```
