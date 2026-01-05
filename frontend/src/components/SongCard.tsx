@@ -20,6 +20,7 @@ export function SongCard({ song, onClick, onEdit, onDelete }: SongCardProps) {
         onDelete();
       } catch (error) {
         console.error('Failed to delete song:', error);
+        alert(t('common.deleteFailed'));
       }
     }
   };

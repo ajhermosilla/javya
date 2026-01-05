@@ -20,6 +20,7 @@ export function SetlistCard({ setlist, onClick, onEdit, onDelete }: SetlistCardP
         onDelete();
       } catch (error) {
         console.error('Failed to delete setlist:', error);
+        alert(t('common.deleteFailed'));
       }
     }
   };

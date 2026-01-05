@@ -3,6 +3,25 @@ import type { Setlist, SetlistCreate, SetlistUpdate } from '../types/setlist';
 
 const BASE_PATH = '/api/v1/setlists';
 
+/**
+ * Download a blob as a file with proper cleanup.
+ */
+function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  try {
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+  } finally {
+    if (a.parentNode) {
+      document.body.removeChild(a);
+    }
+    URL.revokeObjectURL(url);
+  }
+}
+
 export const setlistsApi = {
   list: () => api.get<Setlist[]>(`${BASE_PATH}/`),
 
@@ -21,14 +40,7 @@ export const setlistsApi = {
       throw new Error('Export failed');
     }
     const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${filename}.project`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    downloadBlob(blob, `${filename}.project`);
   },
 
   exportQuelea: async (id: string, filename: string) => {
@@ -37,13 +49,6 @@ export const setlistsApi = {
       throw new Error('Export failed');
     }
     const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${filename}.qsch`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    downloadBlob(blob, `${filename}.qsch`);
   },
 };

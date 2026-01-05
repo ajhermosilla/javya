@@ -23,6 +23,15 @@ from app.services.export_quelea import generate_quelea_schedule
 router = APIRouter()
 
 
+def sanitize_filename(name: str, fallback_id: UUID) -> str:
+    """Create a safe filename from a name, using ID as fallback for uniqueness."""
+    safe_name = "".join(c for c in name if c.isalnum() or c in " -_").strip()
+    if not safe_name:
+        # Use first 8 chars of UUID for uniqueness
+        safe_name = f"setlist-{str(fallback_id)[:8]}"
+    return safe_name
+
+
 @router.post("/", response_model=SetlistDetailResponse, status_code=status.HTTP_201_CREATED)
 async def create_setlist(
     setlist_data: SetlistCreate,
@@ -201,8 +210,7 @@ async def export_setlist_freeshow(
     freeshow_data = generate_freeshow_project(setlist)
 
     # Create filename from setlist name
-    safe_name = "".join(c for c in setlist.name if c.isalnum() or c in " -_").strip()
-    filename = f"{safe_name or 'setlist'}.project"
+    filename = f"{sanitize_filename(setlist.name, setlist.id)}.project"
 
     return Response(
         content=json.dumps(freeshow_data, indent=2),
@@ -236,8 +244,7 @@ async def export_setlist_quelea(
     quelea_data = generate_quelea_schedule(setlist)
 
     # Create filename from setlist name
-    safe_name = "".join(c for c in setlist.name if c.isalnum() or c in " -_").strip()
-    filename = f"{safe_name or 'setlist'}.qsch"
+    filename = f"{sanitize_filename(setlist.name, setlist.id)}.qsch"
 
     return Response(
         content=quelea_data,

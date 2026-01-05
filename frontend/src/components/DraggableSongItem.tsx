@@ -38,12 +38,12 @@ export function DraggableSongItem({ item, onRemove }: DraggableSongItemProps) {
       <div className="song-info">
         <span className="song-position">{item.position + 1}</span>
         <div className="song-details">
-          <span className="song-name">{item.song.name}</span>
-          {item.song.artist && (
+          <span className="song-name">{item.song?.name ?? t('common.error')}</span>
+          {item.song?.artist && (
             <span className="song-artist">{item.song.artist}</span>
           )}
         </div>
-        {item.song.original_key && (
+        {item.song?.original_key && (
           <span className="song-key">{t(`keys.${item.song.original_key}`)}</span>
         )}
       </div>

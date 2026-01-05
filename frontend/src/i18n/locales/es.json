@@ -77,6 +77,7 @@
   "common": {
     "loading": "Cargando...",
     "error": "Ocurrió un error",
+    "deleteFailed": "Error al eliminar. Por favor, intenta de nuevo.",
     "retry": "Reintentar",
     "back": "Volver",
     "filter": "Filtrar",
