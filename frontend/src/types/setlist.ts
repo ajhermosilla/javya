@@ -16,6 +16,7 @@ export interface Setlist {
   description: string | null;
   service_date: string | null;
   event_type: EventType | null;
+  song_count: number;
   created_at: string;
   updated_at: string;
   songs?: SetlistSong[];

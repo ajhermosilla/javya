@@ -57,6 +57,7 @@ class SetlistResponse(SetlistBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
+    song_count: int = 0
     created_at: datetime
     updated_at: datetime
 

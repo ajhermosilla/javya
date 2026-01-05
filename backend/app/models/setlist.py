@@ -42,3 +42,8 @@ class Setlist(Base):
         order_by="SetlistSong.position",
         cascade="all, delete-orphan",
     )
+
+    @property
+    def song_count(self) -> int:
+        """Return the number of songs in this setlist."""
+        return len(self.songs) if self.songs else 0

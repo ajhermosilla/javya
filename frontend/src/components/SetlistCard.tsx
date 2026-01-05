@@ -29,7 +29,7 @@ export function SetlistCard({ setlist, onClick, onEdit, onDelete }: SetlistCardP
     return new Date(dateStr).toLocaleDateString();
   };
 
-  const songCount = setlist.songs?.length ?? 0;
+  const songCount = setlist.song_count;
 
   return (
     <div className="setlist-card">
