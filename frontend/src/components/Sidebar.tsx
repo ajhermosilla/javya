@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import './Sidebar.css';
 
@@ -12,6 +13,7 @@ interface SidebarProps {
 
 export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   const { t } = useTranslation();
+  const { user, logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -45,7 +47,22 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
       </nav>
 
       <div className="sidebar-footer">
-        {!collapsed && <LanguageSwitcher />}
+        {!collapsed && (
+          <>
+            <LanguageSwitcher />
+            {user && (
+              <div className="user-section">
+                <div className="user-info">
+                  <span className="user-name">{user.name}</span>
+                  <span className="user-role">{t(`roles.${user.role}`)}</span>
+                </div>
+                <button className="logout-button" onClick={logout}>
+                  {t('auth.logout')}
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </aside>
   );

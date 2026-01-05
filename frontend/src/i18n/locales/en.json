@@ -6,6 +6,25 @@
     "songs": "Songs",
     "setlists": "Setlists"
   },
+  "auth": {
+    "tagline": "Worship planning for church teams",
+    "login": "Sign In",
+    "register": "Create Account",
+    "logout": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "hasAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "error": {
+      "generic": "An error occurred. Please try again."
+    }
+  },
+  "roles": {
+    "admin": "Administrator",
+    "leader": "Leader",
+    "member": "Member"
+  },
   "songs": {
     "title": "Songs",
     "addSong": "Add Song",

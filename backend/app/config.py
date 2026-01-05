@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     debug: bool = True
     secret_key: str = "generate_a_random_secret_key_here"
 
+    # JWT
+    jwt_algorithm: str = "HS256"
+    jwt_expire_minutes: int = 60 * 24 * 7  # 7 days
+
     # CORS
     cors_origins: str = "http://localhost:3000,http://localhost:5173"
 

@@ -6,6 +6,25 @@
     "songs": "Canciones",
     "setlists": "Listas"
   },
+  "auth": {
+    "tagline": "Planificación de adoración para equipos de iglesia",
+    "login": "Iniciar Sesión",
+    "register": "Crear Cuenta",
+    "logout": "Cerrar Sesión",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "name": "Nombre",
+    "hasAccount": "¿Ya tienes una cuenta?",
+    "noAccount": "¿No tienes una cuenta?",
+    "error": {
+      "generic": "Ocurrió un error. Por favor, intenta de nuevo."
+    }
+  },
+  "roles": {
+    "admin": "Administrador",
+    "leader": "Líder",
+    "member": "Miembro"
+  },
   "songs": {
     "title": "Canciones",
     "addSong": "Agregar Canción",

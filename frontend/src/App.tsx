@@ -1,12 +1,16 @@
 import { useState } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { AuthProvider } from './contexts/AuthContext'
+import { ProtectedRoute } from './components/ProtectedRoute'
 import { Layout } from './components/Layout'
 import { SongList } from './pages/SongList'
 import { SetlistList } from './pages/SetlistList'
+import { LoginPage } from './pages/LoginPage'
 import './App.css'
 
 type Page = 'songs' | 'setlists';
 
-function App() {
+function AppContent() {
   const [currentPage, setCurrentPage] = useState<Page>('songs');
 
   return (
@@ -14,6 +18,26 @@ function App() {
       {currentPage === 'songs' && <SongList />}
       {currentPage === 'setlists' && <SetlistList />}
     </Layout>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/*"
+            element={
+              <ProtectedRoute>
+                <AppContent />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
 
