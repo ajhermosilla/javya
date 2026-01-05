@@ -25,15 +25,15 @@ Javya consolidates this into one reliable tool.
 
 ## Features
 
-### v0.2 (Current)
+### v0.3 (Current)
 - [x] Song database with lyrics, chords, keys, mood, and themes
 - [x] ChordPro chart storage
 - [x] Search and filter songs
 - [x] Multi-language support (English, Spanish)
 - [x] Setlist builder with drag-and-drop
+- [x] Export to FreeShow (.project) and Quelea (.qsch)
 
 ### Roadmap
-- [ ] **v0.3** — Export to Quelea/FreeShow presentation software
 - [ ] **v0.4** — Team availability and scheduling
 
 ---
@@ -84,7 +84,8 @@ javya/
 │   │   ├── models/           # SQLAlchemy models
 │   │   ├── schemas/          # Pydantic schemas
 │   │   ├── routers/          # API routes
-│   │   └── enums/            # Mood, Theme, Key enums
+│   │   ├── services/         # Export generators (FreeShow, Quelea)
+│   │   └── enums/            # Mood, Theme, Key, EventType enums
 │   ├── alembic/              # Database migrations
 │   └── Dockerfile
 ├── frontend/
