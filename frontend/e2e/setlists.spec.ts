@@ -1,15 +1,19 @@
 import { test, expect } from '@playwright/test';
 
+// Helper to get the main content page title (not sidebar)
+const getPageTitle = (page: import('@playwright/test').Page) =>
+  page.locator('main h1');
+
 test.describe('Setlists', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    // Navigate to setlists page
-    await page.getByRole('link', { name: /setlists/i }).click();
-    await expect(page.locator('h1')).toContainText('Setlists');
+    // Navigate to setlists page (sidebar uses buttons, not links)
+    await page.getByRole('button', { name: /setlists/i }).click();
+    await expect(getPageTitle(page)).toContainText('Setlists');
   });
 
   test('displays setlists page with title', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('Setlists');
+    await expect(getPageTitle(page)).toContainText('Setlists');
     await expect(page.getByRole('button', { name: /add setlist/i })).toBeVisible();
   });
 
@@ -30,7 +34,7 @@ test.describe('Setlists', () => {
     await page.getByRole('button', { name: /save/i }).click();
 
     // Should return to list and show the new setlist
-    await expect(page.locator('h1')).toContainText('Setlists');
+    await expect(getPageTitle(page)).toContainText('Setlists');
     await expect(page.getByText('Sunday Service E2E')).toBeVisible();
   });
 
@@ -39,7 +43,7 @@ test.describe('Setlists', () => {
     await page.getByLabel(/song name/i).fill('Should Not Exist');
     await page.getByRole('button', { name: /cancel/i }).click();
 
-    await expect(page.locator('h1')).toContainText('Setlists');
+    await expect(getPageTitle(page)).toContainText('Setlists');
     await expect(page.getByText('Should Not Exist')).not.toBeVisible();
   });
 
@@ -50,7 +54,7 @@ test.describe('Setlists', () => {
     await page.getByRole('button', { name: /save/i }).click();
 
     // Wait for return to list
-    await expect(page.locator('h1')).toContainText('Setlists');
+    await expect(getPageTitle(page)).toContainText('Setlists');
 
     // Click on the setlist to view editor
     await page.getByText('Setlist To View').click();
@@ -68,11 +72,11 @@ test.describe('Setlists', () => {
     await page.getByRole('button', { name: /save/i }).click();
 
     // Wait for return to list
-    await expect(page.locator('h1')).toContainText('Setlists');
+    await expect(getPageTitle(page)).toContainText('Setlists');
 
-    // Find and click edit button
+    // Find and click edit button (use class selector to avoid matching header button)
     const setlistCard = page.locator('.setlist-card', { hasText: 'Setlist To Edit' });
-    await setlistCard.getByRole('button', { name: /edit/i }).click();
+    await setlistCard.locator('.edit-button').click();
 
     // Should show edit form
     await expect(page.getByRole('heading', { name: /edit setlist/i })).toBeVisible();
@@ -82,7 +86,7 @@ test.describe('Setlists', () => {
     await page.getByRole('button', { name: /save/i }).click();
 
     // Should return to list with updated name
-    await expect(page.locator('h1')).toContainText('Setlists');
+    await expect(getPageTitle(page)).toContainText('Setlists');
     await expect(page.getByText('Setlist Edited')).toBeVisible();
   });
 
@@ -93,15 +97,15 @@ test.describe('Setlists', () => {
     await page.getByRole('button', { name: /save/i }).click();
 
     // Wait for return to list
-    await expect(page.locator('h1')).toContainText('Setlists');
+    await expect(getPageTitle(page)).toContainText('Setlists');
     await expect(page.getByText('Setlist To Delete')).toBeVisible();
 
     // Set up dialog handler before clicking delete
     page.on('dialog', dialog => dialog.accept());
 
-    // Find and click delete button
+    // Find and click delete button (use class selector to avoid matching header button)
     const setlistCard = page.locator('.setlist-card', { hasText: 'Setlist To Delete' });
-    await setlistCard.getByRole('button', { name: /delete/i }).click();
+    await setlistCard.locator('.delete-button').click();
 
     // Setlist should be removed
     await expect(page.getByText('Setlist To Delete')).not.toBeVisible();
@@ -109,15 +113,15 @@ test.describe('Setlists', () => {
 
   test('can add songs to setlist', async ({ page }) => {
     // First create a song
-    await page.getByRole('link', { name: /songs/i }).click();
+    await page.getByRole('button', { name: /songs/i }).click();
     await page.getByRole('button', { name: /add song/i }).click();
     await page.getByLabel(/song name/i).fill('Song For Setlist');
     await page.getByLabel(/lyrics/i).fill('Some lyrics here');
     await page.getByRole('button', { name: /save/i }).click();
-    await expect(page.locator('h1')).toContainText('Songs');
+    await expect(getPageTitle(page)).toContainText('Songs');
 
     // Now create a setlist
-    await page.getByRole('link', { name: /setlists/i }).click();
+    await page.getByRole('button', { name: /setlists/i }).click();
     await page.getByRole('button', { name: /add setlist/i }).click();
     await page.getByLabel(/song name/i).fill('Setlist With Songs');
     await page.getByRole('button', { name: /save/i }).click();
@@ -141,13 +145,13 @@ test.describe('Setlists', () => {
 
   test('shows export buttons in editor', async ({ page }) => {
     // Create a setlist with a song
-    await page.getByRole('link', { name: /songs/i }).click();
+    await page.getByRole('button', { name: /songs/i }).click();
     await page.getByRole('button', { name: /add song/i }).click();
     await page.getByLabel(/song name/i).fill('Export Test Song');
     await page.getByLabel(/lyrics/i).fill('Lyrics for export');
     await page.getByRole('button', { name: /save/i }).click();
 
-    await page.getByRole('link', { name: /setlists/i }).click();
+    await page.getByRole('button', { name: /setlists/i }).click();
     await page.getByRole('button', { name: /add setlist/i }).click();
     await page.getByLabel(/song name/i).fill('Export Test Setlist');
     await page.getByRole('button', { name: /save/i }).click();

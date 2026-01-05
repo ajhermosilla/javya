@@ -22,8 +22,8 @@ setup('authenticate', async ({ page }) => {
   // Submit registration form
   await page.locator('.submit-button').click();
 
-  // Wait for redirect to main app
-  await expect(page.locator('h1')).toContainText('Songs', { timeout: 10000 });
+  // Wait for redirect to main app (check for songs page header specifically)
+  await expect(page.getByRole('heading', { name: 'Songs', level: 1 })).toBeVisible({ timeout: 10000 });
 
   // Save authentication state
   await page.context().storageState({ path: AUTH_FILE });

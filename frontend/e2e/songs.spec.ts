@@ -1,14 +1,18 @@
 import { test, expect } from '@playwright/test';
 
+// Helper to get the main content page title (not sidebar)
+const getPageTitle = (page: import('@playwright/test').Page) =>
+  page.locator('main h1');
+
 test.describe('Songs', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     // Wait for the app to load
-    await expect(page.locator('h1')).toContainText('Songs');
+    await expect(getPageTitle(page)).toContainText('Songs');
   });
 
   test('displays songs page with title', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('Songs');
+    await expect(getPageTitle(page)).toContainText('Songs');
     await expect(page.getByRole('button', { name: /add song/i })).toBeVisible();
   });
 
@@ -36,7 +40,7 @@ test.describe('Songs', () => {
     await page.getByRole('button', { name: /save/i }).click();
 
     // Should return to list and show the new song
-    await expect(page.locator('h1')).toContainText('Songs');
+    await expect(getPageTitle(page)).toContainText('Songs');
     await expect(page.getByText('Test Song E2E')).toBeVisible();
   });
 
@@ -45,7 +49,7 @@ test.describe('Songs', () => {
     await page.getByLabel(/song name/i).fill('Should Not Exist');
     await page.getByRole('button', { name: /cancel/i }).click();
 
-    await expect(page.locator('h1')).toContainText('Songs');
+    await expect(getPageTitle(page)).toContainText('Songs');
     await expect(page.getByText('Should Not Exist')).not.toBeVisible();
   });
 
@@ -56,7 +60,7 @@ test.describe('Songs', () => {
     await page.getByRole('button', { name: /save/i }).click();
 
     // Wait for return to list
-    await expect(page.locator('h1')).toContainText('Songs');
+    await expect(getPageTitle(page)).toContainText('Songs');
 
     // Search for it
     await page.getByPlaceholder(/search/i).fill('Searchable');
@@ -80,7 +84,7 @@ test.describe('Songs', () => {
     await page.getByRole('button', { name: /save/i }).click();
 
     // Wait for return to list
-    await expect(page.locator('h1')).toContainText('Songs');
+    await expect(getPageTitle(page)).toContainText('Songs');
 
     // Click on the song to view details
     await page.getByText('Song With Details').click();
@@ -98,11 +102,11 @@ test.describe('Songs', () => {
     await page.getByRole('button', { name: /save/i }).click();
 
     // Wait for return to list
-    await expect(page.locator('h1')).toContainText('Songs');
+    await expect(getPageTitle(page)).toContainText('Songs');
 
-    // Find and click edit button
+    // Find and click edit button (use class selector to avoid matching header button)
     const songCard = page.locator('.song-card', { hasText: 'Song To Edit' });
-    await songCard.getByRole('button', { name: /edit/i }).click();
+    await songCard.locator('.edit-button').click();
 
     // Should show edit form
     await expect(page.getByRole('heading', { name: /edit song/i })).toBeVisible();
@@ -112,7 +116,7 @@ test.describe('Songs', () => {
     await page.getByRole('button', { name: /save/i }).click();
 
     // Should return to list with updated name
-    await expect(page.locator('h1')).toContainText('Songs');
+    await expect(getPageTitle(page)).toContainText('Songs');
     await expect(page.getByText('Song Edited')).toBeVisible();
     await expect(page.getByText('Song To Edit')).not.toBeVisible();
   });
@@ -124,15 +128,15 @@ test.describe('Songs', () => {
     await page.getByRole('button', { name: /save/i }).click();
 
     // Wait for return to list
-    await expect(page.locator('h1')).toContainText('Songs');
+    await expect(getPageTitle(page)).toContainText('Songs');
     await expect(page.getByText('Song To Delete')).toBeVisible();
 
     // Set up dialog handler before clicking delete
     page.on('dialog', dialog => dialog.accept());
 
-    // Find and click delete button
+    // Find and click delete button (use class selector to avoid matching header button)
     const songCard = page.locator('.song-card', { hasText: 'Song To Delete' });
-    await songCard.getByRole('button', { name: /delete/i }).click();
+    await songCard.locator('.delete-button').click();
 
     // Song should be removed
     await expect(page.getByText('Song To Delete')).not.toBeVisible();
@@ -146,7 +150,7 @@ test.describe('Songs', () => {
     await page.getByRole('button', { name: /save/i }).click();
 
     // Wait for return to list
-    await expect(page.locator('h1')).toContainText('Songs');
+    await expect(getPageTitle(page)).toContainText('Songs');
 
     // Filter by key G
     await page.locator('.filter-select').first().selectOption('G');
