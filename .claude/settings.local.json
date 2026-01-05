@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(gh -R ajhermosilla/javya run list --limit 3)",
-      "Bash(gh -R ajhermosilla/javya run view 20724940403)"
+      "Bash(gh -R ajhermosilla/javya run view 20724940403)",
+      "Bash(gh -R ajhermosilla/javya run view:*)"
     ]
   }
 }

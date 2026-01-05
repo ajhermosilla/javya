@@ -160,12 +160,13 @@ export function SchedulingPage() {
         />
       )}
 
-      {editingSetlist && isAdminOrLeader && (
+      {editingSetlist && isAdminOrLeader && user && (
         <SetlistAssignmentEditor
           setlistId={editingSetlist.id}
           setlistName={editingSetlist.name}
           serviceDate={editingSetlist.service_date}
           users={users}
+          currentUserId={user.id}
           onClose={handleCloseEditor}
         />
       )}

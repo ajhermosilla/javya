@@ -15,6 +15,7 @@ interface SetlistAssignmentEditorProps {
   setlistName: string;
   serviceDate: string | null;
   users: User[];
+  currentUserId: string;
   onClose: () => void;
 }
 
@@ -23,6 +24,7 @@ export function SetlistAssignmentEditor({
   setlistName,
   serviceDate,
   users,
+  currentUserId,
   onClose,
 }: SetlistAssignmentEditorProps) {
   const { t } = useTranslation();
@@ -197,19 +199,25 @@ export function SetlistAssignmentEditor({
                       )}
                     </div>
                     <div className="assignment-actions">
-                      <button
-                        className={`confirm-btn ${assignment.confirmed ? 'confirmed' : ''}`}
-                        onClick={() =>
-                          handleToggleConfirm(assignment.id, assignment.confirmed)
-                        }
-                        title={
-                          assignment.confirmed
-                            ? t('scheduling.markPending')
-                            : t('scheduling.markConfirmed')
-                        }
-                      >
-                        {assignment.confirmed ? t('scheduling.confirmed') : t('scheduling.pending')}
-                      </button>
+                      {assignment.user_id === currentUserId ? (
+                        <button
+                          className={`confirm-btn ${assignment.confirmed ? 'confirmed' : ''}`}
+                          onClick={() =>
+                            handleToggleConfirm(assignment.id, assignment.confirmed)
+                          }
+                          title={
+                            assignment.confirmed
+                              ? t('scheduling.markPending')
+                              : t('scheduling.markConfirmed')
+                          }
+                        >
+                          {assignment.confirmed ? t('scheduling.confirmed') : t('scheduling.pending')}
+                        </button>
+                      ) : (
+                        <span className={`status-badge ${assignment.confirmed ? 'confirmed' : 'pending'}`}>
+                          {assignment.confirmed ? t('scheduling.confirmed') : t('scheduling.pending')}
+                        </span>
+                      )}
                       <button
                         className="delete-btn"
                         onClick={() => handleDeleteAssignment(assignment.id)}

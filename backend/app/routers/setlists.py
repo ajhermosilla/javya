@@ -6,6 +6,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import Response
 from sqlalchemy import and_, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -368,7 +369,7 @@ async def create_assignment(
             detail=f"Setlist with id {setlist_id} not found",
         )
 
-    # Verify user exists
+    # Verify user exists and is active
     user_result = await db.execute(
         select(User).where(User.id == assignment_data.user_id)
     )
@@ -377,6 +378,11 @@ async def create_assignment(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User with id {assignment_data.user_id} not found",
+        )
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot assign inactive user to setlist",
         )
 
     # Check for duplicate assignment
@@ -402,7 +408,14 @@ async def create_assignment(
         notes=assignment_data.notes,
     )
     db.add(assignment)
-    await db.commit()
+    try:
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This user is already assigned to this role in this setlist",
+        )
 
     # Reload with user
     result = await db.execute(

@@ -38,6 +38,8 @@ export interface SetlistAssignment {
 export interface SetlistAssignmentWithUser extends SetlistAssignment {
   user_name: string;
   user_email: string;
+  user_role: string;
+  availability_status: AvailabilityStatus | null;
 }
 
 export interface SetlistAssignmentCreate {
