@@ -120,10 +120,16 @@ export function SetlistAssignmentEditor({
   }, [onClose]);
 
   return (
-    <div className="assignment-editor-overlay" onClick={onClose}>
+    <div
+      className="assignment-editor-overlay"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="assignment-editor-title"
+    >
       <div className="assignment-editor" onClick={(e) => e.stopPropagation()}>
         <header className="editor-header">
-          <h2>{t('scheduling.editAssignments')}</h2>
+          <h2 id="assignment-editor-title">{t('scheduling.editAssignments')}</h2>
           <p className="setlist-info">{setlistName}</p>
           <button className="close-btn" onClick={onClose}>
             &times;

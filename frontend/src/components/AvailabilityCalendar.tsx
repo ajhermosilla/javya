@@ -55,7 +55,7 @@ export function AvailabilityCalendar({
         dayOfMonth: day,
         isCurrentMonth: false,
         isToday: false,
-        status: avail?.status as AvailabilityStatus | null ?? null,
+        status: avail?.status ?? null,
         note: avail?.note ?? null,
       });
     }
@@ -70,7 +70,7 @@ export function AvailabilityCalendar({
         dayOfMonth: day,
         isCurrentMonth: true,
         isToday: date.getTime() === today.getTime(),
-        status: avail?.status as AvailabilityStatus | null ?? null,
+        status: avail?.status ?? null,
         note: avail?.note ?? null,
       });
     }
@@ -86,7 +86,7 @@ export function AvailabilityCalendar({
         dayOfMonth: i,
         isCurrentMonth: false,
         isToday: false,
-        status: avail?.status as AvailabilityStatus | null ?? null,
+        status: avail?.status ?? null,
         note: avail?.note ?? null,
       });
     }

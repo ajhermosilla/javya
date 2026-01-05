@@ -23,15 +23,22 @@ export function clearStoredToken(): void {
   localStorage.removeItem(TOKEN_KEY);
 }
 
+const DEFAULT_TIMEOUT_MS = 30000;
+
 async function request<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  timeoutMs: number = DEFAULT_TIMEOUT_MS
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
   const token = getStoredToken();
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
   const config: RequestInit = {
     ...options,
+    signal: controller.signal,
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -39,7 +46,17 @@ async function request<T>(
     },
   };
 
-  const response = await fetch(url, config);
+  let response: Response;
+  try {
+    response = await fetch(url, config);
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new ApiError(0, 'Request timed out');
+    }
+    throw err;
+  }
+  clearTimeout(timeoutId);
 
   if (!response.ok) {
     // Handle token expiry - clear token and redirect to login

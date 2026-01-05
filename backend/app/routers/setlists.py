@@ -229,6 +229,12 @@ async def export_setlist_freeshow(
             detail=f"Setlist with id {setlist_id} not found",
         )
 
+    if not setlist.songs:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot export an empty setlist. Add songs first.",
+        )
+
     # Generate FreeShow project
     freeshow_data = generate_freeshow_project(setlist)
 
@@ -261,6 +267,12 @@ async def export_setlist_quelea(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Setlist with id {setlist_id} not found",
+        )
+
+    if not setlist.songs:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot export an empty setlist. Add songs first.",
         )
 
     # Generate Quelea schedule ZIP

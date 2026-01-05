@@ -530,15 +530,14 @@ class TestExportSetlist:
     async def test_export_freeshow_empty_setlist(
         self, client: AsyncClient, sample_setlist_data: dict[str, Any]
     ) -> None:
-        """Test exporting an empty setlist to FreeShow format."""
+        """Test exporting an empty setlist returns 400 error."""
         create_response = await client.post("/api/v1/setlists/", json=sample_setlist_data)
         setlist_id = create_response.json()["id"]
 
         response = await client.get(f"/api/v1/setlists/{setlist_id}/export/freeshow")
 
-        assert response.status_code == 200
-        data = response.json()
-        assert data["shows"] == {}
+        assert response.status_code == 400
+        assert "empty setlist" in response.json()["detail"].lower()
 
     @pytest.mark.asyncio
     async def test_export_freeshow_not_found(self, client: AsyncClient) -> None:

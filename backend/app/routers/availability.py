@@ -278,11 +278,21 @@ async def update_pattern(
             detail="Cannot update another user's pattern",
         )
 
-    update_data = pattern_update.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        if hasattr(value, "value"):  # Handle enums
-            value = value.value
-        setattr(pattern, field, value)
+    # Update only provided fields explicitly
+    if pattern_update.pattern_type is not None:
+        pattern.pattern_type = pattern_update.pattern_type
+    if pattern_update.day_of_week is not None:
+        pattern.day_of_week = pattern_update.day_of_week
+    if pattern_update.status is not None:
+        pattern.status = pattern_update.status
+    if pattern_update.start_date is not None:
+        pattern.start_date = pattern_update.start_date
+    if pattern_update.end_date is not None:
+        pattern.end_date = pattern_update.end_date
+    if pattern_update.is_active is not None:
+        pattern.is_active = pattern_update.is_active
+    if pattern_update.note is not None:
+        pattern.note = pattern_update.note
 
     await db.commit()
     await db.refresh(pattern)
