@@ -25,7 +25,11 @@ Javya consolidates this into one reliable tool.
 
 ## Features
 
-### v0.3 (Current)
+### v0.4 (Current)
+- [x] **Authentication** — JWT-based login with secure password hashing
+- [x] **Role-based access** — Admin, Leader, and Member roles
+- [x] **Availability calendar** — Track team member availability by date
+- [x] **Recurring patterns** — Set weekly, biweekly, or monthly availability
 - [x] Song database with lyrics, chords, keys, mood, and themes
 - [x] ChordPro chart storage
 - [x] Search and filter songs
@@ -34,7 +38,7 @@ Javya consolidates this into one reliable tool.
 - [x] Export to FreeShow (.project) and Quelea (.qsch)
 
 ### Roadmap
-- [ ] **v0.4** — Team availability and scheduling
+- [ ] **v0.5** — Team scheduling and service assignments
 
 ---
 
@@ -42,9 +46,10 @@ Javya consolidates this into one reliable tool.
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React + Vite |
-| Backend | FastAPI (Python) |
-| Database | PostgreSQL |
+| Frontend | React 19 + Vite + TypeScript |
+| Backend | FastAPI + async SQLAlchemy |
+| Database | PostgreSQL 16 |
+| Auth | JWT + bcrypt |
 | i18n | react-i18next |
 | Deployment | Docker Compose |
 
@@ -72,6 +77,12 @@ docker compose up -d
 # API Docs: http://localhost:8000/docs
 ```
 
+### First-time setup
+
+1. Open http://localhost:5173
+2. Click "Create Account" to register
+3. **The first user automatically becomes Admin** and can manage roles for subsequent users
+
 ---
 
 ## Project Structure
@@ -81,17 +92,20 @@ javya/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py           # FastAPI entry point
-│   │   ├── models/           # SQLAlchemy models
+│   │   ├── models/           # SQLAlchemy models (User, Song, Setlist, Availability)
 │   │   ├── schemas/          # Pydantic schemas
-│   │   ├── routers/          # API routes
+│   │   ├── routers/          # API routes (auth, songs, setlists, availability)
 │   │   ├── services/         # Export generators (FreeShow, Quelea)
-│   │   └── enums/            # Mood, Theme, Key, EventType enums
+│   │   ├── auth/             # JWT security & dependencies
+│   │   └── enums/            # Role, Mood, Theme, Key, EventType enums
 │   ├── alembic/              # Database migrations
-│   └── Dockerfile
+│   └── tests/                # Pytest test suite
 ├── frontend/
 │   ├── src/
 │   │   ├── components/       # React components
 │   │   ├── pages/            # Page components
+│   │   ├── contexts/         # Auth context
+│   │   ├── hooks/            # Custom hooks
 │   │   ├── api/              # API client
 │   │   └── i18n/             # Translations (en, es)
 │   └── Dockerfile

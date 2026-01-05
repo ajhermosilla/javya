@@ -6,25 +6,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Javya is an open-source worship planning platform for church teams. It helps manage songs, build setlists, and export presentations. The name comes from Guaraní "javy'a" meaning "let us rejoice together."
 
-## Current Status: v0.3 Complete
+## Current Status: v0.4 Complete
 
 ### Features
+- **Authentication**: JWT-based login with bcrypt password hashing
+- **Roles**: Admin > Leader > Member permission hierarchy
+- **Availability**: Calendar-based availability tracking per user
+- **Patterns**: Recurring availability (weekly/biweekly/monthly)
 - **Songs**: Full CRUD, search/filter, detail view with lyrics/ChordPro
 - **Setlists**: Create setlists with drag-and-drop song ordering
 - **Export**: Export setlists to FreeShow (.project) and Quelea (.qsch)
 - **Navigation**: Collapsible sidebar menu
 - **i18n**: English and Spanish with language switcher
 - **Backend**: FastAPI + async SQLAlchemy + PostgreSQL
-- **Frontend**: React + Vite + TypeScript + dnd-kit
+- **Frontend**: React 19 + Vite + TypeScript + dnd-kit
 - **Deployment**: Docker Compose
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React + Vite + TypeScript + react-i18next |
+| Frontend | React 19 + Vite + TypeScript + react-i18next |
 | Backend | FastAPI + async SQLAlchemy + Pydantic |
 | Database | PostgreSQL 16 |
+| Auth | JWT (python-jose) + bcrypt (passlib) |
 | Deployment | Docker Compose |
 
 ## Development Commands
@@ -66,6 +71,20 @@ docker compose exec frontend npm run dev
 
 ## API Endpoints
 
+### Auth (`/api/v1/auth`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/register` | Create account (first user = admin) |
+| POST | `/login` | Get JWT token |
+| GET | `/me` | Get current user |
+
+### Users (`/api/v1/users`) — Admin/Leader only
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | List all users |
+| PUT | `/{id}/role` | Change user role (admin only) |
+| DELETE | `/{id}` | Deactivate user (admin only) |
+
 ### Songs (`/api/v1/songs`)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -73,7 +92,7 @@ docker compose exec frontend npm run dev
 | POST | `/` | Create song |
 | GET | `/{id}` | Get song by ID |
 | PUT | `/{id}` | Update song |
-| DELETE | `/{id}` | Delete song |
+| DELETE | `/{id}` | Delete song (admin/leader only) |
 
 ### Setlists (`/api/v1/setlists`)
 | Method | Endpoint | Description |
@@ -82,9 +101,22 @@ docker compose exec frontend npm run dev
 | POST | `/` | Create setlist with songs |
 | GET | `/{id}` | Get setlist with songs |
 | PUT | `/{id}` | Update setlist and songs |
-| DELETE | `/{id}` | Delete setlist |
+| DELETE | `/{id}` | Delete setlist (admin/leader only) |
 | GET | `/{id}/export/freeshow` | Export to FreeShow (.project) |
 | GET | `/{id}/export/quelea` | Export to Quelea (.qsch) |
+
+### Availability (`/api/v1/availability`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/` | Set date availability |
+| POST | `/bulk` | Set multiple dates at once |
+| GET | `/me` | Get own availability (`?start_date=`, `?end_date=`) |
+| GET | `/team` | Get team availability (admin/leader only) |
+| DELETE | `/{id}` | Delete availability entry |
+| POST | `/patterns` | Create recurring pattern |
+| GET | `/patterns` | Get own patterns |
+| PUT | `/patterns/{id}` | Update pattern |
+| DELETE | `/patterns/{id}` | Delete pattern |
 
 ## Architecture
 
@@ -92,38 +124,44 @@ docker compose exec frontend npm run dev
 ```
 app/
 ├── main.py          # FastAPI entry, CORS, routers
-├── config.py        # Pydantic settings
+├── config.py        # Pydantic settings (includes JWT config)
 ├── database.py      # Async SQLAlchemy engine
-├── models/          # SQLAlchemy ORM models
+├── models/          # SQLAlchemy ORM models (User, Song, Setlist, Availability)
 ├── schemas/         # Pydantic request/response
-├── routers/         # API route handlers
+├── routers/         # API route handlers (auth, users, songs, setlists, availability)
 ├── services/        # Business logic (export generators)
-├── enums/           # MusicalKey, Mood, Theme, EventType
+├── auth/            # Security (password hashing, JWT, dependencies)
+├── enums/           # UserRole, MusicalKey, Mood, Theme, EventType, AvailabilityStatus
 alembic/             # Database migrations
-tests/               # Pytest test suite
+tests/               # Pytest test suite (93 tests)
 ```
 
 ### Frontend Structure (`frontend/`)
 ```
 src/
 ├── api/             # API client and endpoints
-│   ├── client.ts    # Fetch wrapper with error handling
+│   ├── client.ts    # Fetch wrapper with JWT auth
+│   ├── auth.ts      # Auth API (login, register)
 │   ├── songs.ts     # Songs API methods
-│   └── setlists.ts  # Setlists API methods (CRUD + export)
+│   ├── setlists.ts  # Setlists API methods (CRUD + export)
+│   └── availability.ts # Availability API methods
 ├── components/      # Reusable UI components
 │   ├── Layout       # App layout with sidebar
 │   ├── Sidebar      # Navigation sidebar
-│   ├── SongCard     # Song card with metadata
-│   ├── SongDetail   # Full song view with lyrics
-│   ├── SongForm     # Create/edit form
-│   ├── SetlistCard  # Setlist card
-│   ├── SetlistForm  # Create/edit setlist form
-│   ├── SetlistEditor # Drag-and-drop song ordering + export
+│   ├── ProtectedRoute # Auth route guard
+│   ├── AvailabilityCalendar # Month calendar grid
+│   ├── PatternEditor # Recurring pattern form
+│   ├── SongCard, SongDetail, SongForm
+│   ├── SetlistCard, SetlistForm, SetlistEditor
 │   └── LanguageSwitcher
+├── contexts/
+│   └── AuthContext  # Auth state provider
 ├── pages/
-│   ├── SongList     # Songs page with list/detail/form views
-│   └── SetlistList  # Setlists page
-├── hooks/           # Data fetching hooks
+│   ├── LoginPage    # Login/register form
+│   ├── SongList     # Songs page
+│   ├── SetlistList  # Setlists page
+│   └── AvailabilityPage # Availability calendar
+├── hooks/           # Custom hooks (useSongs, useAvailability, etc.)
 ├── i18n/            # Translations (en, es)
 └── types/           # TypeScript types
 ```
@@ -163,3 +201,6 @@ Set in `.env` or docker-compose:
 | `TEST_DATABASE_URL` | Test database connection |
 | `CORS_ORIGINS` | Comma-separated allowed origins |
 | `DEBUG` | Enable SQLAlchemy query logging |
+| `JWT_SECRET_KEY` | Secret for signing JWT tokens |
+| `JWT_ALGORITHM` | JWT algorithm (default: HS256) |
+| `JWT_EXPIRE_MINUTES` | Token expiration (default: 10080 = 7 days) |
