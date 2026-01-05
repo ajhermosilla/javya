@@ -39,7 +39,8 @@ async def get_calendar(
     result = await db.execute(
         select(Setlist)
         .options(
-            selectinload(Setlist.assignments).selectinload(SetlistAssignment.user)
+            selectinload(Setlist.songs),
+            selectinload(Setlist.assignments).selectinload(SetlistAssignment.user),
         )
         .where(
             and_(

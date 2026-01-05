@@ -6,13 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Javya is an open-source worship planning platform for church teams. It helps manage songs, build setlists, and export presentations. The name comes from Guaraní "javy'a" meaning "let us rejoice together."
 
-## Current Status: v0.4 Complete
+## Current Status: v0.5 Complete
 
 ### Features
 - **Authentication**: JWT-based login with bcrypt password hashing
 - **Roles**: Admin > Leader > Member permission hierarchy
 - **Availability**: Calendar-based availability tracking per user
 - **Patterns**: Recurring availability (weekly/biweekly/monthly)
+- **Scheduling**: Team scheduling with service role assignments
+- **Assignments**: Assign team members to setlists with confirmation workflow
 - **Songs**: Full CRUD, search/filter, detail view with lyrics/ChordPro
 - **Setlists**: Create setlists with drag-and-drop song ordering
 - **Export**: Export setlists to FreeShow (.project) and Quelea (.qsch)
@@ -118,6 +120,22 @@ docker compose exec frontend npm run dev
 | PUT | `/patterns/{id}` | Update pattern |
 | DELETE | `/patterns/{id}` | Delete pattern |
 
+### Scheduling (`/api/v1/scheduling`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/calendar` | Get setlists with assignments for date range |
+| GET | `/my-assignments` | Get current user's assignments |
+| GET | `/team-availability` | Check team availability for a date (admin/leader) |
+
+### Setlist Assignments (`/api/v1/setlists/{id}/assignments`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | List assignments for setlist |
+| POST | `/` | Create assignment (admin/leader only) |
+| PUT | `/{assignment_id}` | Update assignment (admin/leader only) |
+| DELETE | `/{assignment_id}` | Delete assignment (admin/leader only) |
+| PATCH | `/{assignment_id}/confirm` | Confirm/unconfirm own assignment |
+
 ## Architecture
 
 ### Backend Structure (`backend/`)
@@ -126,31 +144,36 @@ app/
 ├── main.py          # FastAPI entry, CORS, routers
 ├── config.py        # Pydantic settings (includes JWT config)
 ├── database.py      # Async SQLAlchemy engine
-├── models/          # SQLAlchemy ORM models (User, Song, Setlist, Availability)
+├── models/          # SQLAlchemy ORM models (User, Song, Setlist, Availability, SetlistAssignment)
 ├── schemas/         # Pydantic request/response
-├── routers/         # API route handlers (auth, users, songs, setlists, availability)
+├── routers/         # API route handlers (auth, users, songs, setlists, availability, scheduling)
 ├── services/        # Business logic (export generators)
 ├── auth/            # Security (password hashing, JWT, dependencies)
-├── enums/           # UserRole, MusicalKey, Mood, Theme, EventType, AvailabilityStatus
+├── enums/           # UserRole, MusicalKey, Mood, Theme, EventType, AvailabilityStatus, ServiceRole
 alembic/             # Database migrations
-tests/               # Pytest test suite (93 tests)
+tests/               # Pytest test suite (116 tests)
 ```
 
 ### Frontend Structure (`frontend/`)
 ```
 src/
 ├── api/             # API client and endpoints
-│   ├── client.ts    # Fetch wrapper with JWT auth
+│   ├── client.ts    # Fetch wrapper with JWT auth + timeout
 │   ├── auth.ts      # Auth API (login, register)
 │   ├── songs.ts     # Songs API methods
 │   ├── setlists.ts  # Setlists API methods (CRUD + export)
-│   └── availability.ts # Availability API methods
+│   ├── availability.ts # Availability API methods
+│   └── scheduling.ts # Scheduling API methods
 ├── components/      # Reusable UI components
 │   ├── Layout       # App layout with sidebar
 │   ├── Sidebar      # Navigation sidebar
 │   ├── ProtectedRoute # Auth route guard
+│   ├── ErrorBoundary # Error boundary for graceful failures
 │   ├── AvailabilityCalendar # Month calendar grid
 │   ├── PatternEditor # Recurring pattern form
+│   ├── ScheduleCalendar, ScheduleList # Scheduling views
+│   ├── SetlistAssignmentEditor # Team assignment modal
+│   ├── TeamRoster   # Team availability display
 │   ├── SongCard, SongDetail, SongForm
 │   ├── SetlistCard, SetlistForm, SetlistEditor
 │   └── LanguageSwitcher
@@ -160,10 +183,11 @@ src/
 │   ├── LoginPage    # Login/register form
 │   ├── SongList     # Songs page
 │   ├── SetlistList  # Setlists page
-│   └── AvailabilityPage # Availability calendar
-├── hooks/           # Custom hooks (useSongs, useAvailability, etc.)
+│   ├── AvailabilityPage # Availability calendar
+│   └── SchedulingPage # Team scheduling calendar/list
+├── hooks/           # Custom hooks (useSongs, useAvailability, useScheduling, etc.)
 ├── i18n/            # Translations (en, es)
-└── types/           # TypeScript types
+└── types/           # TypeScript types (includes scheduling.ts)
 ```
 
 ### Key Patterns
