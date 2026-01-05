@@ -25,6 +25,7 @@ export function useSongs(filters: SongFilters = {}): UseSongsResult {
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.search, filters.key, filters.mood, filters.theme]);
 
   useEffect(() => {
