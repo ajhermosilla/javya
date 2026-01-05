@@ -6,15 +6,21 @@ setup('authenticate', async ({ page }) => {
   // Go to login page
   await page.goto('/login');
 
-  // Register a new user (first user becomes admin)
-  await page.getByText(/Don't have an account/i).click();
-  await page.getByRole('button', { name: /Create Account/i }).waitFor();
+  // Wait for the login form to load
+  await page.waitForLoadState('networkidle');
+
+  // Switch to registration mode by clicking the "Create Account" link in toggle-mode section
+  await page.locator('.toggle-mode button').click();
+
+  // Wait for registration form to appear (name field visible)
+  await page.locator('#name').waitFor();
 
   await page.locator('#name').fill('Test User');
   await page.locator('#email').fill(`test-${Date.now()}@example.com`);
   await page.locator('#password').fill('testpassword123');
 
-  await page.getByRole('button', { name: /Create Account/i }).click();
+  // Submit registration form
+  await page.locator('.submit-button').click();
 
   // Wait for redirect to main app
   await expect(page.locator('h1')).toContainText('Songs', { timeout: 10000 });
