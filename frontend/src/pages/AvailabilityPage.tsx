@@ -6,12 +6,20 @@ import { PatternEditor } from '../components/PatternEditor';
 import type { AvailabilityStatus } from '../types/availability';
 import './AvailabilityPage.css';
 
+function formatLocalDate(date: Date): string {
+  // Format as YYYY-MM-DD using local timezone (avoids UTC conversion issues)
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 function getMonthRange(year: number, month: number) {
   const startDate = new Date(year, month, 1);
   const endDate = new Date(year, month + 1, 0);
   return {
-    startDate: startDate.toISOString().split('T')[0],
-    endDate: endDate.toISOString().split('T')[0],
+    startDate: formatLocalDate(startDate),
+    endDate: formatLocalDate(endDate),
   };
 }
 

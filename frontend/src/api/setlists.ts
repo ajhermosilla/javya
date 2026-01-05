@@ -4,21 +4,29 @@ import type { Setlist, SetlistCreate, SetlistUpdate } from '../types/setlist';
 const BASE_PATH = '/api/v1/setlists';
 
 /**
- * Download a blob as a file with proper cleanup.
+ * Download a blob as a file with proper cleanup and error handling.
  */
 function downloadBlob(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  let url: string | null = null;
+  let a: HTMLAnchorElement | null = null;
+
   try {
+    url = URL.createObjectURL(blob);
+    a = document.createElement('a');
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
     a.click();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    throw new Error(`Failed to download file: ${message}`);
   } finally {
-    if (a.parentNode) {
+    if (a?.parentNode) {
       document.body.removeChild(a);
     }
-    URL.revokeObjectURL(url);
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
   }
 }
 
