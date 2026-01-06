@@ -23,7 +23,7 @@ import type { SetlistSong, SetlistSongCreate } from '../types/setlist';
 import type { Song } from '../types/song';
 import './SetlistEditor.css';
 
-type ExportFormat = 'freeshow' | 'quelea';
+type ExportFormat = 'freeshow' | 'quelea' | 'pdf-summary' | 'pdf-chords';
 
 interface SetlistEditorProps {
   setlistId: string;
@@ -124,14 +124,16 @@ export function SetlistEditor({ setlistId, onBack }: SetlistEditorProps) {
   const handleExport = async (format: ExportFormat) => {
     if (!setlist) return;
 
-    // Check for songs without lyrics
-    const songsWithoutLyrics = songs.filter((s) => !s.song?.lyrics?.trim());
-    if (songsWithoutLyrics.length > 0) {
-      const names = songsWithoutLyrics.map((s) => s.song?.name || '?').join(', ');
-      const proceed = window.confirm(
-        `${t('setlistEditor.songsWithoutLyrics')}: ${names}\n\n${t('setlistEditor.continueExport')}`
-      );
-      if (!proceed) return;
+    // Check for songs without lyrics (skip for summary PDF)
+    if (format !== 'pdf-summary') {
+      const songsWithoutLyrics = songs.filter((s) => !s.song?.lyrics?.trim());
+      if (songsWithoutLyrics.length > 0) {
+        const names = songsWithoutLyrics.map((s) => s.song?.name || '?').join(', ');
+        const proceed = window.confirm(
+          `${t('setlistEditor.songsWithoutLyrics')}: ${names}\n\n${t('setlistEditor.continueExport')}`
+        );
+        if (!proceed) return;
+      }
     }
 
     setExporting(true);
@@ -140,6 +142,10 @@ export function SetlistEditor({ setlistId, onBack }: SetlistEditorProps) {
         await setlistsApi.exportFreeshow(setlist.id, setlist.name);
       } else if (format === 'quelea') {
         await setlistsApi.exportQuelea(setlist.id, setlist.name);
+      } else if (format === 'pdf-summary') {
+        await setlistsApi.exportPdf(setlist.id, setlist.name, 'summary');
+      } else if (format === 'pdf-chords') {
+        await setlistsApi.exportPdf(setlist.id, setlist.name, 'chords');
       }
     } catch (error) {
       console.error('Failed to export setlist:', error);
@@ -190,6 +196,20 @@ export function SetlistEditor({ setlistId, onBack }: SetlistEditorProps) {
             disabled={exporting || songs.length === 0}
           >
             {exporting ? t('setlistEditor.exporting') : t('setlistEditor.exportQuelea')}
+          </button>
+          <button
+            className="export-button export-pdf"
+            onClick={() => handleExport('pdf-summary')}
+            disabled={exporting || songs.length === 0}
+          >
+            {exporting ? t('setlistEditor.exporting') : t('setlistEditor.exportPdfSummary')}
+          </button>
+          <button
+            className="export-button export-pdf"
+            onClick={() => handleExport('pdf-chords')}
+            disabled={exporting || songs.length === 0}
+          >
+            {exporting ? t('setlistEditor.exporting') : t('setlistEditor.exportPdfChords')}
           </button>
           <button
             className="save-button"

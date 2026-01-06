@@ -83,4 +83,32 @@ export const setlistsApi = {
     const blob = await response.blob();
     downloadBlob(blob, `${filename}.qsch`);
   },
+
+  exportPdf: async (id: string, filename: string, format: 'summary' | 'chords' = 'summary') => {
+    const token = getStoredToken();
+    const headers: HeadersInit = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    const response = await fetch(
+      `${BASE_PATH}/${id}/export/pdf?format=${format}`,
+      { headers }
+    );
+    if (!response.ok) {
+      const status = response.status;
+      if (status === 401) {
+        throw new Error('Authentication required');
+      }
+      if (status === 404) {
+        throw new Error('Setlist not found');
+      }
+      if (status === 400) {
+        throw new Error('Cannot export empty setlist');
+      }
+      throw new Error(`Export failed (${status})`);
+    }
+    const blob = await response.blob();
+    const suffix = format === 'summary' ? 'summary' : 'chords';
+    downloadBlob(blob, `${filename}-${suffix}.pdf`);
+  },
 };

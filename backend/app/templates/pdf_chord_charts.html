@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ setlist_name }} - Chord Charts</title>
+</head>
+<body>
+    <!-- Title page -->
+    <div class="setlist-header title-page">
+        <h1 class="setlist-title">{{ setlist_name }}</h1>
+        <div class="setlist-meta">
+            {% if service_date %}{{ service_date.strftime('%B %d, %Y') }}{% endif %}
+            {% if event_type %} &bull; {{ event_type }}{% endif %}
+        </div>
+        <div class="song-list">
+            {% for song in songs %}
+            <div class="song-list-item">{{ song.position }}. {{ song.name }}{% if song.key %} ({{ song.key }}){% endif %}</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Individual song pages -->
+    {% for song in songs %}
+    <div class="song-page">
+        <div class="song-header">
+            <h2 class="song-title">{{ song.position }}. {{ song.name }}</h2>
+            <div class="song-meta">
+                {% if song.artist %}{{ song.artist }}{% endif %}
+                {% if song.key %} &bull; Key: {{ song.key }}{% endif %}
+                {% if song.tempo %} &bull; {{ song.tempo }} BPM{% endif %}
+            </div>
+        </div>
+
+        <div class="chord-chart">
+            {{ song.chord_chart_html|safe }}
+        </div>
+
+        {% if song.notes %}
+        <div class="song-notes">
+            <strong>Notes:</strong> {{ song.notes }}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    <div class="footer-note">
+        Generated {{ generated_date.strftime('%B %d, %Y') }} with Javya
+    </div>
+</body>
+</html>

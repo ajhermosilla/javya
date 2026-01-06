@@ -616,3 +616,166 @@ class TestExportSetlist:
         assert "<" not in disposition
         assert ">" not in disposition
         assert "/" not in disposition.split("filename=")[1]
+
+
+class TestExportPDF:
+    """Tests for PDF export endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_export_pdf_summary_success(
+        self,
+        client: AsyncClient,
+        sample_setlist_data: dict[str, Any],
+        sample_song_data: dict[str, Any],
+    ) -> None:
+        """Test exporting a setlist to PDF summary format."""
+        headers = await get_admin_headers(client)
+        # Create song with lyrics
+        song_response = await client.post("/api/v1/songs/", json=sample_song_data)
+        song_id = song_response.json()["id"]
+
+        # Create setlist with song
+        setlist_data = {
+            **sample_setlist_data,
+            "songs": [{"song_id": song_id, "position": 0}],
+        }
+        create_response = await client.post("/api/v1/setlists/", json=setlist_data)
+        setlist_id = create_response.json()["id"]
+
+        response = await client.get(
+            f"/api/v1/setlists/{setlist_id}/export/pdf?format=summary",
+            headers=headers
+        )
+
+        assert response.status_code == 200
+        assert response.headers["content-type"] == "application/pdf"
+        assert "attachment" in response.headers["content-disposition"]
+        assert ".pdf" in response.headers["content-disposition"]
+        # Verify it's a valid PDF (starts with PDF magic bytes)
+        assert response.content[:4] == b"%PDF"
+
+    @pytest.mark.asyncio
+    async def test_export_pdf_chords_success(
+        self,
+        client: AsyncClient,
+        sample_setlist_data: dict[str, Any],
+        sample_song_data: dict[str, Any],
+    ) -> None:
+        """Test exporting a setlist to PDF chord charts format."""
+        headers = await get_admin_headers(client)
+        song_response = await client.post("/api/v1/songs/", json=sample_song_data)
+        song_id = song_response.json()["id"]
+
+        setlist_data = {
+            **sample_setlist_data,
+            "songs": [{"song_id": song_id, "position": 0}],
+        }
+        create_response = await client.post("/api/v1/setlists/", json=setlist_data)
+        setlist_id = create_response.json()["id"]
+
+        response = await client.get(
+            f"/api/v1/setlists/{setlist_id}/export/pdf?format=chords",
+            headers=headers
+        )
+
+        assert response.status_code == 200
+        assert response.headers["content-type"] == "application/pdf"
+        assert "chords.pdf" in response.headers["content-disposition"]
+        assert response.content[:4] == b"%PDF"
+
+    @pytest.mark.asyncio
+    async def test_export_pdf_default_format(
+        self,
+        client: AsyncClient,
+        sample_setlist_data: dict[str, Any],
+        sample_song_data: dict[str, Any],
+    ) -> None:
+        """Test PDF export defaults to summary format."""
+        headers = await get_admin_headers(client)
+        song_response = await client.post("/api/v1/songs/", json=sample_song_data)
+        song_id = song_response.json()["id"]
+
+        setlist_data = {
+            **sample_setlist_data,
+            "songs": [{"song_id": song_id, "position": 0}],
+        }
+        create_response = await client.post("/api/v1/setlists/", json=setlist_data)
+        setlist_id = create_response.json()["id"]
+
+        # Request without format parameter
+        response = await client.get(
+            f"/api/v1/setlists/{setlist_id}/export/pdf",
+            headers=headers
+        )
+
+        assert response.status_code == 200
+        assert "summary.pdf" in response.headers["content-disposition"]
+
+    @pytest.mark.asyncio
+    async def test_export_pdf_invalid_format(
+        self,
+        client: AsyncClient,
+        sample_setlist_data: dict[str, Any],
+        sample_song_data: dict[str, Any],
+    ) -> None:
+        """Test that invalid format parameter returns 400."""
+        headers = await get_admin_headers(client)
+        song_response = await client.post("/api/v1/songs/", json=sample_song_data)
+        song_id = song_response.json()["id"]
+
+        setlist_data = {
+            **sample_setlist_data,
+            "songs": [{"song_id": song_id, "position": 0}],
+        }
+        create_response = await client.post("/api/v1/setlists/", json=setlist_data)
+        setlist_id = create_response.json()["id"]
+
+        response = await client.get(
+            f"/api/v1/setlists/{setlist_id}/export/pdf?format=invalid",
+            headers=headers
+        )
+
+        assert response.status_code == 400
+        assert "invalid format" in response.json()["detail"].lower()
+
+    @pytest.mark.asyncio
+    async def test_export_pdf_empty_setlist(
+        self, client: AsyncClient, sample_setlist_data: dict[str, Any]
+    ) -> None:
+        """Test exporting an empty setlist returns 400 error."""
+        headers = await get_admin_headers(client)
+        create_response = await client.post("/api/v1/setlists/", json=sample_setlist_data)
+        setlist_id = create_response.json()["id"]
+
+        response = await client.get(
+            f"/api/v1/setlists/{setlist_id}/export/pdf",
+            headers=headers
+        )
+
+        assert response.status_code == 400
+        assert "empty setlist" in response.json()["detail"].lower()
+
+    @pytest.mark.asyncio
+    async def test_export_pdf_not_found(self, client: AsyncClient) -> None:
+        """Test exporting a non-existent setlist returns 404."""
+        headers = await get_admin_headers(client)
+        fake_id = str(uuid4())
+
+        response = await client.get(
+            f"/api/v1/setlists/{fake_id}/export/pdf",
+            headers=headers
+        )
+
+        assert response.status_code == 404
+
+    @pytest.mark.asyncio
+    async def test_export_pdf_requires_auth(
+        self, client: AsyncClient, sample_setlist_data: dict[str, Any]
+    ) -> None:
+        """Test that PDF export requires authentication."""
+        create_response = await client.post("/api/v1/setlists/", json=sample_setlist_data)
+        setlist_id = create_response.json()["id"]
+
+        response = await client.get(f"/api/v1/setlists/{setlist_id}/export/pdf")
+
+        assert response.status_code == 401

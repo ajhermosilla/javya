@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ setlist_name }} - Summary</title>
+</head>
+<body>
+    <div class="setlist-header">
+        <h1 class="setlist-title">{{ setlist_name }}</h1>
+        <div class="setlist-meta">
+            {% if service_date %}{{ service_date.strftime('%B %d, %Y') }}{% endif %}
+            {% if event_type %} &bull; {{ event_type }}{% endif %}
+        </div>
+        {% if description %}
+        <div class="setlist-description">{{ description }}</div>
+        {% endif %}
+    </div>
+
+    <table class="song-table">
+        <thead>
+            <tr>
+                <th class="song-number">#</th>
+                <th>Song</th>
+                <th>Artist</th>
+                <th>Key</th>
+                <th>BPM</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for song in songs %}
+            <tr>
+                <td class="song-number">{{ song.position }}</td>
+                <td class="song-name">{{ song.name }}</td>
+                <td>{{ song.artist }}</td>
+                <td class="song-key">{{ song.key }}</td>
+                <td class="song-tempo">{{ song.tempo if song.tempo else '-' }}</td>
+                <td class="song-notes">{{ song.notes }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer-note">
+        Generated {{ generated_date.strftime('%B %d, %Y') }} with Javya
+    </div>
+</body>
+</html>

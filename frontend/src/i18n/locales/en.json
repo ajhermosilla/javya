@@ -135,6 +135,8 @@
     "allSongsAdded": "All songs have been added",
     "exportFreeshow": "FreeShow",
     "exportQuelea": "Quelea",
+    "exportPdfSummary": "PDF Summary",
+    "exportPdfChords": "PDF Chords",
     "exporting": "Exporting...",
     "exportFailed": "Export failed",
     "songsWithoutLyrics": "The following songs have no lyrics",

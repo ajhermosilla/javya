@@ -135,6 +135,8 @@
     "allSongsAdded": "Todas las canciones han sido agregadas",
     "exportFreeshow": "FreeShow",
     "exportQuelea": "Quelea",
+    "exportPdfSummary": "PDF Resumen",
+    "exportPdfChords": "PDF Acordes",
     "exporting": "Exportando...",
     "exportFailed": "Error al exportar",
     "songsWithoutLyrics": "Las siguientes canciones no tienen letra",

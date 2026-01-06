@@ -31,6 +31,7 @@ from app.schemas.setlist_assignment import (
     SetlistAssignmentConfirm,
 )
 from app.services.export_freeshow import generate_freeshow_project
+from app.services.export_pdf import generate_pdf_chord_charts, generate_pdf_summary
 from app.services.export_quelea import generate_quelea_schedule
 
 router = APIRouter()
@@ -286,6 +287,65 @@ async def export_setlist_quelea(
     return Response(
         content=quelea_data,
         media_type="application/zip",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"'
+        },
+    )
+
+
+@router.get("/{setlist_id}/export/pdf")
+async def export_setlist_pdf(
+    setlist_id: UUID,
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    format: str = Query("summary", description="PDF format: 'summary' or 'chords'"),
+    db: AsyncSession = Depends(get_db),
+) -> Response:
+    """Export a setlist to PDF format for musicians.
+
+    Formats:
+    - summary: Overview with song titles, keys, tempo, artist
+    - chords: Full chord charts with ChordPro lyrics inline
+    """
+    # Validate format parameter
+    if format not in ("summary", "chords"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid format. Use 'summary' or 'chords'.",
+        )
+
+    result = await db.execute(
+        select(Setlist)
+        .options(selectinload(Setlist.songs).selectinload(SetlistSong.song))
+        .where(Setlist.id == setlist_id)
+    )
+    setlist = result.scalar_one_or_none()
+
+    if not setlist:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Setlist with id {setlist_id} not found",
+        )
+
+    if not setlist.songs:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot export an empty setlist. Add songs first.",
+        )
+
+    # Generate PDF based on format
+    if format == "summary":
+        pdf_bytes = generate_pdf_summary(setlist)
+        suffix = "summary"
+    else:
+        pdf_bytes = generate_pdf_chord_charts(setlist)
+        suffix = "chords"
+
+    # Create filename from setlist name
+    filename = f"{sanitize_filename(setlist.name, setlist.id)}-{suffix}.pdf"
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
         headers={
             "Content-Disposition": f'attachment; filename="{filename}"'
         },
