@@ -25,7 +25,9 @@ Javya consolidates this into one reliable tool.
 
 ## Features
 
-### v0.4 (Current)
+### v0.5 (Current)
+- [x] **Team scheduling** — Calendar view with service role assignments
+- [x] **PDF export** — Generate summary sheets and chord charts for musicians
 - [x] **Authentication** — JWT-based login with secure password hashing
 - [x] **Role-based access** — Admin, Leader, and Member roles
 - [x] **Availability calendar** — Track team member availability by date
@@ -37,8 +39,13 @@ Javya consolidates this into one reliable tool.
 - [x] Setlist builder with drag-and-drop
 - [x] Export to FreeShow (.project) and Quelea (.qsch)
 
-### Roadmap
-- [ ] **v0.5** — Team scheduling and service assignments
+### Coming Soon
+See our full **[Roadmap](ROADMAP.md)** for planned features including:
+- Song transposition and import tools
+- Email notifications and reminders
+- Dashboard and analytics
+- Mobile app and offline support
+- Calendar and projection software integrations
 
 ---
 
@@ -95,7 +102,8 @@ javya/
 │   │   ├── models/           # SQLAlchemy models (User, Song, Setlist, Availability)
 │   │   ├── schemas/          # Pydantic schemas
 │   │   ├── routers/          # API routes (auth, songs, setlists, availability)
-│   │   ├── services/         # Export generators (FreeShow, Quelea)
+│   │   ├── services/         # Export generators (FreeShow, Quelea, PDF)
+│   │   ├── templates/        # HTML templates for PDF generation
 │   │   ├── auth/             # JWT security & dependencies
 │   │   └── enums/            # Role, Mood, Theme, Key, EventType enums
 │   ├── alembic/              # Database migrations
