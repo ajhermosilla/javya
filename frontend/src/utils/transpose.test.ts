@@ -17,7 +17,6 @@ import {
   noteToSemitone,
   semitoneToNote,
   calculateInterval,
-  transposeNote,
   parseChord,
   transposeChord,
   isChord,
