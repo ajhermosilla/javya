@@ -56,17 +56,28 @@
   },
   "keys": {
     "C": "Do",
-    "C#": "Do#",
-    "D": "Re",
-    "D#": "Re#",
-    "E": "Mi",
-    "F": "Fa",
-    "F#": "Fa#",
     "G": "Sol",
-    "G#": "Sol#",
+    "D": "Re",
     "A": "La",
-    "A#": "La#",
-    "B": "Si"
+    "E": "Mi",
+    "B": "Si",
+    "F#": "Fa#",
+    "C#": "Do#",
+    "F": "Fa",
+    "Bb": "Sib",
+    "Eb": "Mib",
+    "Ab": "Lab",
+    "Db": "Reb",
+    "Gb": "Solb",
+    "D#": "Re#",
+    "G#": "Sol#",
+    "A#": "La#"
+  },
+  "transpose": {
+    "displayKey": "Tono",
+    "reset": "Restablecer",
+    "capoSuggestion": "Sugerencia de cejilla",
+    "capo": "Cejilla"
   },
   "moods": {
     "Joyful": "Alegre",

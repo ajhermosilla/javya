@@ -2,7 +2,11 @@ import { useTranslation } from 'react-i18next';
 import type { MusicalKey, Mood, Theme } from '../types/song';
 import './FilterBar.css';
 
-const KEYS: MusicalKey[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+// Keys ordered by Circle of Fifths: sharp keys clockwise, flat keys counter-clockwise
+const KEYS: MusicalKey[] = [
+  'C', 'G', 'D', 'A', 'E', 'B', 'F#',  // Sharp keys
+  'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb',   // Flat keys
+];
 const MOODS: Mood[] = ['Joyful', 'Reflective', 'Triumphant', 'Intimate', 'Peaceful', 'Energetic', 'Hopeful', 'Solemn', 'Celebratory'];
 const THEMES: Theme[] = ['Worship', 'Communion', 'Offering', 'Opening', 'Closing', 'Prayer', 'Declaration', 'Thanksgiving', 'Faith', 'Grace', 'Salvation', 'Baptism', 'Christmas', 'Holy Week'];
 

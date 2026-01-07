@@ -131,6 +131,19 @@
   letter-spacing: 0.05em;
 }
 
+.section-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.section-header-row h2 {
+  margin: 0;
+}
+
 .chordpro-content,
 .lyrics-content {
   background-color: #f8f9fa;

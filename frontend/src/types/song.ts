@@ -1,6 +1,10 @@
+// Musical keys following the Circle of Fifths
+// Sharp keys (clockwise): C, G, D, A, E, B, F#, C#
+// Flat keys (counter-clockwise): F, Bb, Eb, Ab, Db, Gb
 export type MusicalKey =
-  | 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F'
-  | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B';
+  | 'C' | 'G' | 'D' | 'A' | 'E' | 'B' | 'F#' | 'C#'  // Sharp keys
+  | 'F' | 'Bb' | 'Eb' | 'Ab' | 'Db' | 'Gb'           // Flat keys
+  | 'D#' | 'G#' | 'A#';                               // Enharmonic (backward compat)
 
 export type Mood =
   | 'Joyful' | 'Reflective' | 'Triumphant' | 'Intimate'

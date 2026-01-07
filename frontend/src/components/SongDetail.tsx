@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Song } from '../types/song';
+import { TransposeControls } from './TransposeControls';
+import { ChordProViewer } from './ChordProViewer';
 import './SongDetail.css';
 
 interface SongDetailProps {
@@ -10,6 +13,11 @@ interface SongDetailProps {
 
 export function SongDetail({ song, onBack, onEdit }: SongDetailProps) {
   const { t } = useTranslation();
+
+  // Display key for transposition (defaults to preferred > original > C)
+  const [displayKey, setDisplayKey] = useState(
+    song.preferred_key || song.original_key || 'C'
+  );
 
   return (
     <div className="song-detail">
@@ -75,8 +83,21 @@ export function SongDetail({ song, onBack, onEdit }: SongDetailProps) {
 
         {song.chordpro_chart && (
           <section className="detail-section">
-            <h2>{t('form.chordproChart')}</h2>
-            <pre className="chordpro-content">{song.chordpro_chart}</pre>
+            <div className="section-header-row">
+              <h2>{t('form.chordproChart')}</h2>
+              {song.original_key && (
+                <TransposeControls
+                  originalKey={song.original_key}
+                  currentKey={displayKey}
+                  onKeyChange={setDisplayKey}
+                />
+              )}
+            </div>
+            <ChordProViewer
+              chordpro={song.chordpro_chart}
+              fromKey={song.original_key}
+              toKey={displayKey}
+            />
           </section>
         )}
 

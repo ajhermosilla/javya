@@ -56,17 +56,28 @@
   },
   "keys": {
     "C": "C",
-    "C#": "C#",
-    "D": "D",
-    "D#": "D#",
-    "E": "E",
-    "F": "F",
-    "F#": "F#",
     "G": "G",
-    "G#": "G#",
+    "D": "D",
     "A": "A",
-    "A#": "A#",
-    "B": "B"
+    "E": "E",
+    "B": "B",
+    "F#": "F#",
+    "C#": "C#",
+    "F": "F",
+    "Bb": "Bb",
+    "Eb": "Eb",
+    "Ab": "Ab",
+    "Db": "Db",
+    "Gb": "Gb",
+    "D#": "D#",
+    "G#": "G#",
+    "A#": "A#"
+  },
+  "transpose": {
+    "displayKey": "Display Key",
+    "reset": "Reset",
+    "capoSuggestion": "Capo suggestion",
+    "capo": "Capo"
   },
   "moods": {
     "Joyful": "Joyful",
