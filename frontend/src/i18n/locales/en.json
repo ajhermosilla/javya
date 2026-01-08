@@ -86,7 +86,7 @@
     "tabPaste": "Paste Lyrics",
     "tabUrl": "From URL",
     "dropFiles": "Drop files here or click to select",
-    "supportedFormats": "ChordPro, OpenLyrics, OpenSong, Plain Text",
+    "supportedFormats": "ChordPro, OpenLyrics, OpenSong, Plain Text, ZIP archives",
     "selectedFiles": "{{count}} file(s) selected",
     "upload": "Upload & Preview",
     "parse": "Parse & Preview",

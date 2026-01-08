@@ -18,7 +18,12 @@ type InputMode = 'file' | 'paste' | 'url';
 
 const MAX_FILES = 20;
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+const MAX_ZIP_SIZE = 10 * 1024 * 1024; // 10MB for ZIP archives
 const MAX_PASTE_LENGTH = 50000; // 50KB for pasted text
+
+const isZipFile = (file: File): boolean => {
+  return file.name.toLowerCase().endsWith('.zip') || file.type === 'application/zip';
+};
 
 export function ImportModal({
   isOpen,
@@ -48,7 +53,10 @@ export function ImportModal({
 
   const addFiles = (newFiles: File[]) => {
     const validFiles = newFiles
-      .filter((f) => f.size <= MAX_FILE_SIZE)
+      .filter((f) => {
+        const maxSize = isZipFile(f) ? MAX_ZIP_SIZE : MAX_FILE_SIZE;
+        return f.size <= maxSize;
+      })
       .slice(0, MAX_FILES - files.length);
 
     setFiles((prev) => [...prev, ...validFiles].slice(0, MAX_FILES));
@@ -229,7 +237,7 @@ export function ImportModal({
                   <input
                     type="file"
                     multiple
-                    accept=".cho,.crd,.chopro,.xml,.txt"
+                    accept=".cho,.crd,.chopro,.xml,.txt,.onsong,.zip"
                     onChange={handleFileSelect}
                     id="import-file-input"
                     className="import-file-input"

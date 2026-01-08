@@ -1,5 +1,7 @@
 """Router for song import endpoints."""
 
+import zipfile
+from io import BytesIO
 from urllib.parse import urlparse
 
 import httpx
@@ -26,8 +28,68 @@ router = APIRouter()
 # Limits
 MAX_FILES = 20
 MAX_FILE_SIZE = 1024 * 1024  # 1MB
+MAX_ZIP_SIZE = 10 * 1024 * 1024  # 10MB for ZIP archives
+MAX_FILES_IN_ZIP = 50  # Maximum files to extract from ZIP
 URL_FETCH_TIMEOUT = 10  # seconds
 MAX_URL_CONTENT_SIZE = 1024 * 1024  # 1MB
+
+# Supported song file extensions
+SONG_EXTENSIONS = {".cho", ".crd", ".chopro", ".txt", ".xml", ".onsong"}
+
+
+def is_zip_file(content: bytes) -> bool:
+    """Check if content is a ZIP archive by magic bytes."""
+    return content[:4] == b"PK\x03\x04"
+
+
+def extract_zip_files(
+    zip_content: bytes, zip_filename: str
+) -> list[tuple[str, bytes, str | None]]:
+    """Extract song files from a ZIP archive.
+
+    Returns list of tuples: (filename, content, error)
+    """
+    results: list[tuple[str, bytes, str | None]] = []
+
+    try:
+        with zipfile.ZipFile(BytesIO(zip_content), "r") as zf:
+            # Get list of files (exclude directories and hidden files)
+            file_list = [
+                name
+                for name in zf.namelist()
+                if not name.endswith("/")
+                and not name.startswith("__MACOSX/")
+                and not name.split("/")[-1].startswith(".")
+            ]
+
+            # Check file count limit
+            if len(file_list) > MAX_FILES_IN_ZIP:
+                file_list = file_list[:MAX_FILES_IN_ZIP]
+
+            for name in file_list:
+                # Check if it's a supported song file
+                ext = "." + name.rsplit(".", 1)[-1].lower() if "." in name else ""
+                if ext not in SONG_EXTENSIONS:
+                    continue
+
+                try:
+                    content = zf.read(name)
+                    # Check individual file size
+                    if len(content) > MAX_FILE_SIZE:
+                        results.append(
+                            (name, b"", f"File exceeds maximum size of {MAX_FILE_SIZE // 1024}KB")
+                        )
+                    else:
+                        results.append((name, content, None))
+                except Exception as e:
+                    results.append((name, b"", f"Failed to extract: {str(e)}"))
+
+    except zipfile.BadZipFile:
+        results.append((zip_filename, b"", "Invalid ZIP archive"))
+    except Exception as e:
+        results.append((zip_filename, b"", f"Failed to read ZIP: {str(e)}"))
+
+    return results
 
 
 @router.post("/preview", response_model=ImportPreviewResponse)
@@ -42,9 +104,11 @@ async def preview_import(
 
     Also checks for duplicates and includes existing song info.
 
+    Supports ZIP archives containing multiple song files.
+
     Limits:
-    - Maximum 20 files per request
-    - Maximum 1MB per file
+    - Maximum 20 files per request (or 50 files from a ZIP)
+    - Maximum 1MB per file, 10MB for ZIP archives
     """
     # Validate file count
     if len(files) > MAX_FILES:
@@ -59,21 +123,52 @@ async def preview_import(
             detail="No files provided",
         )
 
-    parsed_songs: list[ParsedSong] = []
-    successful = 0
-    failed = 0
+    # Collect all files to parse (including extracted from ZIPs)
+    files_to_parse: list[tuple[str, bytes]] = []
 
     for file in files:
         # Read file content
         try:
             content = await file.read()
         except Exception as e:
+            files_to_parse.append((file.filename or "unknown", b""))
+            continue
+
+        filename = file.filename or "unknown"
+
+        # Check if it's a ZIP archive
+        if is_zip_file(content):
+            # Check ZIP size limit
+            if len(content) > MAX_ZIP_SIZE:
+                files_to_parse.append(
+                    (filename, b"")
+                )  # Will be handled as error below
+                continue
+
+            # Extract files from ZIP
+            extracted = extract_zip_files(content, filename)
+            for extracted_name, extracted_content, error in extracted:
+                if error:
+                    # Store with empty content to indicate error
+                    files_to_parse.append((f"{filename}/{extracted_name}", b""))
+                else:
+                    files_to_parse.append((f"{filename}/{extracted_name}", extracted_content))
+        else:
+            files_to_parse.append((filename, content))
+
+    parsed_songs: list[ParsedSong] = []
+    successful = 0
+    failed = 0
+
+    for filename, content in files_to_parse:
+        # Handle files that failed to read or extract
+        if len(content) == 0:
             parsed_songs.append(
                 ParsedSong(
-                    file_name=file.filename or "unknown",
+                    file_name=filename,
                     detected_format="unknown",
                     success=False,
-                    error=f"Failed to read file: {str(e)}",
+                    error="Failed to read file",
                 )
             )
             failed += 1
@@ -83,7 +178,7 @@ async def preview_import(
         if len(content) > MAX_FILE_SIZE:
             parsed_songs.append(
                 ParsedSong(
-                    file_name=file.filename or "unknown",
+                    file_name=filename,
                     detected_format="unknown",
                     success=False,
                     error=f"File exceeds maximum size of {MAX_FILE_SIZE // 1024}KB",
@@ -93,12 +188,12 @@ async def preview_import(
             continue
 
         # Parse file
-        result = detect_and_parse(content, file.filename or "unknown")
+        result = detect_and_parse(content, filename)
 
         if result.success:
             parsed_songs.append(
                 ParsedSong(
-                    file_name=file.filename or "unknown",
+                    file_name=filename,
                     detected_format=result.detected_format,
                     success=True,
                     song_data=result.song_data,
@@ -108,7 +203,7 @@ async def preview_import(
         else:
             parsed_songs.append(
                 ParsedSong(
-                    file_name=file.filename or "unknown",
+                    file_name=filename,
                     detected_format=result.detected_format,
                     success=False,
                     error=result.error,
@@ -143,7 +238,7 @@ async def preview_import(
                     ps.duplicate = duplicate_map[key]
 
     return ImportPreviewResponse(
-        total_files=len(files),
+        total_files=len(files_to_parse),
         successful=successful,
         failed=failed,
         songs=parsed_songs,

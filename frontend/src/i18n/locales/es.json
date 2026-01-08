@@ -86,7 +86,7 @@
     "tabPaste": "Pegar Letra",
     "tabUrl": "Desde URL",
     "dropFiles": "Arrastra archivos aquí o haz clic para seleccionar",
-    "supportedFormats": "ChordPro, OpenLyrics, OpenSong, Texto plano",
+    "supportedFormats": "ChordPro, OpenLyrics, OpenSong, Texto plano, archivos ZIP",
     "selectedFiles": "{{count}} archivo(s) seleccionado(s)",
     "upload": "Subir y Previsualizar",
     "parse": "Analizar y Previsualizar",
