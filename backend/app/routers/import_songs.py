@@ -12,7 +12,9 @@ from app.schemas.import_song import (
     ImportPreviewResponse,
     ParsedSong,
 )
+from app.schemas.duplicate import ExistingSongSummary, SongCheck
 from app.schemas.song import SongResponse
+from app.services.duplicate_detector import find_duplicates
 from app.services.import_song import detect_and_parse
 
 router = APIRouter()
@@ -25,11 +27,14 @@ MAX_FILE_SIZE = 1024 * 1024  # 1MB
 @router.post("/preview", response_model=ImportPreviewResponse)
 async def preview_import(
     files: list[UploadFile],
+    db: AsyncSession = Depends(get_db),
 ) -> ImportPreviewResponse:
     """Parse uploaded files and return preview data.
 
     This endpoint does NOT save anything to the database.
     Use /confirm to save selected songs.
+
+    Also checks for duplicates and includes existing song info.
 
     Limits:
     - Maximum 20 files per request
@@ -104,6 +109,32 @@ async def preview_import(
                 )
             )
             failed += 1
+
+    # Check for duplicates in successfully parsed songs
+    songs_to_check = [
+        SongCheck(name=ps.song_data.name, artist=ps.song_data.artist)
+        for ps in parsed_songs
+        if ps.success and ps.song_data
+    ]
+
+    if songs_to_check:
+        duplicates = await find_duplicates(db, songs_to_check)
+
+        # Create a mapping of (name, artist) -> existing song for quick lookup
+        duplicate_map: dict[tuple[str, str | None], ExistingSongSummary] = {
+            (d.name.lower(), d.artist.lower() if d.artist else None): d.existing_song
+            for d in duplicates
+        }
+
+        # Update parsed songs with duplicate info
+        for ps in parsed_songs:
+            if ps.success and ps.song_data:
+                key = (
+                    ps.song_data.name.lower(),
+                    ps.song_data.artist.lower() if ps.song_data.artist else None,
+                )
+                if key in duplicate_map:
+                    ps.duplicate = duplicate_map[key]
 
     return ImportPreviewResponse(
         total_files=len(files),

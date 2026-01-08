@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Song, SongCreate, MusicalKey, Mood, Theme } from '../types/song';
+import { songsApi, type ExistingSongSummary } from '../api/songs';
+import { DuplicateWarning } from './DuplicateWarning';
 import './SongForm.css';
 
 // Keys ordered by Circle of Fifths: sharp keys clockwise, flat keys counter-clockwise
@@ -15,12 +17,15 @@ interface SongFormProps {
   song?: Song;
   onSubmit: (data: SongCreate) => Promise<void>;
   onCancel: () => void;
+  onNavigateToSong?: (id: string) => void;
 }
 
-export function SongForm({ song, onSubmit, onCancel }: SongFormProps) {
+export function SongForm({ song, onSubmit, onCancel, onNavigateToSong }: SongFormProps) {
   const { t } = useTranslation();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [duplicateMatch, setDuplicateMatch] = useState<ExistingSongSummary | null>(null);
+  const [pendingData, setPendingData] = useState<SongCreate | null>(null);
 
   const [name, setName] = useState(song?.name || '');
   const [artist, setArtist] = useState(song?.artist || '');
@@ -43,32 +48,76 @@ export function SongForm({ song, onSubmit, onCancel }: SongFormProps) {
     );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSaving(true);
+  const buildSongData = (): SongCreate => ({
+    name,
+    artist: artist || null,
+    url: url || null,
+    original_key: originalKey || null,
+    preferred_key: preferredKey || null,
+    tempo_bpm: tempoBpm ? parseInt(tempoBpm, 10) : null,
+    mood: mood || null,
+    themes: themes.length > 0 ? themes : null,
+    lyrics: lyrics || null,
+    chordpro_chart: chordproChart || null,
+    min_band: minBand ? minBand.split(',').map(s => s.trim()).filter(Boolean) : null,
+    notes: notes || null,
+  });
 
-    const data: SongCreate = {
-      name,
-      artist: artist || null,
-      url: url || null,
-      original_key: originalKey || null,
-      preferred_key: preferredKey || null,
-      tempo_bpm: tempoBpm ? parseInt(tempoBpm, 10) : null,
-      mood: mood || null,
-      themes: themes.length > 0 ? themes : null,
-      lyrics: lyrics || null,
-      chordpro_chart: chordproChart || null,
-      min_band: minBand ? minBand.split(',').map(s => s.trim()).filter(Boolean) : null,
-      notes: notes || null,
-    };
-
+  const submitSong = async (data: SongCreate) => {
     try {
       await onSubmit(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save song');
       setSaving(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSaving(true);
+
+    const data = buildSongData();
+
+    // Only check for duplicates when creating a new song (not editing)
+    if (!song) {
+      try {
+        const response = await songsApi.checkDuplicates([{ name: data.name, artist: data.artist ?? null }]);
+        if (response.duplicates.length > 0) {
+          // Duplicate found - show warning modal
+          setDuplicateMatch(response.duplicates[0].existing_song);
+          setPendingData(data);
+          setSaving(false);
+          return;
+        }
+      } catch {
+        // If duplicate check fails, proceed with creation
+      }
+    }
+
+    await submitSong(data);
+  };
+
+  const handleUseExisting = () => {
+    if (duplicateMatch && onNavigateToSong) {
+      onNavigateToSong(duplicateMatch.id);
+    }
+    setDuplicateMatch(null);
+    setPendingData(null);
+  };
+
+  const handleCreateAnyway = async () => {
+    if (pendingData) {
+      setSaving(true);
+      setDuplicateMatch(null);
+      await submitSong(pendingData);
+      setPendingData(null);
+    }
+  };
+
+  const handleCancelDuplicate = () => {
+    setDuplicateMatch(null);
+    setPendingData(null);
   };
 
   return (
@@ -237,6 +286,15 @@ export function SongForm({ song, onSubmit, onCancel }: SongFormProps) {
           {saving ? t('form.saving') : t('form.save')}
         </button>
       </div>
+
+      {duplicateMatch && (
+        <DuplicateWarning
+          existingSong={duplicateMatch}
+          onUseExisting={handleUseExisting}
+          onCreateAnyway={handleCreateAnyway}
+          onCancel={handleCancelDuplicate}
+        />
+      )}
     </form>
   );
 }

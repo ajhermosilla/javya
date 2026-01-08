@@ -117,6 +117,12 @@
   cursor: help;
 }
 
+.import-status-duplicate {
+  color: #f57c00;
+  font-weight: 500;
+  cursor: help;
+}
+
 .import-preview-footer {
   display: flex;
   justify-content: space-between;

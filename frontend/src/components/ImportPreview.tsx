@@ -122,9 +122,18 @@ export function ImportPreview({
                 </td>
                 <td className="import-col-status">
                   {song.success ? (
-                    <span className="import-status-success">
-                      {t('import.preview.ready')}
-                    </span>
+                    song.duplicate ? (
+                      <span
+                        className="import-status-duplicate"
+                        title={`${song.duplicate.name}${song.duplicate.artist ? ` - ${song.duplicate.artist}` : ''}`}
+                      >
+                        {t('import.preview.duplicate')}
+                      </span>
+                    ) : (
+                      <span className="import-status-success">
+                        {t('import.preview.ready')}
+                      </span>
+                    )
                   ) : (
                     <span
                       className="import-status-failed"
