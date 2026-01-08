@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<song>
+  <title>Test Song OpenSong</title>
+  <author>Test Artist</author>
+  <key>A</key>
+  <tempo>100</tempo>
+  <copyright>Test Copyright</copyright>
+  <ccli>789012</ccli>
+  <theme>Worship</theme>
+  <lyrics>
+[V1]
+.A       D       A
+This is verse one line one
+.A       E       A
+This is verse one line two
+
+[C]
+.D       A       E       A
+This is the chorus melody
+.D       A       E       A
+Singing together joyfully
+  </lyrics>
+</song>

@@ -30,6 +30,7 @@
   "songs": {
     "title": "Canciones",
     "addSong": "Agregar Canción",
+    "importSongs": "Importar",
     "editSong": "Editar Canción",
     "deleteSong": "Eliminar Canción",
     "searchPlaceholder": "Buscar canciones...",
@@ -79,6 +80,28 @@
     "capoSuggestion": "Sugerencia de cejilla",
     "capo": "Cejilla"
   },
+  "import": {
+    "title": "Importar Canciones",
+    "dropFiles": "Arrastra archivos aquí o haz clic para seleccionar",
+    "supportedFormats": "ChordPro, OpenLyrics, OpenSong, Texto plano",
+    "selectedFiles": "{{count}} archivo(s) seleccionado(s)",
+    "upload": "Subir y Previsualizar",
+    "uploading": "Subiendo...",
+    "saving": "Guardando canciones...",
+    "complete": "{{count}} canción(es) importada(s) exitosamente",
+    "preview": {
+      "summary": "{{successful}} de {{total}} archivo(s) procesado(s) correctamente",
+      "selectAll": "Seleccionar Todos",
+      "deselectAll": "Deseleccionar Todos",
+      "file": "Archivo",
+      "format": "Formato",
+      "title": "Título",
+      "status": "Estado",
+      "ready": "Listo",
+      "failed": "Error",
+      "confirm": "Importar Seleccionados ({{count}})"
+    }
+  },
   "moods": {
     "Joyful": "Alegre",
     "Reflective": "Reflexivo",
@@ -121,7 +144,8 @@
     "cancel": "Cancelar",
     "edit": "Editar",
     "delete": "Eliminar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "remove": "Quitar"
   },
   "setlistForm": {
     "serviceDate": "Fecha del Servicio",

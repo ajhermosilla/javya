@@ -1,0 +1,7 @@
+Title: Simple Song
+Artist: Unknown
+
+Just some lyrics here
+Without any chords at all
+This is a plain text song
+That has no musical notation

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<song>
+  <title>Broken XML</title>
+  <lyrics>
+    This XML is not properly closed
+    <verse name="v1">
+      Missing end tags everywhere

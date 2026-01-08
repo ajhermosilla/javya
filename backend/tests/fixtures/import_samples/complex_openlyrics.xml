@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<song xmlns="http://openlyrics.info/namespace/2009/song" version="0.9"
+      createdIn="OpenLP 3.0" modifiedIn="OpenLP 3.0"
+      modifiedDate="2024-01-15T10:30:00">
+  <properties>
+    <titles>
+      <title>Oceans (Where Feet May Fail)</title>
+      <title lang="es">Oceanos</title>
+    </titles>
+    <authors>
+      <author type="words">Matt Crocker</author>
+      <author type="words">Joel Houston</author>
+      <author type="music">Salomon Ligthelm</author>
+    </authors>
+    <copyright>2012 Hillsong Music Publishing</copyright>
+    <ccliNo>6428767</ccliNo>
+    <released>2013-02-25</released>
+    <key>D</key>
+    <tempo type="bpm">66</tempo>
+    <transposition>0</transposition>
+    <themes>
+      <theme>Faith</theme>
+      <theme>Trust</theme>
+      <theme>Surrender</theme>
+    </themes>
+    <verseOrder>v1 c1 v2 c1 b1</verseOrder>
+    <songbooks>
+      <songbook name="Hillsong Zion" entry="3"/>
+    </songbooks>
+  </properties>
+  <lyrics>
+    <verse name="v1">
+      <lines>
+        <chord root="D"/>You call me out upon the waters
+        The great unknown where feet may fail
+        <chord root="A"/>And there I find You in the mystery
+        <chord root="Bm"/>In oceans deep my faith will stand
+      </lines>
+    </verse>
+    <verse name="c1">
+      <lines>
+        <chord root="G"/>And I will call upon Your name
+        <chord root="D"/>And keep my eyes above the waves
+        When oceans rise, <chord root="A"/>my soul will rest
+        <chord root="Bm"/>In Your embrace
+        <chord root="G"/>For I am Yours and <chord root="D"/>You are mine
+      </lines>
+    </verse>
+    <verse name="v2">
+      <lines>
+        <chord root="D"/>Your grace abounds in deepest waters
+        Your sovereign hand will be my guide
+        <chord root="A"/>Where feet may fail and fear surrounds me
+        <chord root="Bm"/>You've never failed and You won't start now
+      </lines>
+    </verse>
+    <verse name="b1">
+      <lines>
+        <chord root="G"/>Spirit lead me where my trust is without borders
+        Let me walk upon the waters
+        <chord root="D"/>Wherever You would call me
+        <chord root="A"/>Take me deeper than my feet could ever wander
+        <chord root="Bm"/>And my faith will be made stronger
+        <chord root="G"/>In the presence of my Savior
+      </lines>
+    </verse>
+  </lyrics>
+</song>

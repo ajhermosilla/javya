@@ -1,0 +1,32 @@
+{title: How Great Is Our God}
+{artist: Chris Tomlin}
+{subtitle: With Age to Age He Stands}
+{composer: Chris Tomlin, Jesse Reeves, Ed Cash}
+{key: G}
+{tempo: 78}
+{capo: 2}
+{copyright: 2004 sixsteps Music}
+{duration: 5:30}
+
+{comment: Start softly, build through chorus}
+
+{start_of_verse}
+[G]The splendor of the [Em7]King
+[Cmaj7]Clothed in majesty
+[G]Let all the earth re[Em7]joice
+[Cmaj7]All the earth re[D]joice
+{end_of_verse}
+
+{start_of_chorus}
+[G]How great [D/F#]is our [Em7]God
+[C]Sing with me, how [G]great [D]is our [Em7]God
+[C]And all will see how [G]great
+[D]How [Em7]great [C]is our God
+{end_of_chorus}
+
+{start_of_bridge}
+[Em7]Name above all [C]names
+[G]Worthy of all [D]praise
+[Em7]My heart will sing how [C]great
+[G]Is our [D]God
+{end_of_bridge}

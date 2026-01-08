@@ -1,0 +1,244 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { importApi } from '../api/import';
+import type { ImportPreviewResponse, ParsedSong } from '../types/import';
+import type { SongCreate } from '../types/song';
+import { ImportPreview } from './ImportPreview';
+import './ImportModal.css';
+
+interface ImportModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onImportComplete: () => void;
+}
+
+type Step = 'select' | 'uploading' | 'preview' | 'saving' | 'complete';
+
+const MAX_FILES = 20;
+const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+
+export function ImportModal({
+  isOpen,
+  onClose,
+  onImportComplete,
+}: ImportModalProps) {
+  const { t } = useTranslation();
+  const [step, setStep] = useState<Step>('select');
+  const [files, setFiles] = useState<File[]>([]);
+  const [previewData, setPreviewData] = useState<ImportPreviewResponse | null>(
+    null
+  );
+  const [selectedIndices, setSelectedIndices] = useState<Set<number>>(
+    new Set()
+  );
+  const [error, setError] = useState<string | null>(null);
+  const [savedCount, setSavedCount] = useState(0);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    addFiles(selectedFiles);
+  };
+
+  const addFiles = (newFiles: File[]) => {
+    const validFiles = newFiles
+      .filter((f) => f.size <= MAX_FILE_SIZE)
+      .slice(0, MAX_FILES - files.length);
+
+    setFiles((prev) => [...prev, ...validFiles].slice(0, MAX_FILES));
+    setError(null);
+  };
+
+  const removeFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    addFiles(droppedFiles);
+  };
+
+  const handleUpload = async () => {
+    if (files.length === 0) return;
+
+    setStep('uploading');
+    setError(null);
+
+    try {
+      const result = await importApi.preview(files);
+      setPreviewData(result);
+
+      // Pre-select all successful parses
+      const successIndices = result.songs
+        .map((s, i) => (s.success ? i : -1))
+        .filter((i) => i >= 0);
+      setSelectedIndices(new Set(successIndices));
+
+      setStep('preview');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed');
+      setStep('select');
+    }
+  };
+
+  const handleConfirm = async () => {
+    if (!previewData) return;
+
+    const songsToSave = previewData.songs
+      .filter((_, i) => selectedIndices.has(i))
+      .filter((s): s is ParsedSong & { song_data: SongCreate } =>
+        Boolean(s.success && s.song_data)
+      )
+      .map((s) => s.song_data);
+
+    if (songsToSave.length === 0) return;
+
+    setStep('saving');
+    setError(null);
+
+    try {
+      const result = await importApi.confirm({ songs: songsToSave });
+      setSavedCount(result.saved_count);
+      setStep('complete');
+      onImportComplete();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Save failed');
+      setStep('preview');
+    }
+  };
+
+  const handleClose = () => {
+    // Reset state
+    setStep('select');
+    setFiles([]);
+    setPreviewData(null);
+    setSelectedIndices(new Set());
+    setError(null);
+    setSavedCount(0);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="import-modal-overlay" onClick={handleClose}>
+      <div className="import-modal" onClick={(e) => e.stopPropagation()}>
+        <header className="import-modal-header">
+          <h2>{t('import.title')}</h2>
+          <button
+            className="import-close-button"
+            onClick={handleClose}
+            aria-label={t('common.close')}
+          >
+            &times;
+          </button>
+        </header>
+
+        {error && <div className="import-error">{error}</div>}
+
+        {step === 'select' && (
+          <div className="import-select">
+            <div
+              className="import-drop-zone"
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+            >
+              <input
+                type="file"
+                multiple
+                accept=".cho,.crd,.chopro,.xml,.txt"
+                onChange={handleFileSelect}
+                id="import-file-input"
+                className="import-file-input"
+              />
+              <label htmlFor="import-file-input" className="import-drop-label">
+                <span className="import-drop-icon">📁</span>
+                <span className="import-drop-text">
+                  {t('import.dropFiles')}
+                </span>
+                <span className="import-drop-hint">
+                  {t('import.supportedFormats')}
+                </span>
+              </label>
+            </div>
+
+            {files.length > 0 && (
+              <div className="import-selected-files">
+                <h3>
+                  {t('import.selectedFiles', { count: files.length })}
+                </h3>
+                <ul className="import-file-list">
+                  {files.map((f, i) => (
+                    <li key={i} className="import-file-item">
+                      <span className="import-file-name">{f.name}</span>
+                      <button
+                        className="import-file-remove"
+                        onClick={() => removeFile(i)}
+                        aria-label={t('common.remove')}
+                      >
+                        &times;
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="import-actions">
+              <button className="import-cancel-button" onClick={handleClose}>
+                {t('common.cancel')}
+              </button>
+              <button
+                className="import-upload-button"
+                onClick={handleUpload}
+                disabled={files.length === 0}
+              >
+                {t('import.upload')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 'uploading' && (
+          <div className="import-loading">
+            <div className="import-spinner"></div>
+            <p>{t('import.uploading')}</p>
+          </div>
+        )}
+
+        {step === 'preview' && previewData && (
+          <ImportPreview
+            data={previewData}
+            selectedIndices={selectedIndices}
+            onSelectionChange={setSelectedIndices}
+            onConfirm={handleConfirm}
+            onBack={() => setStep('select')}
+          />
+        )}
+
+        {step === 'saving' && (
+          <div className="import-loading">
+            <div className="import-spinner"></div>
+            <p>{t('import.saving')}</p>
+          </div>
+        )}
+
+        {step === 'complete' && (
+          <div className="import-complete">
+            <div className="import-complete-icon">✓</div>
+            <p>{t('import.complete', { count: savedCount })}</p>
+            <button className="import-done-button" onClick={handleClose}>
+              {t('common.close')}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

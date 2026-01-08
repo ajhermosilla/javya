@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<song>
+  <properties>
+    <titles>
+      <title>Song Without Namespace</title>
+    </titles>
+    <authors>
+      <author>Unknown Author</author>
+    </authors>
+    <key>E</key>
+  </properties>
+  <lyrics>
+    <verse name="v1">
+      <lines>Some lyrics without the OpenLyrics namespace</lines>
+    </verse>
+  </lyrics>
+</song>
