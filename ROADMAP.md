@@ -30,7 +30,7 @@ This document outlines planned features for Javya. We welcome community input—
 ## Planned Features
 
 ### v0.7 — Advanced Song Import
-- [ ] **Clipboard paste** — Paste lyrics directly without needing a file
+- [x] **Clipboard paste** — Paste lyrics directly without needing a file
 - [ ] **URL import** — Fetch song content from a URL
 - [ ] **Edit before import** — Modify parsed fields in preview before saving
 - [ ] **ZIP archive support** — Import entire song libraries at once
