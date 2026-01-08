@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<song xmlns="http://openlyrics.info/namespace/2009/song" version="0.9">
+  <properties>
+    <titles>
+      <title>Test Song OpenLyrics</title>
+    </titles>
+    <authors>
+      <author type="words">Test Author</author>
+      <author type="music">Test Composer</author>
+    </authors>
+    <key>D</key>
+    <tempo type="bpm">120</tempo>
+    <copyright>Test Copyright 2024</copyright>
+    <ccliNo>123456</ccliNo>
+  </properties>
+  <lyrics>
+    <verse name="v1">
+      <lines>
+        <chord root="D"/>This is the first line of verse one
+        <chord root="A"/>Second line with a chord
+      </lines>
+    </verse>
+    <verse name="c1">
+      <lines>
+        <chord root="G"/>This is the chorus line
+        <chord root="D"/>Another chorus line here
+      </lines>
+    </verse>
+  </lyrics>
+</song>

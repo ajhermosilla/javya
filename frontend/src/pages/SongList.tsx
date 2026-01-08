@@ -6,6 +6,7 @@ import { SongForm } from '../components/SongForm';
 import { SearchBar } from '../components/SearchBar';
 import { FilterBar } from '../components/FilterBar';
 import { SongDetail } from '../components/SongDetail';
+import { ImportModal } from '../components/ImportModal';
 import { songsApi } from '../api/songs';
 import type { Song, SongCreate, SongFilters, MusicalKey, Mood, Theme } from '../types/song';
 import './SongList.css';
@@ -21,6 +22,7 @@ export function SongList() {
   const [keyFilter, setKeyFilter] = useState<MusicalKey | undefined>();
   const [moodFilter, setMoodFilter] = useState<Mood | undefined>();
   const [themeFilter, setThemeFilter] = useState<Theme | undefined>();
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const filters: SongFilters = useMemo(() => ({
     search: search || undefined,
@@ -112,10 +114,21 @@ export function SongList() {
     <div className="song-list-page">
       <header className="page-header">
         <h1>{t('songs.title')}</h1>
-        <button className="add-button" onClick={() => setView('create')}>
-          {t('songs.addSong')}
-        </button>
+        <div className="header-actions">
+          <button className="import-button" onClick={() => setShowImportModal(true)}>
+            {t('songs.importSongs')}
+          </button>
+          <button className="add-button" onClick={() => setView('create')}>
+            {t('songs.addSong')}
+          </button>
+        </div>
       </header>
+
+      <ImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImportComplete={refetch}
+      />
 
       <div className="filters-section">
         <SearchBar

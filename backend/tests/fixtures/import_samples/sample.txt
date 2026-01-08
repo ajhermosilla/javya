@@ -1,0 +1,16 @@
+Title: Test Song Plain Text
+Artist: Plain Text Artist
+Key: E
+Tempo: 90
+
+[Verse 1]
+E           A           E
+This is a test song verse
+E           B           E
+Written for testing purposes
+
+[Chorus]
+A           E           B
+Here comes the chorus now
+A           E           B       E
+Singing loud and singing proud

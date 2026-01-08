@@ -30,6 +30,7 @@
   "songs": {
     "title": "Songs",
     "addSong": "Add Song",
+    "importSongs": "Import",
     "editSong": "Edit Song",
     "deleteSong": "Delete Song",
     "searchPlaceholder": "Search songs...",
@@ -79,6 +80,28 @@
     "capoSuggestion": "Capo suggestion",
     "capo": "Capo"
   },
+  "import": {
+    "title": "Import Songs",
+    "dropFiles": "Drop files here or click to select",
+    "supportedFormats": "ChordPro, OpenLyrics, OpenSong, Plain Text",
+    "selectedFiles": "{{count}} file(s) selected",
+    "upload": "Upload & Preview",
+    "uploading": "Uploading...",
+    "saving": "Saving songs...",
+    "complete": "Successfully imported {{count}} song(s)",
+    "preview": {
+      "summary": "{{successful}} of {{total}} file(s) parsed successfully",
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All",
+      "file": "File",
+      "format": "Format",
+      "title": "Title",
+      "status": "Status",
+      "ready": "Ready",
+      "failed": "Failed",
+      "confirm": "Import Selected ({{count}})"
+    }
+  },
   "moods": {
     "Joyful": "Joyful",
     "Reflective": "Reflective",
@@ -121,7 +144,8 @@
     "cancel": "Cancel",
     "edit": "Edit",
     "delete": "Delete",
-    "close": "Close"
+    "close": "Close",
+    "remove": "Remove"
   },
   "setlistForm": {
     "serviceDate": "Service Date",

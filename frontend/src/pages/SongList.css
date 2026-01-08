@@ -17,6 +17,27 @@
   color: #1a1a1a;
 }
 
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.import-button {
+  background: none;
+  border: 1px solid #646cff;
+  color: #646cff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.import-button:hover {
+  background-color: #646cff;
+  color: white;
+}
+
 .add-button {
   background-color: #646cff;
   color: white;
