@@ -28,8 +28,8 @@ router = APIRouter()
 # Limits
 MAX_FILES = 20
 MAX_FILE_SIZE = 1024 * 1024  # 1MB
-MAX_ZIP_SIZE = 10 * 1024 * 1024  # 10MB for ZIP archives
-MAX_FILES_IN_ZIP = 50  # Maximum files to extract from ZIP
+MAX_ZIP_SIZE = 200 * 1024 * 1024  # 200MB for ZIP archives
+MAX_FILES_IN_ZIP = 1000  # Maximum files to extract from ZIP
 URL_FETCH_TIMEOUT = 10  # seconds
 MAX_URL_CONTENT_SIZE = 1024 * 1024  # 1MB
 

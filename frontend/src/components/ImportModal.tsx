@@ -18,7 +18,7 @@ type InputMode = 'file' | 'paste' | 'url';
 
 const MAX_FILES = 20;
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB
-const MAX_ZIP_SIZE = 10 * 1024 * 1024; // 10MB for ZIP archives
+const MAX_ZIP_SIZE = 200 * 1024 * 1024; // 200MB for ZIP archives
 const MAX_PASTE_LENGTH = 50000; // 50KB for pasted text
 
 const isZipFile = (file: File): boolean => {
