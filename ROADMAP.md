@@ -29,19 +29,28 @@ This document outlines planned features for Javya. We welcome community input—
 
 ## Planned Features
 
-### v0.7 — Notifications & Communication
+### v0.7 — Advanced Song Import
+- [ ] **Clipboard paste** — Paste lyrics directly without needing a file
+- [ ] **URL import** — Fetch song content from a URL
+- [ ] **Edit before import** — Modify parsed fields in preview before saving
+- [ ] **ZIP archive support** — Import entire song libraries at once
+- [ ] **OnSong format** — Support for popular iOS app format (.onsong)
+- [ ] **Smarter parsing** — Auto-detect key from chord progressions, better section detection
+- [ ] **Merge with existing** — Update existing songs instead of creating duplicates
+
+### v0.8 — Notifications & Communication
 - [ ] **Email notifications** — Notify team members of schedule assignments
 - [ ] **Schedule reminders** — Automated reminders before services
 - [ ] **In-app messaging** — Team chat per setlist/service
 - [ ] **Availability requests** — Leaders can request availability for specific dates
 
-### v0.8 — Dashboard & Analytics
+### v0.9 — Dashboard & Analytics
 - [ ] **Dashboard** — Overview of upcoming services and team stats
 - [ ] **Song usage stats** — Track how often songs are used
 - [ ] **Team participation** — View member contribution over time
 - [ ] **Service history** — Archive of past setlists with notes
 
-### v0.9 — Mobile & Offline
+### v0.10 — Mobile & Offline
 - [ ] **Mobile-responsive UI** — Optimized experience for phones and tablets
 - [ ] **Progressive Web App (PWA)** — Install on mobile devices
 - [ ] **Offline mode** — Access setlists and songs without internet
