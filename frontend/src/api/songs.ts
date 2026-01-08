@@ -1,7 +1,24 @@
 import { api } from './client';
 import type { Song, SongCreate, SongUpdate, SongFilters } from '../types/song';
+import type { ExistingSongSummary } from '../types/import';
 
 const BASE_PATH = '/api/v1/songs';
+
+interface SongCheck {
+  name: string;
+  artist: string | null;
+}
+
+interface DuplicateMatch {
+  index: number;
+  name: string;
+  artist: string | null;
+  existing_song: ExistingSongSummary;
+}
+
+interface CheckDuplicatesResponse {
+  duplicates: DuplicateMatch[];
+}
 
 function buildQueryString(filters: SongFilters): string {
   const params = new URLSearchParams();
@@ -30,4 +47,9 @@ export const songsApi = {
 
   delete: (id: string) =>
     api.delete(`${BASE_PATH}/${id}`),
+
+  checkDuplicates: (songs: SongCheck[]) =>
+    api.post<CheckDuplicatesResponse>(`${BASE_PATH}/check-duplicates`, { songs }),
 };
+
+export type { ExistingSongSummary };

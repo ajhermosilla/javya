@@ -99,6 +99,7 @@
       "status": "Estado",
       "ready": "Listo",
       "failed": "Error",
+      "duplicate": "Duplicado",
       "confirm": "Importar Seleccionados ({{count}})"
     }
   },
@@ -265,5 +266,13 @@
     "sound": "Sonido",
     "projection": "Proyección",
     "other": "Otro"
+  },
+  "duplicates": {
+    "warning": "Canción Similar Encontrada",
+    "exists": "Ya existe una canción con este nombre:",
+    "by": "de",
+    "key": "Tono",
+    "useExisting": "Usar Existente",
+    "createAnyway": "Crear de Todos Modos"
   }
 }

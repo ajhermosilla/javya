@@ -99,6 +99,7 @@
       "status": "Status",
       "ready": "Ready",
       "failed": "Failed",
+      "duplicate": "Duplicate",
       "confirm": "Import Selected ({{count}})"
     }
   },
@@ -265,5 +266,13 @@
     "sound": "Sound",
     "projection": "Projection",
     "other": "Other"
+  },
+  "duplicates": {
+    "warning": "Similar Song Found",
+    "exists": "A song with this name already exists:",
+    "by": "by",
+    "key": "Key",
+    "useExisting": "Use Existing",
+    "createAnyway": "Create Anyway"
   }
 }

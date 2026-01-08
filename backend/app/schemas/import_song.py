@@ -2,6 +2,7 @@
 
 from pydantic import BaseModel
 
+from app.schemas.duplicate import ExistingSongSummary
 from app.schemas.song import SongCreate, SongResponse
 
 
@@ -13,6 +14,7 @@ class ParsedSong(BaseModel):
     success: bool
     error: str | None = None
     song_data: SongCreate | None = None
+    duplicate: ExistingSongSummary | None = None
 
 
 class ImportPreviewResponse(BaseModel):

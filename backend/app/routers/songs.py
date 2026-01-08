@@ -10,7 +10,9 @@ from app.database import get_db
 from app.enums import MusicalKey, Mood, Theme, UserRole
 from app.models.song import Song
 from app.models.user import User
+from app.schemas.duplicate import CheckDuplicatesRequest, CheckDuplicatesResponse
 from app.schemas.song import SongCreate, SongResponse, SongUpdate
+from app.services.duplicate_detector import find_duplicates
 
 router = APIRouter()
 
@@ -44,6 +46,20 @@ async def create_song(
     await db.commit()
     await db.refresh(song)
     return song
+
+
+@router.post("/check-duplicates", response_model=CheckDuplicatesResponse)
+async def check_duplicates(
+    request: CheckDuplicatesRequest,
+    db: AsyncSession = Depends(get_db),
+) -> CheckDuplicatesResponse:
+    """Check for duplicate songs by name + artist.
+
+    Returns a list of songs that have existing matches in the database.
+    Matching is case-insensitive on both name and artist.
+    """
+    duplicates = await find_duplicates(db, request.songs)
+    return CheckDuplicatesResponse(duplicates=duplicates)
 
 
 @router.get("/", response_model=list[SongResponse])

@@ -73,10 +73,25 @@ export function SongList() {
     setEditingSong(undefined);
   };
 
+  const handleNavigateToSong = async (songId: string) => {
+    try {
+      const song = await songsApi.get(songId);
+      setSelectedSong(song);
+      setView('detail');
+    } catch {
+      // If we can't fetch the song, just go back to list
+      setView('list');
+    }
+  };
+
   if (view === 'create') {
     return (
       <div className="song-list-page">
-        <SongForm onSubmit={handleCreate} onCancel={handleCancel} />
+        <SongForm
+          onSubmit={handleCreate}
+          onCancel={handleCancel}
+          onNavigateToSong={handleNavigateToSong}
+        />
       </div>
     );
   }
