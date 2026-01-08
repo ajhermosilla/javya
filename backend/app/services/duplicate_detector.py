@@ -42,7 +42,7 @@ async def find_duplicates(
             query = query.where(Song.artist.is_(None))
 
         result = await db.execute(query)
-        existing = result.scalar_one_or_none()
+        existing = result.scalars().first()
 
         if existing:
             results.append(
@@ -80,4 +80,4 @@ async def find_single_duplicate(
         query = query.where(Song.artist.is_(None))
 
     result = await db.execute(query)
-    return result.scalar_one_or_none()
+    return result.scalars().first()
