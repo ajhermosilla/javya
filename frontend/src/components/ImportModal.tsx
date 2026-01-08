@@ -4,6 +4,7 @@ import { importApi } from '../api/import';
 import type { ImportPreviewResponse, ParsedSong } from '../types/import';
 import type { SongCreate } from '../types/song';
 import { ImportPreview } from './ImportPreview';
+import { ImportEditModal } from './ImportEditModal';
 import './ImportModal.css';
 
 interface ImportModalProps {
@@ -38,6 +39,7 @@ export function ImportModal({
   );
   const [error, setError] = useState<string | null>(null);
   const [savedCount, setSavedCount] = useState(0);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -138,6 +140,22 @@ export function ImportModal({
     }
   };
 
+  const handleSaveEdit = (updatedSong: SongCreate) => {
+    if (editingIndex === null || !previewData) return;
+
+    const updatedSongs = [...previewData.songs];
+    updatedSongs[editingIndex] = {
+      ...updatedSongs[editingIndex],
+      song_data: updatedSong,
+    };
+
+    setPreviewData({
+      ...previewData,
+      songs: updatedSongs,
+    });
+    setEditingIndex(null);
+  };
+
   const handleClose = () => {
     // Reset state
     setStep('select');
@@ -149,6 +167,7 @@ export function ImportModal({
     setSelectedIndices(new Set());
     setError(null);
     setSavedCount(0);
+    setEditingIndex(null);
     onClose();
   };
 
@@ -307,13 +326,25 @@ export function ImportModal({
         )}
 
         {step === 'preview' && previewData && (
-          <ImportPreview
-            data={previewData}
-            selectedIndices={selectedIndices}
-            onSelectionChange={setSelectedIndices}
-            onConfirm={handleConfirm}
-            onBack={() => setStep('select')}
-          />
+          <>
+            <ImportPreview
+              data={previewData}
+              selectedIndices={selectedIndices}
+              onSelectionChange={setSelectedIndices}
+              onEditSong={setEditingIndex}
+              onConfirm={handleConfirm}
+              onBack={() => setStep('select')}
+            />
+            {editingIndex !== null &&
+              previewData.songs[editingIndex]?.song_data && (
+                <ImportEditModal
+                  song={previewData.songs[editingIndex].song_data!}
+                  fileName={previewData.songs[editingIndex].file_name}
+                  onSave={handleSaveEdit}
+                  onClose={() => setEditingIndex(null)}
+                />
+              )}
+          </>
         )}
 
         {step === 'saving' && (

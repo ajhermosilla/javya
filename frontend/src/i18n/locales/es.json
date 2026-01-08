@@ -111,6 +111,10 @@
       "failed": "Error",
       "duplicate": "Duplicado",
       "confirm": "Importar Seleccionados ({{count}})"
+    },
+    "edit": {
+      "title": "Editar Canción",
+      "save": "Guardar Cambios"
     }
   },
   "moods": {

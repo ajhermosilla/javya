@@ -93,6 +93,27 @@
   width: 80px;
 }
 
+.import-col-actions {
+  width: 60px;
+  text-align: center;
+}
+
+.import-edit-button {
+  background: none;
+  border: 1px solid #ddd;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: #666;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.import-edit-button:hover {
+  border-color: #646cff;
+  color: #646cff;
+}
+
 .import-preview-row-failed {
   opacity: 0.6;
 }

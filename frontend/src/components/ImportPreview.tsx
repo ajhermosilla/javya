@@ -6,6 +6,7 @@ interface ImportPreviewProps {
   data: ImportPreviewResponse;
   selectedIndices: Set<number>;
   onSelectionChange: (indices: Set<number>) => void;
+  onEditSong: (index: number) => void;
   onConfirm: () => void;
   onBack: () => void;
 }
@@ -23,6 +24,7 @@ export function ImportPreview({
   data,
   selectedIndices,
   onSelectionChange,
+  onEditSong,
   onConfirm,
   onBack,
 }: ImportPreviewProps) {
@@ -92,6 +94,7 @@ export function ImportPreview({
               <th className="import-col-status">
                 {t('import.preview.status')}
               </th>
+              <th className="import-col-actions"></th>
             </tr>
           </thead>
           <tbody>
@@ -142,6 +145,18 @@ export function ImportPreview({
                     >
                       {t('import.preview.failed')}
                     </span>
+                  )}
+                </td>
+                <td className="import-col-actions">
+                  {song.success && song.song_data && (
+                    <button
+                      className="import-edit-button"
+                      onClick={() => onEditSong(index)}
+                      title={t('import.edit.title')}
+                      type="button"
+                    >
+                      {t('common.edit')}
+                    </button>
                   )}
                 </td>
               </tr>
