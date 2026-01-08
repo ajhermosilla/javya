@@ -6,6 +6,11 @@ This document outlines planned features for Javya. We welcome community input—
 
 ## Completed
 
+### v0.6 — Song Tools ✅
+- [x] Song transposition — Transpose ChordPro charts to any key with capo suggestions
+- [x] Song import — Import from Ultimate Guitar, ChordPro, OpenLyrics, OpenSong, or plain text
+- [x] Song duplicates detection — Warn when adding similar songs
+
 ### v0.5 — Team Scheduling ✅
 - [x] Team scheduling calendar view
 - [x] Service role assignments (worship leader, vocalist, guitarist, etc.)
@@ -23,12 +28,6 @@ This document outlines planned features for Javya. We welcome community input—
 ---
 
 ## Planned Features
-
-### v0.6 — Song Tools
-- [x] **Song transposition** — Transpose ChordPro charts to any key with capo suggestions
-- [x] **Song import** — Import from OpenLP, OpenSong, ChordPro files, or plain text
-- [x] **Song duplicates detection** — Warn when adding similar songs
-- [ ] **CCLI integration** — Search and import from CCLI SongSelect
 
 ### v0.7 — Notifications & Communication
 - [ ] **Email notifications** — Notify team members of schedule assignments
