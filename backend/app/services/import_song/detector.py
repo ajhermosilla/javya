@@ -3,6 +3,7 @@
 from .base import BaseSongParser, ParseResult
 from .chordpro_parser import ChordProParser
 from .openlyrics_parser import OpenLyricsParser
+from .onsong_parser import OnSongParser
 from .opensong_parser import OpenSongParser
 from .plaintext_parser import PlainTextParser
 from .ultimateguitar_parser import UltimateGuitarParser
@@ -14,6 +15,7 @@ PARSERS: list[BaseSongParser] = [
     ChordProParser(),
     OpenLyricsParser(),
     OpenSongParser(),
+    OnSongParser(),
     UltimateGuitarParser(),
     PlainTextParser(),  # Fallback - catches anything
 ]
@@ -71,4 +73,5 @@ def get_supported_extensions() -> list[str]:
         ".pro",
         ".xml",
         ".txt",
+        ".onsong",
     ]
