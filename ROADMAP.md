@@ -31,7 +31,7 @@ This document outlines planned features for Javya. We welcome community input—
 
 ### v0.7 — Advanced Song Import
 - [x] **Clipboard paste** — Paste lyrics directly without needing a file
-- [ ] **URL import** — Fetch song content from a URL
+- [x] **URL import** — Fetch song content from a URL
 - [ ] **Edit before import** — Modify parsed fields in preview before saving
 - [ ] **ZIP archive support** — Import entire song libraries at once
 - [ ] **OnSong format** — Support for popular iOS app format (.onsong)
