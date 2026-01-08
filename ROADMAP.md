@@ -25,8 +25,8 @@ This document outlines planned features for Javya. We welcome community input—
 ## Planned Features
 
 ### v0.6 — Song Tools
-- [ ] **Song transposition** — Transpose ChordPro charts to any key with capo suggestions
-- [ ] **Song import** — Import from OpenLP, OpenSong, ChordPro files, or plain text
+- [x] **Song transposition** — Transpose ChordPro charts to any key with capo suggestions
+- [x] **Song import** — Import from OpenLP, OpenSong, ChordPro files, or plain text
 - [ ] **Song duplicates detection** — Warn when adding similar songs
 - [ ] **CCLI integration** — Search and import from CCLI SongSelect
 
