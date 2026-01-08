@@ -1,5 +1,6 @@
 """Tests for song import API endpoints."""
 
+import zipfile
 from pathlib import Path
 from io import BytesIO
 
@@ -277,3 +278,200 @@ class TestUrlPreviewEndpoint:
         )
 
         assert response.status_code == 422
+
+
+class TestZipImport:
+    """Tests for ZIP archive import."""
+
+    @pytest.fixture
+    def create_zip(self) -> callable:
+        """Factory to create ZIP archives with song files."""
+
+        def _create_zip(files: list[tuple[str, bytes]]) -> bytes:
+            buffer = BytesIO()
+            with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+                for filename, content in files:
+                    zf.writestr(filename, content)
+            return buffer.getvalue()
+
+        return _create_zip
+
+    @pytest.mark.asyncio
+    async def test_preview_zip_single_song(
+        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+    ):
+        """Should extract and preview a single song from ZIP."""
+        zip_content = create_zip([("song.cho", sample_chordpro_content)])
+        files = [("files", ("songs.zip", zip_content, "application/zip"))]
+
+        response = await client.post("/api/v1/songs/import/preview", files=files)
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total_files"] == 1
+        assert data["successful"] == 1
+        assert data["songs"][0]["success"] is True
+        assert "songs.zip/song.cho" in data["songs"][0]["file_name"]
+
+    @pytest.mark.asyncio
+    async def test_preview_zip_multiple_songs(
+        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+    ):
+        """Should extract and preview multiple songs from ZIP."""
+        song1 = b"""{title: Song One}
+{artist: Artist A}
+
+[G]First song lyrics"""
+
+        song2 = b"""{title: Song Two}
+{artist: Artist B}
+
+[C]Second song lyrics"""
+
+        zip_content = create_zip([
+            ("song1.cho", song1),
+            ("song2.cho", song2),
+            ("song3.txt", b"Just plain text lyrics"),
+        ])
+        files = [("files", ("songs.zip", zip_content, "application/zip"))]
+
+        response = await client.post("/api/v1/songs/import/preview", files=files)
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total_files"] == 3
+        assert data["successful"] == 3
+
+    @pytest.mark.asyncio
+    async def test_preview_zip_filters_non_song_files(
+        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+    ):
+        """Should only extract song files from ZIP, ignoring others."""
+        zip_content = create_zip([
+            ("song.cho", sample_chordpro_content),
+            ("readme.md", b"# README"),
+            ("image.png", b"PNG data"),
+            ("config.json", b"{}"),
+        ])
+        files = [("files", ("songs.zip", zip_content, "application/zip"))]
+
+        response = await client.post("/api/v1/songs/import/preview", files=files)
+
+        assert response.status_code == 200
+        data = response.json()
+        # Only .cho file should be extracted
+        assert data["total_files"] == 1
+        assert data["successful"] == 1
+
+    @pytest.mark.asyncio
+    async def test_preview_zip_ignores_macosx_folder(
+        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+    ):
+        """Should ignore __MACOSX folder in ZIP."""
+        zip_content = create_zip([
+            ("song.cho", sample_chordpro_content),
+            ("__MACOSX/._song.cho", b"metadata"),
+        ])
+        files = [("files", ("songs.zip", zip_content, "application/zip"))]
+
+        response = await client.post("/api/v1/songs/import/preview", files=files)
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total_files"] == 1
+        assert data["successful"] == 1
+
+    @pytest.mark.asyncio
+    async def test_preview_zip_ignores_hidden_files(
+        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+    ):
+        """Should ignore hidden files (starting with .) in ZIP."""
+        zip_content = create_zip([
+            ("song.cho", sample_chordpro_content),
+            (".hidden.cho", sample_chordpro_content),
+            ("folder/.hidden.txt", b"hidden"),
+        ])
+        files = [("files", ("songs.zip", zip_content, "application/zip"))]
+
+        response = await client.post("/api/v1/songs/import/preview", files=files)
+
+        assert response.status_code == 200
+        data = response.json()
+        # Only non-hidden song file should be extracted
+        assert data["total_files"] == 1
+        assert data["successful"] == 1
+
+    @pytest.mark.asyncio
+    async def test_preview_zip_nested_folders(
+        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+    ):
+        """Should extract song files from nested folders."""
+        zip_content = create_zip([
+            ("songs/worship/song1.cho", sample_chordpro_content),
+            ("songs/hymns/song2.cho", sample_chordpro_content),
+        ])
+        files = [("files", ("songs.zip", zip_content, "application/zip"))]
+
+        response = await client.post("/api/v1/songs/import/preview", files=files)
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total_files"] == 2
+        assert data["successful"] == 2
+
+    @pytest.mark.asyncio
+    async def test_preview_zip_with_invalid_zip(self, client: AsyncClient):
+        """Should handle invalid ZIP gracefully."""
+        # Starts with ZIP magic bytes but is corrupted
+        fake_zip = b"PK\x03\x04corrupted content that is not a valid zip"
+        files = [("files", ("songs.zip", fake_zip, "application/zip"))]
+
+        response = await client.post("/api/v1/songs/import/preview", files=files)
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["failed"] >= 1
+        # Should have an error message about invalid ZIP
+        assert any("Invalid ZIP" in (s.get("error") or "") or "Failed to read" in (s.get("error") or "")
+                   for s in data["songs"])
+
+    @pytest.mark.asyncio
+    async def test_preview_zip_mixed_with_regular_files(
+        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+    ):
+        """Should handle ZIP and regular files in same request."""
+        zip_content = create_zip([("zipped_song.cho", sample_chordpro_content)])
+
+        files = [
+            ("files", ("regular.cho", sample_chordpro_content, "text/plain")),
+            ("files", ("archive.zip", zip_content, "application/zip")),
+        ]
+
+        response = await client.post("/api/v1/songs/import/preview", files=files)
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total_files"] == 2
+        assert data["successful"] == 2
+
+    @pytest.mark.asyncio
+    async def test_preview_zip_all_supported_extensions(
+        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+    ):
+        """Should extract all supported song file extensions."""
+        zip_content = create_zip([
+            ("song.cho", sample_chordpro_content),
+            ("song.crd", sample_chordpro_content),
+            ("song.chopro", sample_chordpro_content),
+            ("song.txt", b"Plain text song"),
+            ("song.xml", b"<song><lyrics>test</lyrics></song>"),
+            ("song.onsong", sample_chordpro_content),
+        ])
+        files = [("files", ("songs.zip", zip_content, "application/zip"))]
+
+        response = await client.post("/api/v1/songs/import/preview", files=files)
+
+        assert response.status_code == 200
+        data = response.json()
+        # All 6 supported extensions should be extracted
+        assert data["total_files"] == 6
