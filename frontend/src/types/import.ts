@@ -4,6 +4,7 @@ export type ImportFormat =
   | 'chordpro'
   | 'openlyrics'
   | 'opensong'
+  | 'ultimateguitar'
   | 'plaintext'
   | 'unknown';
 

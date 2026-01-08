@@ -5,6 +5,7 @@ from .chordpro_parser import ChordProParser
 from .openlyrics_parser import OpenLyricsParser
 from .opensong_parser import OpenSongParser
 from .plaintext_parser import PlainTextParser
+from .ultimateguitar_parser import UltimateGuitarParser
 
 
 # Parsers in order of detection priority
@@ -13,6 +14,7 @@ PARSERS: list[BaseSongParser] = [
     ChordProParser(),
     OpenLyricsParser(),
     OpenSongParser(),
+    UltimateGuitarParser(),
     PlainTextParser(),  # Fallback - catches anything
 ]
 

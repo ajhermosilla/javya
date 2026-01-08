@@ -14,6 +14,7 @@ const FORMAT_LABELS: Record<string, string> = {
   chordpro: 'ChordPro',
   openlyrics: 'OpenLyrics',
   opensong: 'OpenSong',
+  ultimateguitar: 'Ultimate Guitar',
   plaintext: 'Plain Text',
   unknown: 'Unknown',
 };

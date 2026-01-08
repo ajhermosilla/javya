@@ -10,6 +10,7 @@ from app.services.import_song.chordpro_parser import ChordProParser
 from app.services.import_song.openlyrics_parser import OpenLyricsParser
 from app.services.import_song.opensong_parser import OpenSongParser
 from app.services.import_song.plaintext_parser import PlainTextParser
+from app.services.import_song.ultimateguitar_parser import UltimateGuitarParser
 
 
 # Path to test fixtures
@@ -235,18 +236,187 @@ This is the lyrics
 
     def test_parse_sample_file(self):
         """Should parse sample plain text file."""
-        sample_path = FIXTURES_DIR / "sample.txt"
+        sample_path = FIXTURES_DIR / "sample_plaintext.txt"
         if not sample_path.exists():
             pytest.skip("Sample file not found")
 
         content = sample_path.read_bytes()
-        result = detect_and_parse(content, "sample.txt")
+        result = detect_and_parse(content, "sample_plaintext.txt")
 
         assert result.success is True
         assert result.detected_format == "plaintext"
         assert result.song_data is not None
         assert result.song_data.name == "Test Song Plain Text"
         assert result.song_data.original_key == MusicalKey.E
+
+
+class TestUltimateGuitarParser:
+    """Tests for Ultimate Guitar format parser."""
+
+    def test_can_parse_by_capo(self):
+        """Should detect UG format by Capo line."""
+        parser = UltimateGuitarParser()
+        content = """Song Title
+Capo: 2
+
+[Verse]
+G       D
+Some lyrics here
+"""
+        assert parser.can_parse(content, "song.txt") is True
+
+    def test_can_parse_by_tuning(self):
+        """Should detect UG format by Tuning line."""
+        parser = UltimateGuitarParser()
+        content = """Song Title
+Tuning: Drop D
+
+[Verse]
+G       D
+Some lyrics here
+"""
+        assert parser.can_parse(content, "song.txt") is True
+
+    def test_can_parse_by_filename(self):
+        """Should detect UG format by filename hint."""
+        parser = UltimateGuitarParser()
+        content = "G    D\nSome lyrics"
+        assert parser.can_parse(content, "song_ug.txt") is True
+        assert parser.can_parse(content, "ultimate_song.txt") is True
+
+    def test_can_parse_by_sections(self):
+        """Should detect UG format by multiple section markers with chords."""
+        parser = UltimateGuitarParser()
+        content = """[Verse]
+G       D
+Some lyrics
+
+[Chorus]
+C       G
+More lyrics
+"""
+        assert parser.can_parse(content, "song.txt") is True
+
+    def test_cannot_parse_plain_lyrics(self):
+        """Should not parse plain lyrics without UG markers."""
+        parser = UltimateGuitarParser()
+        content = """Just some plain text
+Without any chords
+Or section markers"""
+        assert parser.can_parse(content, "song.txt") is False
+
+    def test_parse_extracts_metadata(self):
+        """Should extract title, artist, capo, and key."""
+        parser = UltimateGuitarParser()
+        content = """Amazing Grace by John Newton
+
+Capo: 3
+Key: G
+
+[Verse 1]
+G       C       G
+Amazing grace how sweet the sound
+"""
+        result = parser.parse(content, "song.txt")
+
+        assert result.success is True
+        assert result.song_data is not None
+        assert result.song_data.name == "Amazing Grace"
+        assert result.song_data.artist == "John Newton"
+        assert result.song_data.original_key == MusicalKey.G
+        assert result.song_data.notes is not None
+        assert "Capo: 3" in result.song_data.notes
+
+    def test_parse_converts_to_chordpro(self):
+        """Should convert chord-over-lyrics to ChordPro format."""
+        parser = UltimateGuitarParser()
+        content = """Test Song
+Capo: 2
+
+[Verse]
+G       D
+Hello world
+"""
+        result = parser.parse(content, "song.txt")
+
+        assert result.success is True
+        assert result.song_data.chordpro_chart is not None
+        assert "[G]" in result.song_data.chordpro_chart
+        assert "[D]" in result.song_data.chordpro_chart
+
+    def test_parse_extracts_plain_lyrics(self):
+        """Should extract plain lyrics without chords."""
+        parser = UltimateGuitarParser()
+        content = """Test Song
+Capo: 2
+
+G       D
+Hello world
+C       G
+Goodbye world
+"""
+        result = parser.parse(content, "song.txt")
+
+        assert result.success is True
+        assert result.song_data.lyrics is not None
+        assert "Hello world" in result.song_data.lyrics
+        assert "Goodbye world" in result.song_data.lyrics
+        assert "[G]" not in result.song_data.lyrics
+
+    def test_parse_sample_file(self):
+        """Should parse sample Ultimate Guitar file."""
+        sample_path = FIXTURES_DIR / "sample_ug.txt"
+        if not sample_path.exists():
+            pytest.skip("Sample file not found")
+
+        content = sample_path.read_bytes()
+        result = detect_and_parse(content, "sample_ug.txt")
+
+        assert result.success is True
+        assert result.detected_format == "ultimateguitar"
+        assert result.song_data is not None
+        assert result.song_data.name == "Blessed Be Your Name"
+        assert result.song_data.artist == "Matt Redman"
+        assert result.song_data.original_key == MusicalKey.A
+        assert "Capo: 2" in result.song_data.notes
+
+    def test_parse_preserves_sections(self):
+        """Should preserve section markers in output."""
+        parser = UltimateGuitarParser()
+        content = """Song
+Capo: 1
+
+[Verse]
+G    D
+First verse
+
+[Chorus]
+C    G
+The chorus
+"""
+        result = parser.parse(content, "song.txt")
+
+        assert result.success is True
+        assert "[Verse]" in result.song_data.chordpro_chart
+        assert "[Chorus]" in result.song_data.chordpro_chart
+
+    def test_parse_handles_tuning(self):
+        """Should extract non-standard tuning."""
+        parser = UltimateGuitarParser()
+        content = """Song Title
+Tuning: DADGAD
+Capo: 2
+
+[Verse]
+G    D
+Lyrics
+"""
+        result = parser.parse(content, "song.txt")
+
+        assert result.success is True
+        assert result.song_data.notes is not None
+        assert "Tuning: DADGAD" in result.song_data.notes
+        assert "Capo: 2" in result.song_data.notes
 
 
 class TestFormatDetection:
@@ -269,6 +439,18 @@ class TestFormatDetection:
         content = b"<song><title>Test</title><lyrics>text</lyrics></song>"
         result = detect_and_parse(content, "song.xml")
         assert result.detected_format == "opensong"
+
+    def test_detect_ultimateguitar(self):
+        """Should detect Ultimate Guitar format."""
+        content = b"""Song Title
+Capo: 2
+
+[Verse]
+G       D
+Some lyrics here
+"""
+        result = detect_and_parse(content, "song.txt")
+        assert result.detected_format == "ultimateguitar"
 
     def test_fallback_to_plaintext(self):
         """Should fall back to plain text for unrecognized content."""

@@ -122,7 +122,9 @@ class TestPreviewEndpoint:
             ("sample.cho", "chordpro"),
             ("sample_openlyrics.xml", "openlyrics"),
             ("sample_opensong.xml", "opensong"),
-            ("sample.txt", "plaintext"),
+            ("sample.txt", "ultimateguitar"),
+            ("sample_plaintext.txt", "plaintext"),
+            ("sample_ug.txt", "ultimateguitar"),
         ]
 
         for filename, expected_format in files_to_test:
