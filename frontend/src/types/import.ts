@@ -9,11 +9,13 @@ export type ImportFormat =
   | 'plaintext'
   | 'unknown';
 
-export enum ImportAction {
-  CREATE = 'create',
-  MERGE = 'merge',
-  SKIP = 'skip',
-}
+export const ImportAction = {
+  CREATE: 'create',
+  MERGE: 'merge',
+  SKIP: 'skip',
+} as const;
+
+export type ImportAction = (typeof ImportAction)[keyof typeof ImportAction];
 
 export interface ExistingSongSummary {
   id: string;
