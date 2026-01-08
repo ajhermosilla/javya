@@ -8,6 +8,7 @@ from app.enums import MusicalKey
 from app.services.import_song import detect_and_parse, ParseResult
 from app.services.import_song.chordpro_parser import ChordProParser
 from app.services.import_song.openlyrics_parser import OpenLyricsParser
+from app.services.import_song.onsong_parser import OnSongParser
 from app.services.import_song.opensong_parser import OpenSongParser
 from app.services.import_song.plaintext_parser import PlainTextParser
 from app.services.import_song.ultimateguitar_parser import UltimateGuitarParser
@@ -190,6 +191,174 @@ Test lyrics here
         assert result.song_data is not None
         assert result.song_data.name == "Test Song OpenSong"
         assert result.song_data.original_key == MusicalKey.A
+
+
+class TestOnSongParser:
+    """Tests for OnSong format parser."""
+
+    def test_can_parse_by_extension(self):
+        """Should detect OnSong by file extension."""
+        parser = OnSongParser()
+        assert parser.can_parse("some content", "song.onsong") is True
+
+    def test_can_parse_by_content(self):
+        """Should detect OnSong by metadata, section headers, and inline chords."""
+        parser = OnSongParser()
+        content = """Amazing Grace
+John Newton
+
+Key: G
+Tempo: 72
+
+Verse 1:
+[G]Amazing [D]grace how [C]sweet the [G]sound
+"""
+        assert parser.can_parse(content, "song.txt") is True
+
+    def test_cannot_parse_chords_above_lyrics(self):
+        """Should not parse Ultimate Guitar style (chords above lyrics)."""
+        parser = OnSongParser()
+        # This is UG style - chords on separate line above lyrics
+        content = """Title: Test Song
+Key: G
+
+Verse:
+G      D      C      G
+Amazing grace how sweet the sound
+"""
+        assert parser.can_parse(content, "song.txt") is False
+
+    def test_cannot_parse_chordpro(self):
+        """Should not parse ChordPro format."""
+        parser = OnSongParser()
+        content = "{title: Test}\n{key: G}\n[G]Lyrics"
+        assert parser.can_parse(content, "song.txt") is False
+
+    def test_parse_basic_onsong(self):
+        """Should parse basic OnSong content."""
+        parser = OnSongParser()
+        content = """Test Song
+Test Artist
+
+Key: G
+Tempo: 120
+
+Verse:
+[G]This is a [D]test
+"""
+        result = parser.parse(content, "test.onsong")
+
+        assert result.success is True
+        assert result.song_data is not None
+        assert result.song_data.name == "Test Song"
+        assert result.song_data.artist == "Test Artist"
+        assert result.song_data.original_key == MusicalKey.G
+        assert result.song_data.tempo_bpm == 120
+
+    def test_parse_extracts_lyrics(self):
+        """Should extract plain lyrics without chords."""
+        parser = OnSongParser()
+        content = """Test
+Key: G
+
+Verse:
+[G]Hello [D]world
+"""
+        result = parser.parse(content, "test.onsong")
+
+        assert result.success is True
+        assert result.song_data is not None
+        assert "Hello world" in result.song_data.lyrics
+        assert "[G]" not in result.song_data.lyrics
+
+    def test_parse_artist_in_parens(self):
+        """Should parse artist in parentheses."""
+        parser = OnSongParser()
+        content = """Test Song
+(Test Artist)
+
+Key: G
+
+Verse:
+[G]Lyrics
+"""
+        result = parser.parse(content, "test.onsong")
+
+        assert result.success is True
+        assert result.song_data.artist == "Test Artist"
+
+    def test_parse_artist_with_by_prefix(self):
+        """Should parse artist with 'by' prefix."""
+        parser = OnSongParser()
+        content = """Test Song
+by Test Artist
+
+Key: G
+
+Verse:
+[G]Lyrics
+"""
+        result = parser.parse(content, "test.onsong")
+
+        assert result.success is True
+        assert result.song_data.artist == "Test Artist"
+
+    def test_parse_converts_to_chordpro(self):
+        """Should convert to ChordPro format."""
+        parser = OnSongParser()
+        content = """Test Song
+Test Artist
+
+Key: G
+
+Verse:
+[G]Lyrics here
+"""
+        result = parser.parse(content, "test.onsong")
+
+        assert result.success is True
+        assert result.song_data.chordpro_chart is not None
+        assert "{title: Test Song}" in result.song_data.chordpro_chart
+        assert "{artist: Test Artist}" in result.song_data.chordpro_chart
+        assert "{key: G}" in result.song_data.chordpro_chart
+
+    def test_parse_sample_file(self):
+        """Should parse sample OnSong file."""
+        sample_path = FIXTURES_DIR / "sample.onsong"
+        if not sample_path.exists():
+            pytest.skip("Sample file not found")
+
+        content = sample_path.read_bytes()
+        result = detect_and_parse(content, "sample.onsong")
+
+        assert result.success is True
+        assert result.detected_format == "onsong"
+        assert result.song_data is not None
+        assert result.song_data.name == "Amazing Grace"
+        assert result.song_data.artist == "John Newton"
+        assert result.song_data.original_key == MusicalKey.G
+        assert result.song_data.tempo_bpm == 72
+
+    def test_parse_complex_onsong(self):
+        """Should parse complex OnSong file with all sections."""
+        sample_path = FIXTURES_DIR / "complex_onsong.onsong"
+        if not sample_path.exists():
+            pytest.skip("Sample file not found")
+
+        content = sample_path.read_bytes()
+        result = detect_and_parse(content, "complex_onsong.onsong")
+
+        assert result.success is True
+        assert result.detected_format == "onsong"
+        assert result.song_data is not None
+        assert result.song_data.name == "Test Song Title"
+        assert result.song_data.artist == "Test Artist Name"
+        assert result.song_data.original_key == MusicalKey.D
+        assert result.song_data.tempo_bpm == 120
+        # Should have capo, time, and CCLI in notes
+        assert "Capo: 3" in result.song_data.notes
+        assert "Time: 4/4" in result.song_data.notes
+        assert "CCLI: 123456" in result.song_data.notes
 
 
 class TestPlainTextParser:
