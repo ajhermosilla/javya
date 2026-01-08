@@ -1,9 +1,15 @@
 """Schemas for song import endpoints."""
 
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
 from app.schemas.duplicate import ExistingSongSummary
 from app.schemas.song import SongCreate, SongResponse
+
+
+class UrlImportRequest(BaseModel):
+    """Request to import a song from a URL."""
+
+    url: HttpUrl
 
 
 class ParsedSong(BaseModel):

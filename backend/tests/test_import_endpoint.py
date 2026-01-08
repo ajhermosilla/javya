@@ -239,3 +239,41 @@ class TestConfirmEndpoint:
 
         assert get_response.status_code == 200
         assert get_response.json()["name"] == "Test Import Song"
+
+
+class TestUrlPreviewEndpoint:
+    """Tests for POST /api/v1/songs/import/preview-url."""
+
+    @pytest.mark.asyncio
+    async def test_preview_url_invalid_url(self, client: AsyncClient):
+        """Should reject invalid URL."""
+        response = await client.post(
+            "/api/v1/songs/import/preview-url",
+            json={"url": "not-a-valid-url"},
+        )
+
+        assert response.status_code == 422  # Validation error
+
+    @pytest.mark.asyncio
+    async def test_preview_url_unreachable(self, client: AsyncClient):
+        """Should handle unreachable URL gracefully."""
+        response = await client.post(
+            "/api/v1/songs/import/preview-url",
+            json={"url": "https://this-domain-does-not-exist-12345.com/song.cho"},
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["failed"] == 1
+        assert data["songs"][0]["success"] is False
+        assert "Failed to fetch URL" in data["songs"][0]["error"]
+
+    @pytest.mark.asyncio
+    async def test_preview_url_missing_url(self, client: AsyncClient):
+        """Should reject request without URL."""
+        response = await client.post(
+            "/api/v1/songs/import/preview-url",
+            json={},
+        )
+
+        assert response.status_code == 422
