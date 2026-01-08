@@ -13,9 +13,11 @@ interface ImportModalProps {
 }
 
 type Step = 'select' | 'uploading' | 'preview' | 'saving' | 'complete';
+type InputMode = 'file' | 'paste';
 
 const MAX_FILES = 20;
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+const MAX_PASTE_LENGTH = 50000; // 50KB for pasted text
 
 export function ImportModal({
   isOpen,
@@ -24,7 +26,9 @@ export function ImportModal({
 }: ImportModalProps) {
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>('select');
+  const [inputMode, setInputMode] = useState<InputMode>('file');
   const [files, setFiles] = useState<File[]>([]);
+  const [pastedText, setPastedText] = useState('');
   const [previewData, setPreviewData] = useState<ImportPreviewResponse | null>(
     null
   );
@@ -65,13 +69,28 @@ export function ImportModal({
   };
 
   const handleUpload = async () => {
-    if (files.length === 0) return;
+    let filesToUpload: File[];
+
+    if (inputMode === 'paste') {
+      const trimmed = pastedText.trim();
+      if (!trimmed) return;
+      if (trimmed.length > MAX_PASTE_LENGTH) {
+        setError(t('import.pasteTooLong'));
+        return;
+      }
+      // Convert pasted text to a File object
+      const blob = new Blob([trimmed], { type: 'text/plain' });
+      filesToUpload = [new File([blob], 'pasted_song.txt', { type: 'text/plain' })];
+    } else {
+      if (files.length === 0) return;
+      filesToUpload = files;
+    }
 
     setStep('uploading');
     setError(null);
 
     try {
-      const result = await importApi.preview(files);
+      const result = await importApi.preview(filesToUpload);
       setPreviewData(result);
 
       // Pre-select all successful parses
@@ -116,13 +135,19 @@ export function ImportModal({
   const handleClose = () => {
     // Reset state
     setStep('select');
+    setInputMode('file');
     setFiles([]);
+    setPastedText('');
     setPreviewData(null);
     setSelectedIndices(new Set());
     setError(null);
     setSavedCount(0);
     onClose();
   };
+
+  const canUpload = inputMode === 'file'
+    ? files.length > 0
+    : pastedText.trim().length > 0;
 
   if (!isOpen) return null;
 
@@ -144,49 +169,83 @@ export function ImportModal({
 
         {step === 'select' && (
           <div className="import-select">
-            <div
-              className="import-drop-zone"
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-            >
-              <input
-                type="file"
-                multiple
-                accept=".cho,.crd,.chopro,.xml,.txt"
-                onChange={handleFileSelect}
-                id="import-file-input"
-                className="import-file-input"
-              />
-              <label htmlFor="import-file-input" className="import-drop-label">
-                <span className="import-drop-icon">📁</span>
-                <span className="import-drop-text">
-                  {t('import.dropFiles')}
-                </span>
-                <span className="import-drop-hint">
-                  {t('import.supportedFormats')}
-                </span>
-              </label>
+            <div className="import-tabs">
+              <button
+                className={`import-tab ${inputMode === 'file' ? 'active' : ''}`}
+                onClick={() => setInputMode('file')}
+              >
+                {t('import.tabFile')}
+              </button>
+              <button
+                className={`import-tab ${inputMode === 'paste' ? 'active' : ''}`}
+                onClick={() => setInputMode('paste')}
+              >
+                {t('import.tabPaste')}
+              </button>
             </div>
 
-            {files.length > 0 && (
-              <div className="import-selected-files">
-                <h3>
-                  {t('import.selectedFiles', { count: files.length })}
-                </h3>
-                <ul className="import-file-list">
-                  {files.map((f, i) => (
-                    <li key={i} className="import-file-item">
-                      <span className="import-file-name">{f.name}</span>
-                      <button
-                        className="import-file-remove"
-                        onClick={() => removeFile(i)}
-                        aria-label={t('common.remove')}
-                      >
-                        &times;
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+            {inputMode === 'file' && (
+              <>
+                <div
+                  className="import-drop-zone"
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                >
+                  <input
+                    type="file"
+                    multiple
+                    accept=".cho,.crd,.chopro,.xml,.txt"
+                    onChange={handleFileSelect}
+                    id="import-file-input"
+                    className="import-file-input"
+                  />
+                  <label htmlFor="import-file-input" className="import-drop-label">
+                    <span className="import-drop-icon">📁</span>
+                    <span className="import-drop-text">
+                      {t('import.dropFiles')}
+                    </span>
+                    <span className="import-drop-hint">
+                      {t('import.supportedFormats')}
+                    </span>
+                  </label>
+                </div>
+
+                {files.length > 0 && (
+                  <div className="import-selected-files">
+                    <h3>
+                      {t('import.selectedFiles', { count: files.length })}
+                    </h3>
+                    <ul className="import-file-list">
+                      {files.map((f, i) => (
+                        <li key={i} className="import-file-item">
+                          <span className="import-file-name">{f.name}</span>
+                          <button
+                            className="import-file-remove"
+                            onClick={() => removeFile(i)}
+                            aria-label={t('common.remove')}
+                          >
+                            &times;
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </>
+            )}
+
+            {inputMode === 'paste' && (
+              <div className="import-paste-container">
+                <textarea
+                  className="import-paste-textarea"
+                  placeholder={t('import.pastePlaceholder')}
+                  value={pastedText}
+                  onChange={(e) => setPastedText(e.target.value)}
+                  rows={12}
+                />
+                <span className="import-paste-hint">
+                  {t('import.pasteHint')}
+                </span>
               </div>
             )}
 
@@ -197,9 +256,9 @@ export function ImportModal({
               <button
                 className="import-upload-button"
                 onClick={handleUpload}
-                disabled={files.length === 0}
+                disabled={!canUpload}
               >
-                {t('import.upload')}
+                {inputMode === 'paste' ? t('import.parse') : t('import.upload')}
               </button>
             </div>
           </div>
