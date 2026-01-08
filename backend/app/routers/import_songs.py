@@ -1,5 +1,8 @@
 """Router for song import endpoints."""
 
+from urllib.parse import urlparse
+
+import httpx
 from fastapi import APIRouter, HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
@@ -11,6 +14,7 @@ from app.schemas.import_song import (
     ImportConfirmResponse,
     ImportPreviewResponse,
     ParsedSong,
+    UrlImportRequest,
 )
 from app.schemas.duplicate import ExistingSongSummary, SongCheck
 from app.schemas.song import SongResponse
@@ -22,6 +26,8 @@ router = APIRouter()
 # Limits
 MAX_FILES = 20
 MAX_FILE_SIZE = 1024 * 1024  # 1MB
+URL_FETCH_TIMEOUT = 10  # seconds
+MAX_URL_CONTENT_SIZE = 1024 * 1024  # 1MB
 
 
 @router.post("/preview", response_model=ImportPreviewResponse)
@@ -142,6 +148,157 @@ async def preview_import(
         failed=failed,
         songs=parsed_songs,
     )
+
+
+@router.post("/preview-url", response_model=ImportPreviewResponse)
+async def preview_url_import(
+    request: UrlImportRequest,
+    db: AsyncSession = Depends(get_db),
+) -> ImportPreviewResponse:
+    """Fetch content from a URL and return preview data.
+
+    This endpoint does NOT save anything to the database.
+    Use /confirm to save selected songs.
+
+    Limits:
+    - Maximum 1MB content size
+    - 10 second timeout
+    """
+    url = str(request.url)
+
+    # Extract filename from URL path
+    parsed_url = urlparse(url)
+    path_parts = parsed_url.path.rsplit("/", 1)
+    filename = path_parts[-1] if len(path_parts) > 1 and path_parts[-1] else "url_import"
+
+    # Fetch URL content
+    try:
+        async with httpx.AsyncClient(
+            timeout=URL_FETCH_TIMEOUT,
+            follow_redirects=True,
+            max_redirects=5,
+        ) as client:
+            response = await client.get(url)
+            response.raise_for_status()
+
+            # Check content length
+            content_length = response.headers.get("content-length")
+            if content_length and int(content_length) > MAX_URL_CONTENT_SIZE:
+                return ImportPreviewResponse(
+                    total_files=1,
+                    successful=0,
+                    failed=1,
+                    songs=[
+                        ParsedSong(
+                            file_name=filename,
+                            detected_format="unknown",
+                            success=False,
+                            error=f"Content exceeds maximum size of {MAX_URL_CONTENT_SIZE // 1024}KB",
+                        )
+                    ],
+                )
+
+            content = response.content
+
+            # Double-check actual content size
+            if len(content) > MAX_URL_CONTENT_SIZE:
+                return ImportPreviewResponse(
+                    total_files=1,
+                    successful=0,
+                    failed=1,
+                    songs=[
+                        ParsedSong(
+                            file_name=filename,
+                            detected_format="unknown",
+                            success=False,
+                            error=f"Content exceeds maximum size of {MAX_URL_CONTENT_SIZE // 1024}KB",
+                        )
+                    ],
+                )
+
+    except httpx.TimeoutException:
+        return ImportPreviewResponse(
+            total_files=1,
+            successful=0,
+            failed=1,
+            songs=[
+                ParsedSong(
+                    file_name=filename,
+                    detected_format="unknown",
+                    success=False,
+                    error="Request timed out",
+                )
+            ],
+        )
+    except httpx.HTTPStatusError as e:
+        return ImportPreviewResponse(
+            total_files=1,
+            successful=0,
+            failed=1,
+            songs=[
+                ParsedSong(
+                    file_name=filename,
+                    detected_format="unknown",
+                    success=False,
+                    error=f"HTTP error: {e.response.status_code}",
+                )
+            ],
+        )
+    except httpx.RequestError as e:
+        return ImportPreviewResponse(
+            total_files=1,
+            successful=0,
+            failed=1,
+            songs=[
+                ParsedSong(
+                    file_name=filename,
+                    detected_format="unknown",
+                    success=False,
+                    error=f"Failed to fetch URL: {str(e)}",
+                )
+            ],
+        )
+
+    # Parse the content
+    result = detect_and_parse(content, filename)
+
+    if result.success:
+        parsed_song = ParsedSong(
+            file_name=filename,
+            detected_format=result.detected_format,
+            success=True,
+            song_data=result.song_data,
+        )
+
+        # Check for duplicates
+        if result.song_data:
+            duplicates = await find_duplicates(
+                db,
+                [SongCheck(name=result.song_data.name, artist=result.song_data.artist)],
+            )
+            if duplicates:
+                parsed_song.duplicate = duplicates[0].existing_song
+
+        return ImportPreviewResponse(
+            total_files=1,
+            successful=1,
+            failed=0,
+            songs=[parsed_song],
+        )
+    else:
+        return ImportPreviewResponse(
+            total_files=1,
+            successful=0,
+            failed=1,
+            songs=[
+                ParsedSong(
+                    file_name=filename,
+                    detected_format=result.detected_format,
+                    success=False,
+                    error=result.error,
+                )
+            ],
+        )
 
 
 @router.post("/confirm", response_model=ImportConfirmResponse)

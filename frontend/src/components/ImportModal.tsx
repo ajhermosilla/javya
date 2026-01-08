@@ -13,7 +13,7 @@ interface ImportModalProps {
 }
 
 type Step = 'select' | 'uploading' | 'preview' | 'saving' | 'complete';
-type InputMode = 'file' | 'paste';
+type InputMode = 'file' | 'paste' | 'url';
 
 const MAX_FILES = 20;
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB
@@ -29,6 +29,7 @@ export function ImportModal({
   const [inputMode, setInputMode] = useState<InputMode>('file');
   const [files, setFiles] = useState<File[]>([]);
   const [pastedText, setPastedText] = useState('');
+  const [urlInput, setUrlInput] = useState('');
   const [previewData, setPreviewData] = useState<ImportPreviewResponse | null>(
     null
   );
@@ -69,28 +70,33 @@ export function ImportModal({
   };
 
   const handleUpload = async () => {
-    let filesToUpload: File[];
-
-    if (inputMode === 'paste') {
-      const trimmed = pastedText.trim();
-      if (!trimmed) return;
-      if (trimmed.length > MAX_PASTE_LENGTH) {
-        setError(t('import.pasteTooLong'));
-        return;
-      }
-      // Convert pasted text to a File object
-      const blob = new Blob([trimmed], { type: 'text/plain' });
-      filesToUpload = [new File([blob], 'pasted_song.txt', { type: 'text/plain' })];
-    } else {
-      if (files.length === 0) return;
-      filesToUpload = files;
-    }
-
     setStep('uploading');
     setError(null);
 
     try {
-      const result = await importApi.preview(filesToUpload);
+      let result: ImportPreviewResponse;
+
+      if (inputMode === 'url') {
+        const trimmedUrl = urlInput.trim();
+        if (!trimmedUrl) return;
+        result = await importApi.previewUrl(trimmedUrl);
+      } else if (inputMode === 'paste') {
+        const trimmed = pastedText.trim();
+        if (!trimmed) return;
+        if (trimmed.length > MAX_PASTE_LENGTH) {
+          setError(t('import.pasteTooLong'));
+          setStep('select');
+          return;
+        }
+        // Convert pasted text to a File object
+        const blob = new Blob([trimmed], { type: 'text/plain' });
+        const filesToUpload = [new File([blob], 'pasted_song.txt', { type: 'text/plain' })];
+        result = await importApi.preview(filesToUpload);
+      } else {
+        if (files.length === 0) return;
+        result = await importApi.preview(files);
+      }
+
       setPreviewData(result);
 
       // Pre-select all successful parses
@@ -138,6 +144,7 @@ export function ImportModal({
     setInputMode('file');
     setFiles([]);
     setPastedText('');
+    setUrlInput('');
     setPreviewData(null);
     setSelectedIndices(new Set());
     setError(null);
@@ -145,9 +152,12 @@ export function ImportModal({
     onClose();
   };
 
-  const canUpload = inputMode === 'file'
-    ? files.length > 0
-    : pastedText.trim().length > 0;
+  const canUpload =
+    inputMode === 'file'
+      ? files.length > 0
+      : inputMode === 'paste'
+        ? pastedText.trim().length > 0
+        : urlInput.trim().length > 0;
 
   if (!isOpen) return null;
 
@@ -181,6 +191,12 @@ export function ImportModal({
                 onClick={() => setInputMode('paste')}
               >
                 {t('import.tabPaste')}
+              </button>
+              <button
+                className={`import-tab ${inputMode === 'url' ? 'active' : ''}`}
+                onClick={() => setInputMode('url')}
+              >
+                {t('import.tabUrl')}
               </button>
             </div>
 
@@ -249,6 +265,21 @@ export function ImportModal({
               </div>
             )}
 
+            {inputMode === 'url' && (
+              <div className="import-url-container">
+                <input
+                  type="url"
+                  className="import-url-input"
+                  placeholder={t('import.urlPlaceholder')}
+                  value={urlInput}
+                  onChange={(e) => setUrlInput(e.target.value)}
+                />
+                <span className="import-url-hint">
+                  {t('import.urlHint')}
+                </span>
+              </div>
+            )}
+
             <div className="import-actions">
               <button className="import-cancel-button" onClick={handleClose}>
                 {t('common.cancel')}
@@ -258,7 +289,11 @@ export function ImportModal({
                 onClick={handleUpload}
                 disabled={!canUpload}
               >
-                {inputMode === 'paste' ? t('import.parse') : t('import.upload')}
+                {inputMode === 'url'
+                  ? t('import.fetch')
+                  : inputMode === 'paste'
+                    ? t('import.parse')
+                    : t('import.upload')}
               </button>
             </div>
           </div>

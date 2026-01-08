@@ -42,6 +42,36 @@ export async function previewImport(
 }
 
 /**
+ * Import from URL preview.
+ * Content is fetched and parsed but NOT saved to the database.
+ */
+export async function previewUrlImport(
+  url: string
+): Promise<ImportPreviewResponse> {
+  const token = getStoredToken();
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/songs/import/preview-url`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ url }),
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ detail: 'URL import failed' }));
+    throw new ApiError(response.status, error.detail || 'URL import failed');
+  }
+
+  return response.json();
+}
+
+/**
  * Confirm and save selected songs from preview.
  */
 export async function confirmImport(
@@ -72,5 +102,6 @@ export async function confirmImport(
 
 export const importApi = {
   preview: previewImport,
+  previewUrl: previewUrlImport,
   confirm: confirmImport,
 };
