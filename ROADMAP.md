@@ -34,7 +34,7 @@ This document outlines planned features for Javya. We welcome community input—
 - [x] **URL import** — Fetch song content from a URL
 - [x] **Edit before import** — Modify parsed fields in preview before saving
 - [x] **ZIP archive support** — Import entire song libraries at once
-- [ ] **OnSong format** — Support for popular iOS app format (.onsong)
+- [x] **OnSong format** — Support for popular iOS app format (.onsong)
 - [ ] **Smarter parsing** — Auto-detect key from chord progressions, better section detection
 - [ ] **Merge with existing** — Update existing songs instead of creating duplicates
 
