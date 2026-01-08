@@ -1,11 +1,14 @@
 import { useTranslation } from 'react-i18next';
 import type { ImportPreviewResponse } from '../types/import';
+import { ImportAction } from '../types/import';
 import './ImportPreview.css';
 
 interface ImportPreviewProps {
   data: ImportPreviewResponse;
   selectedIndices: Set<number>;
   onSelectionChange: (indices: Set<number>) => void;
+  duplicateActions: Map<number, ImportAction>;
+  onDuplicateActionChange: (index: number, action: ImportAction) => void;
   onEditSong: (index: number) => void;
   onConfirm: () => void;
   onBack: () => void;
@@ -15,6 +18,7 @@ const FORMAT_LABELS: Record<string, string> = {
   chordpro: 'ChordPro',
   openlyrics: 'OpenLyrics',
   opensong: 'OpenSong',
+  onsong: 'OnSong',
   ultimateguitar: 'Ultimate Guitar',
   plaintext: 'Plain Text',
   unknown: 'Unknown',
@@ -24,6 +28,8 @@ export function ImportPreview({
   data,
   selectedIndices,
   onSelectionChange,
+  duplicateActions,
+  onDuplicateActionChange,
   onEditSong,
   onConfirm,
   onBack,
@@ -127,12 +133,40 @@ export function ImportPreview({
                 <td className="import-col-status">
                   {song.success ? (
                     song.duplicate ? (
-                      <span
-                        className="import-status-duplicate"
-                        title={`${song.duplicate.name}${song.duplicate.artist ? ` - ${song.duplicate.artist}` : ''}`}
-                      >
-                        {t('import.preview.duplicate')}
-                      </span>
+                      <div className="import-duplicate-actions">
+                        <span
+                          className="import-duplicate-label"
+                          title={`${song.duplicate.name}${song.duplicate.artist ? ` - ${song.duplicate.artist}` : ''}`}
+                        >
+                          {t('import.preview.duplicate')}:
+                        </span>
+                        <div className="import-action-buttons">
+                          <button
+                            type="button"
+                            className={`import-action-btn ${duplicateActions.get(index) === ImportAction.SKIP ? 'active' : ''}`}
+                            onClick={() => onDuplicateActionChange(index, ImportAction.SKIP)}
+                            title={t('import.actions.skipDesc')}
+                          >
+                            {t('import.actions.skip')}
+                          </button>
+                          <button
+                            type="button"
+                            className={`import-action-btn import-action-merge ${duplicateActions.get(index) === ImportAction.MERGE ? 'active' : ''}`}
+                            onClick={() => onDuplicateActionChange(index, ImportAction.MERGE)}
+                            title={t('import.actions.mergeDesc')}
+                          >
+                            {t('import.actions.merge')}
+                          </button>
+                          <button
+                            type="button"
+                            className={`import-action-btn ${duplicateActions.get(index) === ImportAction.CREATE ? 'active' : ''}`}
+                            onClick={() => onDuplicateActionChange(index, ImportAction.CREATE)}
+                            title={t('import.actions.createDesc')}
+                          >
+                            {t('import.actions.create')}
+                          </button>
+                        </div>
+                      </div>
                     ) : (
                       <span className="import-status-success">
                         {t('import.preview.ready')}

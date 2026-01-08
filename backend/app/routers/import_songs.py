@@ -403,42 +403,103 @@ async def confirm_import(
 ) -> ImportConfirmResponse:
     """Save selected songs from preview to the database.
 
-    Pass the song_data objects from the preview response
-    for the songs you want to import.
+    Each song can have an action:
+    - CREATE: Create as new song (default)
+    - MERGE: Update existing song with new data (requires existing_song_id)
+    - SKIP: Don't import this song
     """
+    from app.schemas.import_song import ImportAction
+
     if not request.songs:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No songs provided",
         )
 
-    saved_songs: list[Song] = []
+    result_songs: list[Song] = []
+    created_count = 0
+    merged_count = 0
+    skipped_count = 0
 
-    for song_data in request.songs:
-        song = Song(
-            name=song_data.name,
-            artist=song_data.artist,
-            url=song_data.url,
-            original_key=song_data.original_key.value if song_data.original_key else None,
-            preferred_key=song_data.preferred_key.value if song_data.preferred_key else None,
-            tempo_bpm=song_data.tempo_bpm,
-            mood=song_data.mood.value if song_data.mood else None,
-            themes=[t.value for t in song_data.themes] if song_data.themes else None,
-            lyrics=song_data.lyrics,
-            chordpro_chart=song_data.chordpro_chart,
-            min_band=song_data.min_band,
-            notes=song_data.notes,
-        )
-        db.add(song)
-        saved_songs.append(song)
+    for item in request.songs:
+        song_data = item.song_data
+
+        if item.action == ImportAction.SKIP:
+            skipped_count += 1
+            continue
+
+        if item.action == ImportAction.MERGE:
+            if not item.existing_song_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="existing_song_id required for merge action",
+                )
+
+            # Fetch existing song
+            existing = await db.get(Song, item.existing_song_id)
+            if not existing:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Song {item.existing_song_id} not found",
+                )
+
+            # Merge: update existing song with new data
+            if song_data.name:
+                existing.name = song_data.name
+            if song_data.artist is not None:
+                existing.artist = song_data.artist
+            if song_data.url is not None:
+                existing.url = song_data.url
+            if song_data.original_key is not None:
+                existing.original_key = song_data.original_key.value
+            if song_data.preferred_key is not None:
+                existing.preferred_key = song_data.preferred_key.value
+            if song_data.tempo_bpm is not None:
+                existing.tempo_bpm = song_data.tempo_bpm
+            if song_data.mood is not None:
+                existing.mood = song_data.mood.value
+            if song_data.themes is not None:
+                existing.themes = [t.value for t in song_data.themes]
+            if song_data.lyrics is not None:
+                existing.lyrics = song_data.lyrics
+            if song_data.chordpro_chart is not None:
+                existing.chordpro_chart = song_data.chordpro_chart
+            if song_data.min_band is not None:
+                existing.min_band = song_data.min_band
+            if song_data.notes is not None:
+                existing.notes = song_data.notes
+
+            result_songs.append(existing)
+            merged_count += 1
+
+        else:  # CREATE (default)
+            song = Song(
+                name=song_data.name,
+                artist=song_data.artist,
+                url=song_data.url,
+                original_key=song_data.original_key.value if song_data.original_key else None,
+                preferred_key=song_data.preferred_key.value if song_data.preferred_key else None,
+                tempo_bpm=song_data.tempo_bpm,
+                mood=song_data.mood.value if song_data.mood else None,
+                themes=[t.value for t in song_data.themes] if song_data.themes else None,
+                lyrics=song_data.lyrics,
+                chordpro_chart=song_data.chordpro_chart,
+                min_band=song_data.min_band,
+                notes=song_data.notes,
+            )
+            db.add(song)
+            result_songs.append(song)
+            created_count += 1
 
     await db.commit()
 
     # Refresh all songs to get their IDs
-    for song in saved_songs:
+    for song in result_songs:
         await db.refresh(song)
 
     return ImportConfirmResponse(
-        saved_count=len(saved_songs),
-        songs=[SongResponse.model_validate(song) for song in saved_songs],
+        created_count=created_count,
+        merged_count=merged_count,
+        skipped_count=skipped_count,
+        songs=[SongResponse.model_validate(song) for song in result_songs],
     )

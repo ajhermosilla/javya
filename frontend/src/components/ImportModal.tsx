@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { importApi } from '../api/import';
-import type { ImportPreviewResponse, ParsedSong } from '../types/import';
+import type { ImportPreviewResponse, ParsedSong, SongImportItem } from '../types/import';
+import { ImportAction } from '../types/import';
 import type { SongCreate } from '../types/song';
 import { ImportPreview } from './ImportPreview';
 import { ImportEditModal } from './ImportEditModal';
@@ -44,7 +45,9 @@ export function ImportModal({
   );
   const [error, setError] = useState<string | null>(null);
   const [savedCount, setSavedCount] = useState(0);
+  const [mergedCount, setMergedCount] = useState(0);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [duplicateActions, setDuplicateActions] = useState<Map<number, ImportAction>>(new Map());
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -115,6 +118,15 @@ export function ImportModal({
         .filter((i) => i >= 0);
       setSelectedIndices(new Set(successIndices));
 
+      // Initialize default actions for duplicates (default to SKIP)
+      const defaultActions = new Map<number, ImportAction>();
+      result.songs.forEach((song, index) => {
+        if (song.success && song.duplicate) {
+          defaultActions.set(index, ImportAction.SKIP);
+        }
+      });
+      setDuplicateActions(defaultActions);
+
       setStep('preview');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed');
@@ -125,12 +137,21 @@ export function ImportModal({
   const handleConfirm = async () => {
     if (!previewData) return;
 
-    const songsToSave = previewData.songs
-      .filter((_, i) => selectedIndices.has(i))
-      .filter((s): s is ParsedSong & { song_data: SongCreate } =>
-        Boolean(s.success && s.song_data)
-      )
-      .map((s) => s.song_data);
+    // Build SongImportItem[] with actions
+    const songsToSave: SongImportItem[] = previewData.songs
+      .map((song, index) => ({ song, index }))
+      .filter(({ song, index }) => selectedIndices.has(index) && song.success && song.song_data)
+      .map(({ song, index }) => {
+        const action = song.duplicate
+          ? (duplicateActions.get(index) ?? ImportAction.SKIP)
+          : ImportAction.CREATE;
+
+        return {
+          song_data: song.song_data!,
+          action,
+          existing_song_id: action === ImportAction.MERGE ? song.duplicate?.id : undefined,
+        };
+      });
 
     if (songsToSave.length === 0) return;
 
@@ -139,13 +160,22 @@ export function ImportModal({
 
     try {
       const result = await importApi.confirm({ songs: songsToSave });
-      setSavedCount(result.saved_count);
+      setSavedCount(result.created_count);
+      setMergedCount(result.merged_count);
       setStep('complete');
       onImportComplete();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Save failed');
       setStep('preview');
     }
+  };
+
+  const handleDuplicateActionChange = (index: number, action: ImportAction) => {
+    setDuplicateActions((prev) => {
+      const next = new Map(prev);
+      next.set(index, action);
+      return next;
+    });
   };
 
   const handleSaveEdit = (updatedSong: SongCreate) => {
@@ -175,7 +205,9 @@ export function ImportModal({
     setSelectedIndices(new Set());
     setError(null);
     setSavedCount(0);
+    setMergedCount(0);
     setEditingIndex(null);
+    setDuplicateActions(new Map());
     onClose();
   };
 
@@ -339,6 +371,8 @@ export function ImportModal({
               data={previewData}
               selectedIndices={selectedIndices}
               onSelectionChange={setSelectedIndices}
+              duplicateActions={duplicateActions}
+              onDuplicateActionChange={handleDuplicateActionChange}
               onEditSong={setEditingIndex}
               onConfirm={handleConfirm}
               onBack={() => setStep('select')}
@@ -365,7 +399,12 @@ export function ImportModal({
         {step === 'complete' && (
           <div className="import-complete">
             <div className="import-complete-icon">✓</div>
-            <p>{t('import.complete', { count: savedCount })}</p>
+            <p>
+              {savedCount > 0 && t('import.complete', { count: savedCount })}
+              {savedCount > 0 && mergedCount > 0 && ' · '}
+              {mergedCount > 0 && t('import.merged', { count: mergedCount })}
+              {savedCount === 0 && mergedCount === 0 && t('import.nothingImported')}
+            </p>
             <button className="import-done-button" onClick={handleClose}>
               {t('common.close')}
             </button>

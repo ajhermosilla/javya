@@ -1,9 +1,28 @@
 """Schemas for song import endpoints."""
 
+from enum import Enum
+from uuid import UUID
+
 from pydantic import BaseModel, HttpUrl
 
 from app.schemas.duplicate import ExistingSongSummary
 from app.schemas.song import SongCreate, SongResponse
+
+
+class ImportAction(str, Enum):
+    """Action to take for an imported song."""
+
+    CREATE = "create"  # Create as new song
+    MERGE = "merge"  # Merge with existing song
+    SKIP = "skip"  # Don't import
+
+
+class SongImportItem(BaseModel):
+    """A song to import with action specification."""
+
+    song_data: SongCreate
+    action: ImportAction = ImportAction.CREATE
+    existing_song_id: UUID | None = None  # Required when action is MERGE
 
 
 class UrlImportRequest(BaseModel):
@@ -35,11 +54,13 @@ class ImportPreviewResponse(BaseModel):
 class ImportConfirmRequest(BaseModel):
     """Request to save selected songs from preview."""
 
-    songs: list[SongCreate]
+    songs: list[SongImportItem]
 
 
 class ImportConfirmResponse(BaseModel):
     """Response after saving imported songs."""
 
-    saved_count: int
+    created_count: int
+    merged_count: int
+    skipped_count: int
     songs: list[SongResponse]

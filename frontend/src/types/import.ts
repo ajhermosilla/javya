@@ -4,9 +4,16 @@ export type ImportFormat =
   | 'chordpro'
   | 'openlyrics'
   | 'opensong'
+  | 'onsong'
   | 'ultimateguitar'
   | 'plaintext'
   | 'unknown';
+
+export enum ImportAction {
+  CREATE = 'create',
+  MERGE = 'merge',
+  SKIP = 'skip',
+}
 
 export interface ExistingSongSummary {
   id: string;
@@ -31,11 +38,19 @@ export interface ImportPreviewResponse {
   songs: ParsedSong[];
 }
 
+export interface SongImportItem {
+  song_data: SongCreate;
+  action: ImportAction;
+  existing_song_id?: string;
+}
+
 export interface ImportConfirmRequest {
-  songs: SongCreate[];
+  songs: SongImportItem[];
 }
 
 export interface ImportConfirmResponse {
-  saved_count: number;
+  created_count: number;
+  merged_count: number;
+  skipped_count: number;
   songs: Song[];
 }

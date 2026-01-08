@@ -150,21 +150,27 @@ class TestConfirmEndpoint:
     """Tests for POST /api/v1/songs/import/confirm."""
 
     @pytest.mark.asyncio
-    async def test_confirm_saves_songs(
+    async def test_confirm_creates_songs(
         self, client: AsyncClient, db_session: AsyncSession
     ):
-        """Should save songs to database."""
+        """Should create new songs in database."""
         request_data = {
             "songs": [
                 {
-                    "name": "Imported Song 1",
-                    "artist": "Test Artist",
-                    "original_key": "G",
+                    "song_data": {
+                        "name": "Imported Song 1",
+                        "artist": "Test Artist",
+                        "original_key": "G",
+                    },
+                    "action": "create",
                 },
                 {
-                    "name": "Imported Song 2",
-                    "artist": "Another Artist",
-                    "original_key": "D",
+                    "song_data": {
+                        "name": "Imported Song 2",
+                        "artist": "Another Artist",
+                        "original_key": "D",
+                    },
+                    "action": "create",
                 },
             ]
         }
@@ -173,7 +179,9 @@ class TestConfirmEndpoint:
 
         assert response.status_code == 200
         data = response.json()
-        assert data["saved_count"] == 2
+        assert data["created_count"] == 2
+        assert data["merged_count"] == 0
+        assert data["skipped_count"] == 0
         assert len(data["songs"]) == 2
 
         # Verify songs have IDs
@@ -184,6 +192,177 @@ class TestConfirmEndpoint:
         names = {s["name"] for s in data["songs"]}
         assert "Imported Song 1" in names
         assert "Imported Song 2" in names
+
+    @pytest.mark.asyncio
+    async def test_confirm_skip_action(self, client: AsyncClient):
+        """Should skip songs with skip action."""
+        request_data = {
+            "songs": [
+                {
+                    "song_data": {
+                        "name": "Song to Skip",
+                        "artist": "Test Artist",
+                    },
+                    "action": "skip",
+                },
+            ]
+        }
+
+        response = await client.post("/api/v1/songs/import/confirm", json=request_data)
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["created_count"] == 0
+        assert data["merged_count"] == 0
+        assert data["skipped_count"] == 1
+        assert len(data["songs"]) == 0
+
+    @pytest.mark.asyncio
+    async def test_confirm_merge_action(
+        self, client: AsyncClient, db_session: AsyncSession
+    ):
+        """Should merge with existing song."""
+        # First create a song
+        create_response = await client.post(
+            "/api/v1/songs/",
+            json={
+                "name": "Original Song",
+                "artist": "Original Artist",
+                "original_key": "C",
+            },
+        )
+        assert create_response.status_code == 201
+        existing_id = create_response.json()["id"]
+
+        # Now import with merge action
+        request_data = {
+            "songs": [
+                {
+                    "song_data": {
+                        "name": "Updated Song Name",
+                        "artist": "Updated Artist",
+                        "original_key": "G",
+                        "lyrics": "New lyrics content",
+                    },
+                    "action": "merge",
+                    "existing_song_id": existing_id,
+                },
+            ]
+        }
+
+        response = await client.post("/api/v1/songs/import/confirm", json=request_data)
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["created_count"] == 0
+        assert data["merged_count"] == 1
+        assert data["skipped_count"] == 0
+        assert len(data["songs"]) == 1
+
+        # Verify the song was updated
+        merged_song = data["songs"][0]
+        assert merged_song["id"] == existing_id
+        assert merged_song["name"] == "Updated Song Name"
+        assert merged_song["artist"] == "Updated Artist"
+        assert merged_song["original_key"] == "G"
+        assert merged_song["lyrics"] == "New lyrics content"
+
+    @pytest.mark.asyncio
+    async def test_confirm_merge_requires_existing_id(self, client: AsyncClient):
+        """Should reject merge without existing_song_id."""
+        request_data = {
+            "songs": [
+                {
+                    "song_data": {
+                        "name": "Song to Merge",
+                        "artist": "Test Artist",
+                    },
+                    "action": "merge",
+                    # Missing existing_song_id
+                },
+            ]
+        }
+
+        response = await client.post("/api/v1/songs/import/confirm", json=request_data)
+
+        assert response.status_code == 400
+        assert "existing_song_id required" in response.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_confirm_merge_invalid_id(self, client: AsyncClient):
+        """Should reject merge with non-existent song ID."""
+        import uuid
+
+        request_data = {
+            "songs": [
+                {
+                    "song_data": {
+                        "name": "Song to Merge",
+                        "artist": "Test Artist",
+                    },
+                    "action": "merge",
+                    "existing_song_id": str(uuid.uuid4()),
+                },
+            ]
+        }
+
+        response = await client.post("/api/v1/songs/import/confirm", json=request_data)
+
+        assert response.status_code == 404
+        assert "not found" in response.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_confirm_mixed_actions(
+        self, client: AsyncClient, db_session: AsyncSession
+    ):
+        """Should handle mix of create, merge, and skip actions."""
+        # First create a song to merge with
+        create_response = await client.post(
+            "/api/v1/songs/",
+            json={
+                "name": "Existing Song",
+                "artist": "Existing Artist",
+            },
+        )
+        assert create_response.status_code == 201
+        existing_id = create_response.json()["id"]
+
+        # Import with mixed actions
+        request_data = {
+            "songs": [
+                {
+                    "song_data": {
+                        "name": "New Song",
+                        "artist": "New Artist",
+                    },
+                    "action": "create",
+                },
+                {
+                    "song_data": {
+                        "name": "Merged Song",
+                        "artist": "Merged Artist",
+                    },
+                    "action": "merge",
+                    "existing_song_id": existing_id,
+                },
+                {
+                    "song_data": {
+                        "name": "Skipped Song",
+                        "artist": "Skipped Artist",
+                    },
+                    "action": "skip",
+                },
+            ]
+        }
+
+        response = await client.post("/api/v1/songs/import/confirm", json=request_data)
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["created_count"] == 1
+        assert data["merged_count"] == 1
+        assert data["skipped_count"] == 1
+        assert len(data["songs"]) == 2  # Only created and merged songs returned
 
     @pytest.mark.asyncio
     async def test_confirm_no_songs(self, client: AsyncClient):
@@ -198,7 +377,10 @@ class TestConfirmEndpoint:
         """Should validate song data (name required)."""
         request_data = {
             "songs": [
-                {"name": "", "artist": "Test"}  # Empty name should fail
+                {
+                    "song_data": {"name": "", "artist": "Test"},  # Empty name should fail
+                    "action": "create",
+                }
             ]
         }
 
@@ -224,14 +406,22 @@ class TestConfirmEndpoint:
         # Get the song data from preview
         song_data = preview_data["songs"][0]["song_data"]
 
-        # Step 2: Confirm
+        # Step 2: Confirm with new format
         confirm_response = await client.post(
-            "/api/v1/songs/import/confirm", json={"songs": [song_data]}
+            "/api/v1/songs/import/confirm",
+            json={
+                "songs": [
+                    {
+                        "song_data": song_data,
+                        "action": "create",
+                    }
+                ]
+            },
         )
 
         assert confirm_response.status_code == 200
         confirm_data = confirm_response.json()
-        assert confirm_data["saved_count"] == 1
+        assert confirm_data["created_count"] == 1
         assert confirm_data["songs"][0]["name"] == "Test Import Song"
 
         # Step 3: Verify song exists in database

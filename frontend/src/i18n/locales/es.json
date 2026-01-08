@@ -98,7 +98,17 @@
     "urlHint": "Enlace directo a un archivo ChordPro, texto o XML",
     "uploading": "Subiendo...",
     "saving": "Guardando canciones...",
-    "complete": "{{count}} canción(es) importada(s) exitosamente",
+    "complete": "{{count}} canción(es) creada(s)",
+    "merged": "{{count}} canción(es) actualizada(s)",
+    "nothingImported": "No se importaron canciones",
+    "actions": {
+      "skip": "Omitir",
+      "skipDesc": "No importar esta canción",
+      "merge": "Fusionar",
+      "mergeDesc": "Actualizar canción existente con estos datos",
+      "create": "Nueva",
+      "createDesc": "Crear como canción nueva"
+    },
     "preview": {
       "summary": "{{successful}} de {{total}} archivo(s) procesado(s) correctamente",
       "selectAll": "Seleccionar Todos",
