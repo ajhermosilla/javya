@@ -31,18 +31,25 @@ def detect_and_parse(content: bytes, filename: str) -> ParseResult:
     Returns:
         ParseResult with success status and parsed song data or error.
     """
-    # Try to decode as UTF-8, fall back to latin-1
-    try:
-        text_content = content.decode("utf-8")
-    except UnicodeDecodeError:
+    # Try multiple encodings in order of likelihood
+    # - UTF-8: Modern standard
+    # - Mac Roman: Legacy macOS encoding (used by OnSong iOS app exports)
+    # - CP1252: Windows encoding
+    # - Latin-1: Fallback (never fails, accepts any byte sequence)
+    text_content = None
+    for encoding in ("utf-8", "mac_roman", "cp1252", "latin-1"):
         try:
-            text_content = content.decode("latin-1")
-        except Exception:
-            return ParseResult(
-                success=False,
-                error="Could not decode file content",
-                detected_format="unknown",
-            )
+            text_content = content.decode(encoding)
+            break
+        except UnicodeDecodeError:
+            continue
+
+    if text_content is None:
+        return ParseResult(
+            success=False,
+            error="Could not decode file content",
+            detected_format="unknown",
+        )
 
     # Try each parser in order
     for parser in PARSERS:
