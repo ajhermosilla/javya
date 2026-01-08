@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { importApi } from '../api/import';
-import type { ImportPreviewResponse, ParsedSong, SongImportItem } from '../types/import';
+import type { ImportPreviewResponse, SongImportItem } from '../types/import';
 import { ImportAction } from '../types/import';
 import type { SongCreate } from '../types/song';
 import { ImportPreview } from './ImportPreview';
