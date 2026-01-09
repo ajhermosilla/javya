@@ -100,9 +100,9 @@ export function SchedulingPage() {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDateClick = (date: string) => {
     // Future: could open a day detail view
+    void date;
   };
 
   const handleSetlistClick = (setlistId: string) => {
