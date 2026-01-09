@@ -1,4 +1,4 @@
-import { render, screen } from '../test/utils';
+import { render, screen, waitFor } from '../test/utils';
 import userEvent from '@testing-library/user-event';
 import { SearchBar } from './SearchBar';
 
@@ -27,7 +27,7 @@ describe('SearchBar', () => {
     expect(screen.getByDisplayValue('test query')).toBeInTheDocument();
   });
 
-  it('calls onChange when typing', async () => {
+  it('calls onChange after debounce when typing', async () => {
     const user = userEvent.setup();
     const handleChange = vi.fn();
 
@@ -36,14 +36,21 @@ describe('SearchBar', () => {
         value=""
         onChange={handleChange}
         placeholder="Search..."
+        debounceMs={50}
       />
     );
 
     const input = screen.getByPlaceholderText('Search...');
     await user.type(input, 'hello');
 
-    expect(handleChange).toHaveBeenCalledTimes(5);
-    expect(handleChange).toHaveBeenLastCalledWith('o');
+    // onChange should not be called immediately due to debounce
+    expect(handleChange).not.toHaveBeenCalled();
+
+    // Wait for debounce to complete
+    await waitFor(() => {
+      expect(handleChange).toHaveBeenCalledTimes(1);
+    });
+    expect(handleChange).toHaveBeenCalledWith('hello');
   });
 
   it('renders without placeholder', () => {

@@ -1,6 +1,8 @@
 from datetime import datetime
 from uuid import UUID
 
+from urllib.parse import urlparse
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.enums import MusicalKey, Mood, Theme
@@ -20,6 +22,19 @@ class SongBase(BaseModel):
 
     artist: str | None = Field(None, max_length=255)
     url: str | None = Field(None, max_length=500)
+
+    @field_validator("url")
+    @classmethod
+    def validate_url(cls, v: str | None) -> str | None:
+        if v is None or v == "":
+            return None
+        parsed = urlparse(v)
+        if parsed.scheme not in ("http", "https"):
+            raise ValueError("URL must start with http:// or https://")
+        if not parsed.netloc:
+            raise ValueError("Invalid URL format")
+        return v
+
     original_key: MusicalKey | None = None
     preferred_key: MusicalKey | None = None
     tempo_bpm: int | None = Field(None, ge=20, le=300)
