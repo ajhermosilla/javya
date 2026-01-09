@@ -8,8 +8,8 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://javya:change_me_in_production@db:5432/javya"
 
     # Application
-    debug: bool = True
-    secret_key: str = "generate_a_random_secret_key_here"
+    debug: bool = False
+    secret_key: str = "generate_a_random_secret_key_here"  # Override in production!
 
     # JWT
     jwt_algorithm: str = "HS256"
