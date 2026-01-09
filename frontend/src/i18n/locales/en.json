@@ -116,11 +116,23 @@
       "file": "File",
       "format": "Format",
       "title": "Title",
+      "key": "Key",
       "status": "Status",
       "ready": "Ready",
       "failed": "Failed",
       "duplicate": "Duplicate",
       "confirm": "Import Selected ({{count}})"
+    },
+    "keyConfidence": {
+      "high": "High",
+      "medium": "Med",
+      "low": "Low"
+    },
+    "keySource": {
+      "specified": "Key specified in file",
+      "detected": "Key detected from chords",
+      "file": "file",
+      "chords": "chords"
     },
     "edit": {
       "title": "Edit Song",

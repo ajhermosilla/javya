@@ -197,6 +197,10 @@ async def preview_import(
                     detected_format=result.detected_format,
                     success=True,
                     song_data=result.song_data,
+                    specified_key=result.specified_key,
+                    detected_key=result.detected_key,
+                    key_confidence=result.key_confidence,
+                    sections_normalized=result.sections_normalized,
                 )
             )
             successful += 1
@@ -363,6 +367,10 @@ async def preview_url_import(
             detected_format=result.detected_format,
             success=True,
             song_data=result.song_data,
+            specified_key=result.specified_key,
+            detected_key=result.detected_key,
+            key_confidence=result.key_confidence,
+            sections_normalized=result.sections_normalized,
         )
 
         # Check for duplicates

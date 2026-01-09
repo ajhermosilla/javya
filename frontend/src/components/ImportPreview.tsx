@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import type { ImportPreviewResponse } from '../types/import';
 import { ImportAction } from '../types/import';
+import type { MusicalKey } from '../types/song';
+import { KeyIndicator } from './KeyIndicator';
 import './ImportPreview.css';
 
 interface ImportPreviewProps {
@@ -9,6 +11,8 @@ interface ImportPreviewProps {
   onSelectionChange: (indices: Set<number>) => void;
   duplicateActions: Map<number, ImportAction>;
   onDuplicateActionChange: (index: number, action: ImportAction) => void;
+  keySelections: Map<number, MusicalKey | null>;
+  onKeySelectionChange: (index: number, key: MusicalKey | null) => void;
   onEditSong: (index: number) => void;
   onConfirm: () => void;
   onBack: () => void;
@@ -30,6 +34,8 @@ export function ImportPreview({
   onSelectionChange,
   duplicateActions,
   onDuplicateActionChange,
+  keySelections,
+  onKeySelectionChange,
   onEditSong,
   onConfirm,
   onBack,
@@ -97,6 +103,7 @@ export function ImportPreview({
                 {t('import.preview.format')}
               </th>
               <th className="import-col-title">{t('import.preview.title')}</th>
+              <th className="import-col-key">{t('import.preview.key')}</th>
               <th className="import-col-status">
                 {t('import.preview.status')}
               </th>
@@ -129,6 +136,17 @@ export function ImportPreview({
                   {song.success && song.song_data
                     ? song.song_data.name
                     : '—'}
+                </td>
+                <td className="import-col-key">
+                  {song.success && (
+                    <KeyIndicator
+                      specifiedKey={song.specified_key}
+                      detectedKey={song.detected_key}
+                      keyConfidence={song.key_confidence}
+                      selectedKey={keySelections.get(index) ?? null}
+                      onKeySelect={(key) => onKeySelectionChange(index, key)}
+                    />
+                  )}
                 </td>
                 <td className="import-col-status">
                   {song.success ? (

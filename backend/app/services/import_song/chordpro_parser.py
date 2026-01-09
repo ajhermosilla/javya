@@ -97,21 +97,38 @@ class ChordProParser(BaseSongParser):
             # Extract plain lyrics (remove chords)
             lyrics = self._extract_lyrics(content)
 
+            # Normalize sections in lyrics
+            normalized_lyrics, sections_normalized = self._normalize_sections(lyrics)
+
+            # Extract chords and detect key
+            chords = self._extract_chords(content)
+            detected_key, key_confidence = self._detect_key_from_chords(chords)
+
             # Build notes from collected parts
             notes = "\n".join(notes_parts) if notes_parts else None
+
+            # Normalize specified key
+            specified_key = self._normalize_key(key)
+
+            # Use detected key if no specified key
+            final_key = specified_key if specified_key else detected_key
 
             return ParseResult(
                 success=True,
                 song_data=self._build_song_data(
                     name=title,
                     artist=artist,
-                    original_key=self._normalize_key(key),
+                    original_key=final_key,
                     tempo_bpm=tempo,
-                    lyrics=lyrics,
+                    lyrics=normalized_lyrics,
                     chordpro_chart=content,  # Store original ChordPro
                     notes=notes,
                 ),
                 detected_format=self.format_name,
+                specified_key=specified_key,
+                detected_key=detected_key,
+                key_confidence=key_confidence,
+                sections_normalized=sections_normalized,
             )
 
         except Exception as e:

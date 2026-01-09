@@ -132,6 +132,13 @@ class OpenLyricsParser(BaseSongParser):
             lyrics_elem = self._find_element(root, "lyrics", use_ns)
             lyrics, chordpro = self._extract_lyrics(lyrics_elem, use_ns)
 
+            # Normalize sections in lyrics
+            normalized_lyrics, sections_normalized = self._normalize_sections(lyrics)
+
+            # Extract chords and detect key from ChordPro content
+            chords = self._extract_chords(chordpro) if chordpro else []
+            detected_key, key_confidence = self._detect_key_from_chords(chords)
+
             # Use filename if no title found
             if not title:
                 title = self._extract_title_from_filename(filename)
@@ -139,18 +146,28 @@ class OpenLyricsParser(BaseSongParser):
             # Build notes
             notes = "\n".join(notes_parts) if notes_parts else None
 
+            # Normalize specified key
+            specified_key = self._normalize_key(key)
+
+            # Use detected key if no specified key
+            final_key = specified_key if specified_key else detected_key
+
             return ParseResult(
                 success=True,
                 song_data=self._build_song_data(
                     name=title,
                     artist=artist,
-                    original_key=self._normalize_key(key),
+                    original_key=final_key,
                     tempo_bpm=tempo,
-                    lyrics=lyrics,
+                    lyrics=normalized_lyrics,
                     chordpro_chart=chordpro if chordpro else None,
                     notes=notes,
                 ),
                 detected_format=self.format_name,
+                specified_key=specified_key,
+                detected_key=detected_key,
+                key_confidence=key_confidence,
+                sections_normalized=sections_normalized,
             )
 
         except ET.ParseError as e:

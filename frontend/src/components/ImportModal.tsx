@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { importApi } from '../api/import';
 import type { ImportPreviewResponse, SongImportItem } from '../types/import';
 import { ImportAction } from '../types/import';
-import type { SongCreate } from '../types/song';
+import type { MusicalKey, SongCreate } from '../types/song';
 import { ImportPreview } from './ImportPreview';
 import { ImportEditModal } from './ImportEditModal';
 import './ImportModal.css';
@@ -48,6 +48,7 @@ export function ImportModal({
   const [mergedCount, setMergedCount] = useState(0);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [duplicateActions, setDuplicateActions] = useState<Map<number, ImportAction>>(new Map());
+  const [keySelections, setKeySelections] = useState<Map<number, MusicalKey | null>>(new Map());
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -146,8 +147,14 @@ export function ImportModal({
           ? (duplicateActions.get(index) ?? ImportAction.SKIP)
           : ImportAction.CREATE;
 
+        // Use selected key if user made a selection, otherwise use the song_data key
+        const selectedKey = keySelections.get(index);
+        const songData = selectedKey !== undefined
+          ? { ...song.song_data!, original_key: selectedKey }
+          : song.song_data!;
+
         return {
-          song_data: song.song_data!,
+          song_data: songData,
           action,
           existing_song_id: action === ImportAction.MERGE ? song.duplicate?.id : undefined,
         };
@@ -174,6 +181,14 @@ export function ImportModal({
     setDuplicateActions((prev) => {
       const next = new Map(prev);
       next.set(index, action);
+      return next;
+    });
+  };
+
+  const handleKeySelectionChange = (index: number, key: MusicalKey | null) => {
+    setKeySelections((prev) => {
+      const next = new Map(prev);
+      next.set(index, key);
       return next;
     });
   };
@@ -208,6 +223,7 @@ export function ImportModal({
     setMergedCount(0);
     setEditingIndex(null);
     setDuplicateActions(new Map());
+    setKeySelections(new Map());
     onClose();
   };
 
@@ -373,6 +389,8 @@ export function ImportModal({
               onSelectionChange={setSelectedIndices}
               duplicateActions={duplicateActions}
               onDuplicateActionChange={handleDuplicateActionChange}
+              keySelections={keySelections}
+              onKeySelectionChange={handleKeySelectionChange}
               onEditSong={setEditingIndex}
               onConfirm={handleConfirm}
               onBack={() => setStep('select')}

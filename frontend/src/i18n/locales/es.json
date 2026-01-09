@@ -116,11 +116,23 @@
       "file": "Archivo",
       "format": "Formato",
       "title": "Título",
+      "key": "Tono",
       "status": "Estado",
       "ready": "Listo",
       "failed": "Error",
       "duplicate": "Duplicado",
       "confirm": "Importar Seleccionados ({{count}})"
+    },
+    "keyConfidence": {
+      "high": "Alta",
+      "medium": "Med",
+      "low": "Baja"
+    },
+    "keySource": {
+      "specified": "Tono especificado en el archivo",
+      "detected": "Tono detectado de los acordes",
+      "file": "archivo",
+      "chords": "acordes"
     },
     "edit": {
       "title": "Editar Canción",

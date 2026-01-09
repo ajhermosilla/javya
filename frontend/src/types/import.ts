@@ -31,6 +31,14 @@ export interface ParsedSong {
   error: string | null;
   song_data: SongCreate | null;
   duplicate: ExistingSongSummary | null;
+
+  // Key detection results
+  specified_key: MusicalKey | null;
+  detected_key: MusicalKey | null;
+  key_confidence: 'high' | 'medium' | 'low' | null;
+
+  // Section detection results
+  sections_normalized: boolean;
 }
 
 export interface ImportPreviewResponse {

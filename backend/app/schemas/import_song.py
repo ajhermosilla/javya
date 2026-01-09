@@ -5,6 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, HttpUrl
 
+from app.enums import MusicalKey
 from app.schemas.duplicate import ExistingSongSummary
 from app.schemas.song import SongCreate, SongResponse
 
@@ -40,6 +41,14 @@ class ParsedSong(BaseModel):
     error: str | None = None
     song_data: SongCreate | None = None
     duplicate: ExistingSongSummary | None = None
+
+    # Key detection results
+    specified_key: MusicalKey | None = None  # From file metadata
+    detected_key: MusicalKey | None = None  # From chord analysis
+    key_confidence: str | None = None  # "high", "medium", "low"
+
+    # Section detection results
+    sections_normalized: bool = False  # Whether markers were normalized
 
 
 class ImportPreviewResponse(BaseModel):

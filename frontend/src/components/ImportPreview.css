@@ -83,10 +83,14 @@
 }
 
 .import-col-title {
-  max-width: 180px;
+  max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.import-col-key {
+  width: 120px;
 }
 
 .import-col-status {
