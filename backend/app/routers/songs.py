@@ -13,13 +13,9 @@ from app.models.user import User
 from app.schemas.duplicate import CheckDuplicatesRequest, CheckDuplicatesResponse
 from app.schemas.song import SongCreate, SongResponse, SongUpdate
 from app.services.duplicate_detector import find_duplicates
+from app.utils import escape_like_pattern
 
 router = APIRouter()
-
-
-def escape_like_pattern(value: str) -> str:
-    """Escape special LIKE pattern characters to prevent SQL injection."""
-    return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
 
 @router.post("/", response_model=SongResponse, status_code=status.HTTP_201_CREATED)

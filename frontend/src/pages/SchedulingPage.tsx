@@ -59,17 +59,27 @@ export function SchedulingPage() {
 
   // Fetch users for assignment editor
   useEffect(() => {
-    if (isAdminOrLeader) {
-      api.get<User[]>('/api/v1/users/')
-        .then((data) => {
+    if (!isAdminOrLeader) return;
+
+    let cancelled = false;
+
+    api.get<User[]>('/api/v1/users/')
+      .then((data) => {
+        if (!cancelled) {
           setUsers(data);
           setUsersError(null);
-        })
-        .catch((err) => {
-          console.error(err);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          console.error('Failed to load users:', err);
           setUsersError(t('scheduling.usersLoadError'));
-        });
-    }
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [isAdminOrLeader, t]);
 
   const handlePrevMonth = () => {
@@ -90,9 +100,8 @@ export function SchedulingPage() {
     }
   };
 
-  const handleDateClick = (date: string) => {
+  const handleDateClick = (_date: string) => {
     // Future: could open a day detail view
-    console.log('Date clicked:', date);
   };
 
   const handleSetlistClick = (setlistId: string) => {
