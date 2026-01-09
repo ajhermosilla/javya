@@ -1,4 +1,5 @@
 import type { Token, User, UserCreate, LoginCredentials } from '../types/user';
+import { ApiError } from './client';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
@@ -11,7 +12,7 @@ export async function register(data: UserCreate): Promise<User> {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Registration failed' }));
-    throw new Error(error.detail || 'Registration failed');
+    throw new ApiError(response.status, error.detail || 'Registration failed');
   }
 
   return response.json();
@@ -30,7 +31,7 @@ export async function login(credentials: LoginCredentials): Promise<Token> {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Login failed' }));
-    throw new Error(error.detail || 'Login failed');
+    throw new ApiError(response.status, error.detail || 'Login failed');
   }
 
   return response.json();
@@ -42,7 +43,7 @@ export async function getCurrentUser(token: string): Promise<User> {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to get user info');
+    throw new ApiError(response.status, 'Failed to get user info');
   }
 
   return response.json();

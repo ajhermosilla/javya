@@ -36,7 +36,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const userData = await authApi.getCurrentUser(token);
       setUser(userData);
-    } catch {
+    } catch (err) {
+      console.warn('Session expired or invalid, clearing token:', err);
       clearStoredToken();
     } finally {
       setIsLoading(false);

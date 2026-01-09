@@ -33,13 +33,9 @@ from app.schemas.setlist_assignment import (
 from app.services.export_freeshow import generate_freeshow_project
 from app.services.export_pdf import generate_pdf_chord_charts, generate_pdf_summary
 from app.services.export_quelea import generate_quelea_schedule
+from app.utils import escape_like_pattern
 
 router = APIRouter()
-
-
-def escape_like_pattern(value: str) -> str:
-    """Escape special LIKE pattern characters to prevent SQL injection."""
-    return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
 
 def sanitize_filename(name: str, fallback_id: UUID) -> str:

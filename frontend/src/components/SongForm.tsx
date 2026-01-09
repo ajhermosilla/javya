@@ -90,8 +90,9 @@ export function SongForm({ song, onSubmit, onCancel, onNavigateToSong }: SongFor
           setSaving(false);
           return;
         }
-      } catch {
-        // If duplicate check fails, proceed with creation
+      } catch (err) {
+        // If duplicate check fails, log error and proceed with creation
+        console.warn('Duplicate check failed, proceeding with creation:', err);
       }
     }
 
