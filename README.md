@@ -25,27 +25,24 @@ Javya consolidates this into one reliable tool.
 
 ## Features
 
-### v0.5 (Current)
-- [x] **Team scheduling** — Calendar view with service role assignments
-- [x] **PDF export** — Generate summary sheets and chord charts for musicians
-- [x] **Authentication** — JWT-based login with secure password hashing
-- [x] **Role-based access** — Admin, Leader, and Member roles
-- [x] **Availability calendar** — Track team member availability by date
-- [x] **Recurring patterns** — Set weekly, biweekly, or monthly availability
-- [x] Song database with lyrics, chords, keys, mood, and themes
-- [x] ChordPro chart storage
-- [x] Search and filter songs
-- [x] Multi-language support (English, Spanish)
-- [x] Setlist builder with drag-and-drop
-- [x] Export to FreeShow (.project) and Quelea (.qsch)
+### Core Features
+- **Song Management** — Lyrics, ChordPro chords, keys, tempo, mood, themes
+- **Setlist Builder** — Drag-and-drop ordering with notes per song
+- **Team Scheduling** — Calendar view with role assignments and confirmations
+- **Availability Tracking** — Personal calendars with recurring patterns
+- **Multi-format Export** — FreeShow, Quelea, PDF summaries and chord charts
+- **Song Import** — Bulk import from ChordPro, OpenLyrics, OpenSong, plain text
+- **Duplicate Detection** — Smart matching when importing songs
+- **Role-based Access** — Admin, Leader, Member permission hierarchy
+- **Multi-language** — English and Spanish with easy extensibility
 
 ### Coming Soon
 See our full **[Roadmap](ROADMAP.md)** for planned features including:
-- Song transposition and import tools
-- Email notifications and reminders
+- Song transposition tool
+- CCLI integration
+- Email notifications
 - Dashboard and analytics
-- Mobile app and offline support
-- Calendar and projection software integrations
+- Mobile app
 
 ---
 
@@ -64,31 +61,31 @@ See our full **[Roadmap](ROADMAP.md)** for planned features including:
 
 ## Quick Start
 
-### Prerequisites
-
-- Docker & Docker Compose
-- Git
-
-### Run locally
-
 ```bash
-# Clone the repo
+# Clone and start
 git clone https://github.com/ajhermosilla/javya.git
 cd javya
-
-# Start all services
 docker compose up -d
 
-# Frontend: http://localhost:5173
-# Backend API: http://localhost:8000
-# API Docs: http://localhost:8000/docs
+# Open http://localhost:5173
+# First user becomes Admin
 ```
 
-### First-time setup
+**Requirements:** Docker & Docker Compose
 
-1. Open http://localhost:5173
-2. Click "Create Account" to register
-3. **The first user automatically becomes Admin** and can manage roles for subsequent users
+See the **[Quickstart Guide](docs/QUICKSTART.md)** for detailed setup instructions.
+
+---
+
+## Documentation
+
+| Document | Audience | Description |
+|----------|----------|-------------|
+| [Quickstart Guide](docs/QUICKSTART.md) | Users | Get started in 10 minutes |
+| [Technical Docs](docs/TECHNICAL.md) | Developers | Architecture, API, deployment |
+| [Roadmap](ROADMAP.md) | Everyone | Planned features |
+| [Contributing](CONTRIBUTING.md) | Contributors | How to contribute |
+| [Changelog](CHANGELOG.md) | Everyone | Version history |
 
 ---
 
