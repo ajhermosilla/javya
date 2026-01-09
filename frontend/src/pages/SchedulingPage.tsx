@@ -100,7 +100,8 @@ export function SchedulingPage() {
     }
   };
 
-  const handleDateClick = (_date: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleDateClick = (date: string) => {
     // Future: could open a day detail view
   };
 
