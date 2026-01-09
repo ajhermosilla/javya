@@ -1,0 +1,75 @@
+# Production Docker Compose Configuration
+# Usage: docker compose -f docker-compose.prod.yml up -d
+#
+# IMPORTANT: Before deploying, create a .env file with:
+#   POSTGRES_PASSWORD=<strong-random-password>
+#   SECRET_KEY=<strong-random-key>
+#   CORS_ORIGINS=https://your-domain.com
+#
+# Generate secrets with: openssl rand -hex 32
+
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: javya-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-javya}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-javya}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # No exposed ports in production - only accessible via internal network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-javya} -d ${POSTGRES_DB:-javya}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: javya-backend
+    restart: always
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-javya}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-javya}
+      DEBUG: "false"
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required}
+      CORS_ORIGINS: ${CORS_ORIGINS:?CORS_ORIGINS is required}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    # No volume mounts in production - use built image
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: ${VITE_API_URL:-}
+    container_name: javya-frontend
+    restart: always
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
