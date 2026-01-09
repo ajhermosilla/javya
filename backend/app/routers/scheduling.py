@@ -24,10 +24,10 @@ router = APIRouter()
 
 @router.get("/calendar")
 async def get_calendar(
+    _current_user: Annotated[User, Depends(get_current_active_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
     start_date: date = Query(..., description="Start date for calendar range"),
     end_date: date = Query(..., description="End date for calendar range"),
-    current_user: Annotated[User, Depends(get_current_active_user)] = None,
-    db: AsyncSession = Depends(get_db),
 ) -> list[dict]:
     """Get setlists with assignments for a date range (for calendar view)."""
     if start_date > end_date:
@@ -76,9 +76,9 @@ async def get_calendar(
 
 @router.get("/availability", response_model=list[TeamMemberAvailability])
 async def check_team_availability(
+    _current_user: Annotated[User, Depends(require_role(UserRole.ADMIN, UserRole.LEADER))],
+    db: Annotated[AsyncSession, Depends(get_db)],
     service_date: date = Query(..., description="Date to check availability for"),
-    current_user: Annotated[User, Depends(require_role(UserRole.ADMIN, UserRole.LEADER))] = None,
-    db: AsyncSession = Depends(get_db),
 ) -> list[TeamMemberAvailability]:
     """Get all team members with their availability for a specific date (admin/leader only)."""
     # Get all active users with their availability for the date
@@ -111,9 +111,9 @@ async def check_team_availability(
 
 @router.get("/my-assignments", response_model=list[MyAssignmentResponse])
 async def get_my_assignments(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
     upcoming_only: bool = Query(True, description="Only show upcoming assignments"),
-    current_user: Annotated[User, Depends(get_current_active_user)] = None,
-    db: AsyncSession = Depends(get_db),
 ) -> list[MyAssignmentResponse]:
     """Get current user's assignments."""
     query = (

@@ -9,6 +9,7 @@ import { ErrorBoundary } from '../components/ErrorBoundary';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../api/client';
 import type { CalendarSetlist } from '../types/scheduling';
+import type { User } from '../types/user';
 import './SchedulingPage.css';
 
 type ViewMode = 'calendar' | 'list';
@@ -28,12 +29,6 @@ function getMonthRange(year: number, month: number) {
     startDate: formatLocalDate(startDate),
     endDate: formatLocalDate(endDate),
   };
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
 }
 
 export function SchedulingPage() {
