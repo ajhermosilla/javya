@@ -116,24 +116,32 @@ cd android
 
 ## User Testing Status
 
-Started v0.7 user testing checklist (`docs/USER-TESTING-v0.7.md`):
+v0.7 user testing checklist (`docs/USER-TESTING-v0.7.md`):
 
-| Section | Tests | Status |
-|---------|-------|--------|
-| 1. Authentication & Authorization | 13 | Started |
-| 2. Song Management | 18 | Pending |
-| 3. Song Transposition | 6 | Pending |
-| 4. Song Import | 22 | Pending |
-| 5. Setlist Management | 17 | Pending |
-| 6. Export Features | 10 | Pending |
-| 7. Availability Calendar | 12 | Pending |
-| 8. Team Scheduling | 13 | Pending |
-| 9. Internationalization | 6 | Pending |
-| 10. Error Handling | 14 | Pending |
-| 11. UI/UX Review | 18 | Pending |
-| 12. Performance | 7 | Pending |
+| Section | Tests | Passed | Skipped | Status |
+|---------|-------|--------|---------|--------|
+| 1. Authentication & Authorization | 13 | 11 | 3 | ✅ Complete |
+| 2. Song Management | 18 | 18 | 0 | ✅ Complete |
+| 3. Song Transposition | 6 | - | - | Pending |
+| 4. Song Import | 22 | - | - | Pending |
+| 5. Setlist Management | 17 | - | - | Pending |
+| 6. Export Features | 10 | - | - | Pending |
+| 7. Availability Calendar | 12 | - | - | Pending |
+| 8. Team Scheduling | 13 | - | - | Pending |
+| 9. Internationalization | 6 | - | - | Pending |
+| 10. Error Handling | 14 | - | - | Pending |
+| 11. UI/UX Review | 18 | - | - | Pending |
+| 12. Performance | 7 | - | - | Pending |
 
-**Total: ~150 test cases**
+**Progress: 29/156 tests complete (~19%)**
+
+### Issues Found During Testing
+
+| Issue | Title | Severity |
+|-------|-------|----------|
+| #21 | feat: Add User Management UI for Admin/Leader roles | Medium |
+| #22 | fix: Improve error message for permission denied on delete | Low |
+| #23 | fix: Polish alignment in song detail view | Low |
 
 ---
 
