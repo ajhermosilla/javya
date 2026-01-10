@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Javya</string>
+    <string name="app_tagline">Planificación de adoración para equipos de iglesia</string>
+
+    <!-- Navigation -->
+    <string name="nav_songs">Canciones</string>
+    <string name="nav_setlists">Repertorios</string>
+    <string name="nav_availability">Disponibilidad</string>
+    <string name="nav_scheduling">Programación</string>
+    <string name="nav_settings">Configuración</string>
+
+    <!-- Auth -->
+    <string name="auth_login">Iniciar Sesión</string>
+    <string name="auth_register">Crear Cuenta</string>
+    <string name="auth_logout">Cerrar Sesión</string>
+    <string name="auth_email">Correo electrónico</string>
+    <string name="auth_password">Contraseña</string>
+    <string name="auth_name">Nombre</string>
+    <string name="auth_forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="auth_no_account">¿No tienes una cuenta?</string>
+    <string name="auth_have_account">¿Ya tienes una cuenta?</string>
+
+    <!-- Common -->
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="delete">Eliminar</string>
+    <string name="edit">Editar</string>
+    <string name="close">Cerrar</string>
+    <string name="search">Buscar</string>
+    <string name="filter">Filtrar</string>
+    <string name="loading">Cargando…</string>
+    <string name="error">Error</string>
+    <string name="retry">Reintentar</string>
+    <string name="offline">Sin conexión</string>
+    <string name="syncing">Sincronizando…</string>
+
+    <!-- Songs -->
+    <string name="songs_title">Canciones</string>
+    <string name="songs_add">Agregar Canción</string>
+    <string name="songs_edit">Editar Canción</string>
+    <string name="songs_search_placeholder">Buscar canciones…</string>
+    <string name="song_name">Nombre de la Canción</string>
+    <string name="song_artist">Artista</string>
+    <string name="song_key">Tonalidad</string>
+    <string name="song_original_key">Tonalidad Original</string>
+    <string name="song_preferred_key">Tonalidad Preferida</string>
+    <string name="song_tempo">Tempo (BPM)</string>
+    <string name="song_mood">Estado de Ánimo</string>
+    <string name="song_themes">Temas</string>
+    <string name="song_lyrics">Letra</string>
+    <string name="song_chords">Acordes (ChordPro)</string>
+    <string name="song_notes">Notas</string>
+    <string name="song_url">URL</string>
+    <string name="song_min_band">Banda Mínima</string>
+    <string name="song_transpose">Transportar</string>
+    <string name="song_capo">Capo</string>
+
+    <!-- Setlists -->
+    <string name="setlists_title">Repertorios</string>
+    <string name="setlists_add">Agregar Repertorio</string>
+    <string name="setlists_edit">Editar Repertorio</string>
+    <string name="setlist_name">Nombre del Repertorio</string>
+    <string name="setlist_description">Descripción</string>
+    <string name="setlist_date">Fecha del Servicio</string>
+    <string name="setlist_event_type">Tipo de Evento</string>
+    <string name="setlist_songs">Canciones</string>
+    <string name="setlist_add_songs">Agregar Canciones</string>
+    <string name="setlist_start_service">Iniciar Modo Servicio</string>
+    <string name="setlist_notes">Notas del Repertorio</string>
+
+    <!-- Availability -->
+    <string name="availability_title">Disponibilidad</string>
+    <string name="availability_available">Disponible</string>
+    <string name="availability_unavailable">No Disponible</string>
+    <string name="availability_maybe">Quizás</string>
+    <string name="availability_patterns">Patrones</string>
+    <string name="availability_show_patterns">Mostrar Patrones</string>
+    <string name="availability_hide_patterns">Ocultar Patrones</string>
+    <string name="availability_add_pattern">Agregar Patrón</string>
+    <string name="availability_edit_pattern">Editar Patrón</string>
+
+    <!-- Patterns -->
+    <string name="pattern_weekly">Semanal</string>
+    <string name="pattern_biweekly">Quincenal</string>
+    <string name="pattern_monthly">Mensual</string>
+    <string name="pattern_day_of_week">Día de la Semana</string>
+    <string name="pattern_start_date">Fecha de Inicio</string>
+    <string name="pattern_end_date">Fecha de Fin</string>
+    <string name="pattern_active">Activo</string>
+
+    <!-- Days of week -->
+    <string name="day_monday">Lunes</string>
+    <string name="day_tuesday">Martes</string>
+    <string name="day_wednesday">Miércoles</string>
+    <string name="day_thursday">Jueves</string>
+    <string name="day_friday">Viernes</string>
+    <string name="day_saturday">Sábado</string>
+    <string name="day_sunday">Domingo</string>
+
+    <!-- Scheduling -->
+    <string name="scheduling_title">Programación</string>
+    <string name="scheduling_calendar">Calendario</string>
+    <string name="scheduling_list">Lista</string>
+    <string name="scheduling_my_assignments">Mis Asignaciones</string>
+    <string name="scheduling_team_availability">Disponibilidad del Equipo</string>
+    <string name="scheduling_assignments">Asignaciones</string>
+    <string name="scheduling_add_assignment">Agregar Asignación</string>
+    <string name="scheduling_confirm">Confirmar</string>
+    <string name="scheduling_unconfirm">Desconfirmar</string>
+    <string name="scheduling_confirmed">Confirmado</string>
+    <string name="scheduling_pending">Pendiente</string>
+
+    <!-- Service Roles -->
+    <string name="role_worship_leader">Líder de Adoración</string>
+    <string name="role_vocalist">Vocalista</string>
+    <string name="role_guitarist">Guitarrista</string>
+    <string name="role_bassist">Bajista</string>
+    <string name="role_drummer">Baterista</string>
+    <string name="role_keys">Teclado</string>
+    <string name="role_sound">Sonido</string>
+    <string name="role_projection">Proyección</string>
+    <string name="role_other">Otro</string>
+
+    <!-- Event Types -->
+    <string name="event_sunday">Domingo</string>
+    <string name="event_wednesday">Miércoles</string>
+    <string name="event_youth">Jóvenes</string>
+    <string name="event_special">Especial</string>
+    <string name="event_retreat">Retiro</string>
+    <string name="event_other">Otro</string>
+
+    <!-- Moods -->
+    <string name="mood_joyful">Alegre</string>
+    <string name="mood_reflective">Reflexivo</string>
+    <string name="mood_triumphant">Triunfante</string>
+    <string name="mood_intimate">Íntimo</string>
+    <string name="mood_peaceful">Pacífico</string>
+    <string name="mood_energetic">Enérgico</string>
+    <string name="mood_hopeful">Esperanzador</string>
+    <string name="mood_solemn">Solemne</string>
+    <string name="mood_celebratory">Celebratorio</string>
+
+    <!-- Service Mode -->
+    <string name="service_mode">Modo Servicio</string>
+    <string name="service_exit">Salir del Modo Servicio</string>
+    <string name="service_previous">Anterior</string>
+    <string name="service_next">Siguiente</string>
+    <string name="service_auto_scroll">Auto Desplazamiento</string>
+    <string name="service_scroll_speed">Velocidad de Desplazamiento</string>
+    <string name="service_notes">Notas</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Configuración</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Oscuro</string>
+    <string name="settings_theme_system">Sistema</string>
+    <string name="settings_server_url">URL del Servidor</string>
+    <string name="settings_sync">Sincronización</string>
+    <string name="settings_sync_now">Sincronizar Ahora</string>
+    <string name="settings_last_sync">Última sincronización: %1$s</string>
+    <string name="settings_about">Acerca de</string>
+    <string name="settings_version">Versión %1$s</string>
+
+    <!-- Errors -->
+    <string name="error_network">Error de red. Por favor verifica tu conexión.</string>
+    <string name="error_auth">Autenticación fallida. Por favor inicia sesión nuevamente.</string>
+    <string name="error_server">Error del servidor. Por favor intenta más tarde.</string>
+    <string name="error_unknown">Ocurrió un error inesperado.</string>
+    <string name="error_required_field">Este campo es requerido</string>
+    <string name="error_invalid_email">Por favor ingresa un correo electrónico válido</string>
+    <string name="error_password_short">La contraseña debe tener al menos 8 caracteres</string>
+</resources>
