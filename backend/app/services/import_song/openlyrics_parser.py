@@ -283,10 +283,11 @@ class OpenLyricsParser(BaseSongParser):
                 plain = "\n"
                 chordpro = "\n"
 
-            # Add text before children
+            # Add text before children (strip leading whitespace for first text)
             if elem.text:
-                plain += elem.text
-                chordpro += elem.text
+                text = elem.text
+                plain += text
+                chordpro += text
 
             # Process children
             for child in elem:
@@ -295,9 +296,13 @@ class OpenLyricsParser(BaseSongParser):
                 chordpro += child_chordpro
 
                 # Add tail text after each child
+                # Strip leading whitespace after <br/> tags to remove XML indentation
                 if child.tail:
-                    plain += child.tail
-                    chordpro += child.tail
+                    tail = child.tail
+                    if child.tag.endswith("br") or child.tag == "br":
+                        tail = tail.lstrip()
+                    plain += tail
+                    chordpro += tail
 
             return plain, chordpro
 
