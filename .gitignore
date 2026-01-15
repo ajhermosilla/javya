@@ -18,6 +18,7 @@ env/
 .env.local
 .env.*.local
 *.env
+!.envrc
 
 # Distribution / packaging
 dist/
@@ -126,6 +127,7 @@ docker-compose.override.yml
 # PostgreSQL dumps
 *.dump
 *.sql.gz
+backup-*.sql
 
 # =========================
 # Project Specific

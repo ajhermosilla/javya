@@ -57,6 +57,24 @@ docker compose up -d
 # API Docs: http://localhost:8000/docs
 ```
 
+### Optional: direnv for auto-loading environment
+
+If you use [direnv](https://direnv.net/), the `.envrc` file will automatically load environment variables when you enter the project directory:
+
+```bash
+# Install direnv (macOS)
+brew install direnv
+
+# Allow the .envrc file (one-time)
+cd javya
+direnv allow
+
+# Now environment variables load automatically when entering the directory
+cd javya        # Variables loaded
+echo $DEBUG     # "true"
+cd ..           # Variables unloaded
+```
+
 ## Code Style
 
 ### Python (Backend)
