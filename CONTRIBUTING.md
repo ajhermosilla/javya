@@ -52,7 +52,7 @@ cp .env.example .env
 # Start development environment
 docker compose up -d
 
-# Frontend: http://localhost:3000
+# Frontend: http://localhost:5173
 # Backend: http://localhost:8000
 # API Docs: http://localhost:8000/docs
 ```

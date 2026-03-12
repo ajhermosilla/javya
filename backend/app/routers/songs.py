@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.dependencies import require_role
+from app.auth.dependencies import get_current_active_user, require_role
 from app.database import get_db
 from app.enums import MusicalKey, Mood, Theme, UserRole
 from app.models.song import Song
@@ -21,6 +21,7 @@ router = APIRouter()
 @router.post("/", response_model=SongResponse, status_code=status.HTTP_201_CREATED)
 async def create_song(
     song_data: SongCreate,
+    _current_user: Annotated[User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ) -> Song:
     """Create a new song."""
@@ -47,6 +48,7 @@ async def create_song(
 @router.post("/check-duplicates", response_model=CheckDuplicatesResponse)
 async def check_duplicates(
     request: CheckDuplicatesRequest,
+    _current_user: Annotated[User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ) -> CheckDuplicatesResponse:
     """Check for duplicate songs by name + artist.
@@ -116,6 +118,7 @@ async def get_song(
 async def update_song(
     song_id: UUID,
     song_data: SongUpdate,
+    _current_user: Annotated[User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ) -> Song:
     """Update a song by ID."""

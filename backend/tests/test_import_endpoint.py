@@ -33,12 +33,12 @@ class TestPreviewEndpoint:
 
     @pytest.mark.asyncio
     async def test_preview_single_file(
-        self, client: AsyncClient, sample_chordpro_content: bytes
+        self, client: AsyncClient, auth_headers: dict, sample_chordpro_content: bytes
     ):
         """Should preview a single file successfully."""
         files = [("files", ("test.cho", sample_chordpro_content, "text/plain"))]
 
-        response = await client.post("/api/v1/songs/import/preview", files=files)
+        response = await client.post("/api/v1/songs/import/preview", files=files, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -56,7 +56,7 @@ class TestPreviewEndpoint:
 
     @pytest.mark.asyncio
     async def test_preview_multiple_files(
-        self, client: AsyncClient, sample_chordpro_content: bytes
+        self, client: AsyncClient, auth_headers: dict, sample_chordpro_content: bytes
     ):
         """Should preview multiple files."""
         files = [
@@ -65,7 +65,7 @@ class TestPreviewEndpoint:
             ("files", ("song3.cho", sample_chordpro_content, "text/plain")),
         ]
 
-        response = await client.post("/api/v1/songs/import/preview", files=files)
+        response = await client.post("/api/v1/songs/import/preview", files=files, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -76,6 +76,7 @@ class TestPreviewEndpoint:
     async def test_preview_with_failures(
         self,
         client: AsyncClient,
+        auth_headers: dict,
         sample_chordpro_content: bytes,
     ):
         """Should handle mixed success/failure with oversized file."""
@@ -87,7 +88,7 @@ class TestPreviewEndpoint:
             ("files", ("large.txt", large_content, "text/plain")),
         ]
 
-        response = await client.post("/api/v1/songs/import/preview", files=files)
+        response = await client.post("/api/v1/songs/import/preview", files=files, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -96,20 +97,20 @@ class TestPreviewEndpoint:
         assert data["failed"] == 1
 
     @pytest.mark.asyncio
-    async def test_preview_no_files(self, client: AsyncClient):
+    async def test_preview_no_files(self, client: AsyncClient, auth_headers: dict):
         """Should reject request with no files."""
-        response = await client.post("/api/v1/songs/import/preview", files=[])
+        response = await client.post("/api/v1/songs/import/preview", files=[], headers=auth_headers)
 
         # FastAPI returns 422 for validation errors (empty required list)
         assert response.status_code == 422
 
     @pytest.mark.asyncio
-    async def test_preview_file_too_large(self, client: AsyncClient):
+    async def test_preview_file_too_large(self, client: AsyncClient, auth_headers: dict):
         """Should reject files larger than 1MB."""
         large_content = b"x" * (1024 * 1024 + 1)  # Just over 1MB
         files = [("files", ("large.txt", large_content, "text/plain"))]
 
-        response = await client.post("/api/v1/songs/import/preview", files=files)
+        response = await client.post("/api/v1/songs/import/preview", files=files, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -117,7 +118,7 @@ class TestPreviewEndpoint:
         assert "exceeds maximum size" in data["songs"][0]["error"]
 
     @pytest.mark.asyncio
-    async def test_preview_real_sample_files(self, client: AsyncClient):
+    async def test_preview_real_sample_files(self, client: AsyncClient, auth_headers: dict):
         """Should preview real sample files from fixtures."""
         files_to_test = [
             ("sample.cho", "chordpro"),
@@ -136,7 +137,7 @@ class TestPreviewEndpoint:
             content = file_path.read_bytes()
             files = [("files", (filename, content, "text/plain"))]
 
-            response = await client.post("/api/v1/songs/import/preview", files=files)
+            response = await client.post("/api/v1/songs/import/preview", files=files, headers=auth_headers)
 
             assert response.status_code == 200, f"Failed for {filename}"
             data = response.json()
@@ -151,7 +152,7 @@ class TestConfirmEndpoint:
 
     @pytest.mark.asyncio
     async def test_confirm_creates_songs(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, auth_headers: dict, db_session: AsyncSession
     ):
         """Should create new songs in database."""
         request_data = {
@@ -175,7 +176,7 @@ class TestConfirmEndpoint:
             ]
         }
 
-        response = await client.post("/api/v1/songs/import/confirm", json=request_data)
+        response = await client.post("/api/v1/songs/import/confirm", json=request_data, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -194,7 +195,7 @@ class TestConfirmEndpoint:
         assert "Imported Song 2" in names
 
     @pytest.mark.asyncio
-    async def test_confirm_skip_action(self, client: AsyncClient):
+    async def test_confirm_skip_action(self, client: AsyncClient, auth_headers: dict):
         """Should skip songs with skip action."""
         request_data = {
             "songs": [
@@ -208,7 +209,7 @@ class TestConfirmEndpoint:
             ]
         }
 
-        response = await client.post("/api/v1/songs/import/confirm", json=request_data)
+        response = await client.post("/api/v1/songs/import/confirm", json=request_data, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -219,12 +220,13 @@ class TestConfirmEndpoint:
 
     @pytest.mark.asyncio
     async def test_confirm_merge_action(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, auth_headers: dict, db_session: AsyncSession
     ):
         """Should merge with existing song."""
         # First create a song
         create_response = await client.post(
             "/api/v1/songs/",
+            headers=auth_headers,
             json={
                 "name": "Original Song",
                 "artist": "Original Artist",
@@ -250,7 +252,7 @@ class TestConfirmEndpoint:
             ]
         }
 
-        response = await client.post("/api/v1/songs/import/confirm", json=request_data)
+        response = await client.post("/api/v1/songs/import/confirm", json=request_data, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -268,7 +270,7 @@ class TestConfirmEndpoint:
         assert merged_song["lyrics"] == "New lyrics content"
 
     @pytest.mark.asyncio
-    async def test_confirm_merge_requires_existing_id(self, client: AsyncClient):
+    async def test_confirm_merge_requires_existing_id(self, client: AsyncClient, auth_headers: dict):
         """Should reject merge without existing_song_id."""
         request_data = {
             "songs": [
@@ -283,13 +285,13 @@ class TestConfirmEndpoint:
             ]
         }
 
-        response = await client.post("/api/v1/songs/import/confirm", json=request_data)
+        response = await client.post("/api/v1/songs/import/confirm", json=request_data, headers=auth_headers)
 
         assert response.status_code == 400
         assert "existing_song_id required" in response.json()["detail"]
 
     @pytest.mark.asyncio
-    async def test_confirm_merge_invalid_id(self, client: AsyncClient):
+    async def test_confirm_merge_invalid_id(self, client: AsyncClient, auth_headers: dict):
         """Should reject merge with non-existent song ID."""
         import uuid
 
@@ -306,19 +308,20 @@ class TestConfirmEndpoint:
             ]
         }
 
-        response = await client.post("/api/v1/songs/import/confirm", json=request_data)
+        response = await client.post("/api/v1/songs/import/confirm", json=request_data, headers=auth_headers)
 
         assert response.status_code == 404
         assert "not found" in response.json()["detail"]
 
     @pytest.mark.asyncio
     async def test_confirm_mixed_actions(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, auth_headers: dict, db_session: AsyncSession
     ):
         """Should handle mix of create, merge, and skip actions."""
         # First create a song to merge with
         create_response = await client.post(
             "/api/v1/songs/",
+            headers=auth_headers,
             json={
                 "name": "Existing Song",
                 "artist": "Existing Artist",
@@ -355,7 +358,7 @@ class TestConfirmEndpoint:
             ]
         }
 
-        response = await client.post("/api/v1/songs/import/confirm", json=request_data)
+        response = await client.post("/api/v1/songs/import/confirm", json=request_data, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -365,15 +368,15 @@ class TestConfirmEndpoint:
         assert len(data["songs"]) == 2  # Only created and merged songs returned
 
     @pytest.mark.asyncio
-    async def test_confirm_no_songs(self, client: AsyncClient):
+    async def test_confirm_no_songs(self, client: AsyncClient, auth_headers: dict):
         """Should reject request with no songs."""
-        response = await client.post("/api/v1/songs/import/confirm", json={"songs": []})
+        response = await client.post("/api/v1/songs/import/confirm", json={"songs": []}, headers=auth_headers)
 
         assert response.status_code == 400
         assert "No songs" in response.json()["detail"]
 
     @pytest.mark.asyncio
-    async def test_confirm_validates_song_data(self, client: AsyncClient):
+    async def test_confirm_validates_song_data(self, client: AsyncClient, auth_headers: dict):
         """Should validate song data (name required)."""
         request_data = {
             "songs": [
@@ -384,19 +387,19 @@ class TestConfirmEndpoint:
             ]
         }
 
-        response = await client.post("/api/v1/songs/import/confirm", json=request_data)
+        response = await client.post("/api/v1/songs/import/confirm", json=request_data, headers=auth_headers)
 
         assert response.status_code == 422  # Validation error
 
     @pytest.mark.asyncio
     async def test_full_import_flow(
-        self, client: AsyncClient, sample_chordpro_content: bytes
+        self, client: AsyncClient, auth_headers: dict, sample_chordpro_content: bytes
     ):
         """Should complete full preview -> confirm flow."""
         # Step 1: Preview
         files = [("files", ("test.cho", sample_chordpro_content, "text/plain"))]
         preview_response = await client.post(
-            "/api/v1/songs/import/preview", files=files
+            "/api/v1/songs/import/preview", files=files, headers=auth_headers
         )
 
         assert preview_response.status_code == 200
@@ -409,6 +412,7 @@ class TestConfirmEndpoint:
         # Step 2: Confirm with new format
         confirm_response = await client.post(
             "/api/v1/songs/import/confirm",
+            headers=auth_headers,
             json={
                 "songs": [
                     {
@@ -426,7 +430,7 @@ class TestConfirmEndpoint:
 
         # Step 3: Verify song exists in database
         song_id = confirm_data["songs"][0]["id"]
-        get_response = await client.get(f"/api/v1/songs/{song_id}")
+        get_response = await client.get(f"/api/v1/songs/{song_id}", headers=auth_headers)
 
         assert get_response.status_code == 200
         assert get_response.json()["name"] == "Test Import Song"
@@ -436,21 +440,23 @@ class TestUrlPreviewEndpoint:
     """Tests for POST /api/v1/songs/import/preview-url."""
 
     @pytest.mark.asyncio
-    async def test_preview_url_invalid_url(self, client: AsyncClient):
+    async def test_preview_url_invalid_url(self, client: AsyncClient, auth_headers: dict):
         """Should reject invalid URL."""
         response = await client.post(
             "/api/v1/songs/import/preview-url",
             json={"url": "not-a-valid-url"},
+            headers=auth_headers,
         )
 
         assert response.status_code == 422  # Validation error
 
     @pytest.mark.asyncio
-    async def test_preview_url_unreachable(self, client: AsyncClient):
+    async def test_preview_url_unreachable(self, client: AsyncClient, auth_headers: dict):
         """Should handle unreachable URL gracefully."""
         response = await client.post(
             "/api/v1/songs/import/preview-url",
             json={"url": "https://this-domain-does-not-exist-12345.com/song.cho"},
+            headers=auth_headers,
         )
 
         assert response.status_code == 200
@@ -460,11 +466,12 @@ class TestUrlPreviewEndpoint:
         assert "Failed to fetch URL" in data["songs"][0]["error"]
 
     @pytest.mark.asyncio
-    async def test_preview_url_missing_url(self, client: AsyncClient):
+    async def test_preview_url_missing_url(self, client: AsyncClient, auth_headers: dict):
         """Should reject request without URL."""
         response = await client.post(
             "/api/v1/songs/import/preview-url",
             json={},
+            headers=auth_headers,
         )
 
         assert response.status_code == 422
@@ -488,13 +495,13 @@ class TestZipImport:
 
     @pytest.mark.asyncio
     async def test_preview_zip_single_song(
-        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+        self, client: AsyncClient, auth_headers: dict, sample_chordpro_content: bytes, create_zip: callable
     ):
         """Should extract and preview a single song from ZIP."""
         zip_content = create_zip([("song.cho", sample_chordpro_content)])
         files = [("files", ("songs.zip", zip_content, "application/zip"))]
 
-        response = await client.post("/api/v1/songs/import/preview", files=files)
+        response = await client.post("/api/v1/songs/import/preview", files=files, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -505,7 +512,7 @@ class TestZipImport:
 
     @pytest.mark.asyncio
     async def test_preview_zip_multiple_songs(
-        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+        self, client: AsyncClient, auth_headers: dict, sample_chordpro_content: bytes, create_zip: callable
     ):
         """Should extract and preview multiple songs from ZIP."""
         song1 = b"""{title: Song One}
@@ -525,7 +532,7 @@ class TestZipImport:
         ])
         files = [("files", ("songs.zip", zip_content, "application/zip"))]
 
-        response = await client.post("/api/v1/songs/import/preview", files=files)
+        response = await client.post("/api/v1/songs/import/preview", files=files, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -534,7 +541,7 @@ class TestZipImport:
 
     @pytest.mark.asyncio
     async def test_preview_zip_filters_non_song_files(
-        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+        self, client: AsyncClient, auth_headers: dict, sample_chordpro_content: bytes, create_zip: callable
     ):
         """Should only extract song files from ZIP, ignoring others."""
         zip_content = create_zip([
@@ -545,7 +552,7 @@ class TestZipImport:
         ])
         files = [("files", ("songs.zip", zip_content, "application/zip"))]
 
-        response = await client.post("/api/v1/songs/import/preview", files=files)
+        response = await client.post("/api/v1/songs/import/preview", files=files, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -555,7 +562,7 @@ class TestZipImport:
 
     @pytest.mark.asyncio
     async def test_preview_zip_ignores_macosx_folder(
-        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+        self, client: AsyncClient, auth_headers: dict, sample_chordpro_content: bytes, create_zip: callable
     ):
         """Should ignore __MACOSX folder in ZIP."""
         zip_content = create_zip([
@@ -564,7 +571,7 @@ class TestZipImport:
         ])
         files = [("files", ("songs.zip", zip_content, "application/zip"))]
 
-        response = await client.post("/api/v1/songs/import/preview", files=files)
+        response = await client.post("/api/v1/songs/import/preview", files=files, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -573,7 +580,7 @@ class TestZipImport:
 
     @pytest.mark.asyncio
     async def test_preview_zip_ignores_hidden_files(
-        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+        self, client: AsyncClient, auth_headers: dict, sample_chordpro_content: bytes, create_zip: callable
     ):
         """Should ignore hidden files (starting with .) in ZIP."""
         zip_content = create_zip([
@@ -583,7 +590,7 @@ class TestZipImport:
         ])
         files = [("files", ("songs.zip", zip_content, "application/zip"))]
 
-        response = await client.post("/api/v1/songs/import/preview", files=files)
+        response = await client.post("/api/v1/songs/import/preview", files=files, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -593,7 +600,7 @@ class TestZipImport:
 
     @pytest.mark.asyncio
     async def test_preview_zip_nested_folders(
-        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+        self, client: AsyncClient, auth_headers: dict, sample_chordpro_content: bytes, create_zip: callable
     ):
         """Should extract song files from nested folders."""
         zip_content = create_zip([
@@ -602,7 +609,7 @@ class TestZipImport:
         ])
         files = [("files", ("songs.zip", zip_content, "application/zip"))]
 
-        response = await client.post("/api/v1/songs/import/preview", files=files)
+        response = await client.post("/api/v1/songs/import/preview", files=files, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -610,13 +617,13 @@ class TestZipImport:
         assert data["successful"] == 2
 
     @pytest.mark.asyncio
-    async def test_preview_zip_with_invalid_zip(self, client: AsyncClient):
+    async def test_preview_zip_with_invalid_zip(self, client: AsyncClient, auth_headers: dict):
         """Should handle invalid ZIP gracefully."""
         # Starts with ZIP magic bytes but is corrupted
         fake_zip = b"PK\x03\x04corrupted content that is not a valid zip"
         files = [("files", ("songs.zip", fake_zip, "application/zip"))]
 
-        response = await client.post("/api/v1/songs/import/preview", files=files)
+        response = await client.post("/api/v1/songs/import/preview", files=files, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -627,7 +634,7 @@ class TestZipImport:
 
     @pytest.mark.asyncio
     async def test_preview_zip_mixed_with_regular_files(
-        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+        self, client: AsyncClient, auth_headers: dict, sample_chordpro_content: bytes, create_zip: callable
     ):
         """Should handle ZIP and regular files in same request."""
         zip_content = create_zip([("zipped_song.cho", sample_chordpro_content)])
@@ -637,7 +644,7 @@ class TestZipImport:
             ("files", ("archive.zip", zip_content, "application/zip")),
         ]
 
-        response = await client.post("/api/v1/songs/import/preview", files=files)
+        response = await client.post("/api/v1/songs/import/preview", files=files, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -646,7 +653,7 @@ class TestZipImport:
 
     @pytest.mark.asyncio
     async def test_preview_zip_all_supported_extensions(
-        self, client: AsyncClient, sample_chordpro_content: bytes, create_zip: callable
+        self, client: AsyncClient, auth_headers: dict, sample_chordpro_content: bytes, create_zip: callable
     ):
         """Should extract all supported song file extensions."""
         zip_content = create_zip([
@@ -659,7 +666,7 @@ class TestZipImport:
         ])
         files = [("files", ("songs.zip", zip_content, "application/zip"))]
 
-        response = await client.post("/api/v1/songs/import/preview", files=files)
+        response = await client.post("/api/v1/songs/import/preview", files=files, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()

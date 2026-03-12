@@ -256,6 +256,9 @@
       "activate": "Activate",
       "deactivate": "Deactivate",
       "endDateBeforeStart": "End date must be after start date",
+      "errorCreate": "Failed to create pattern. Please try again.",
+      "errorUpdate": "Failed to update pattern. Please try again.",
+      "errorDelete": "Failed to delete pattern. Please try again.",
       "types": {
         "weekly": "Weekly",
         "biweekly": "Biweekly",

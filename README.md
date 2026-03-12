@@ -38,7 +38,6 @@ Javya consolidates this into one reliable tool.
 
 ### Coming Soon
 See our full **[Roadmap](ROADMAP.md)** for planned features including:
-- Song transposition tool
 - CCLI integration
 - Email notifications
 - Dashboard and analytics

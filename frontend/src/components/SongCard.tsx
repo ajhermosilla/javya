@@ -27,7 +27,13 @@ export function SongCard({ song, onClick, onEdit, onDelete }: SongCardProps) {
 
   return (
     <div className="song-card">
-      <div className="song-card-header" onClick={onClick} role="button" tabIndex={0}>
+      <div
+        className="song-card-header"
+        onClick={onClick}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } }}
+        role="button"
+        tabIndex={0}
+      >
         <h3 className="song-name">{song.name}</h3>
         {song.artist && <p className="song-artist">{song.artist}</p>}
       </div>

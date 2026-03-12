@@ -5,29 +5,15 @@ import pytest
 from httpx import AsyncClient
 
 
-async def get_admin_headers(client: AsyncClient) -> dict[str, str]:
-    """Register first user (becomes admin) and return auth headers."""
-    await client.post(
-        "/api/v1/auth/register",
-        json={"email": "admin@test.com", "name": "Admin", "password": "testpassword123"},
-    )
-    login_response = await client.post(
-        "/api/v1/auth/login",
-        data={"username": "admin@test.com", "password": "testpassword123"},
-    )
-    token = login_response.json()["access_token"]
-    return {"Authorization": f"Bearer {token}"}
-
-
 class TestCreateSong:
     """Tests for POST /api/v1/songs/ endpoint."""
 
     @pytest.mark.asyncio
     async def test_create_song_full(
-        self, client: AsyncClient, sample_song_data: dict[str, Any]
+        self, client: AsyncClient, auth_headers: dict, sample_song_data: dict[str, Any]
     ) -> None:
         """Test creating a song with all fields."""
-        response = await client.post("/api/v1/songs/", json=sample_song_data)
+        response = await client.post("/api/v1/songs/", json=sample_song_data, headers=auth_headers)
 
         assert response.status_code == 201
         data = response.json()
@@ -49,10 +35,10 @@ class TestCreateSong:
 
     @pytest.mark.asyncio
     async def test_create_song_minimal(
-        self, client: AsyncClient, sample_song_data_minimal: dict[str, Any]
+        self, client: AsyncClient, auth_headers: dict, sample_song_data_minimal: dict[str, Any]
     ) -> None:
         """Test creating a song with only required fields."""
-        response = await client.post("/api/v1/songs/", json=sample_song_data_minimal)
+        response = await client.post("/api/v1/songs/", json=sample_song_data_minimal, headers=auth_headers)
 
         assert response.status_code == 201
         data = response.json()
@@ -61,41 +47,51 @@ class TestCreateSong:
         assert data["url"] is None
 
     @pytest.mark.asyncio
-    async def test_create_song_missing_name(self, client: AsyncClient) -> None:
+    async def test_create_song_missing_name(self, client: AsyncClient, auth_headers: dict) -> None:
         """Test that creating a song without name fails."""
-        response = await client.post("/api/v1/songs/", json={})
+        response = await client.post("/api/v1/songs/", json={}, headers=auth_headers)
 
         assert response.status_code == 422
 
     @pytest.mark.asyncio
-    async def test_create_song_invalid_key(self, client: AsyncClient) -> None:
+    async def test_create_song_invalid_key(self, client: AsyncClient, auth_headers: dict) -> None:
         """Test that invalid musical key is rejected."""
         response = await client.post(
             "/api/v1/songs/",
             json={"name": "Test Song", "original_key": "Z"},
+            headers=auth_headers,
         )
 
         assert response.status_code == 422
 
     @pytest.mark.asyncio
-    async def test_create_song_invalid_mood(self, client: AsyncClient) -> None:
+    async def test_create_song_invalid_mood(self, client: AsyncClient, auth_headers: dict) -> None:
         """Test that invalid mood is rejected."""
         response = await client.post(
             "/api/v1/songs/",
             json={"name": "Test Song", "mood": "InvalidMood"},
+            headers=auth_headers,
         )
 
         assert response.status_code == 422
 
     @pytest.mark.asyncio
-    async def test_create_song_invalid_tempo(self, client: AsyncClient) -> None:
+    async def test_create_song_invalid_tempo(self, client: AsyncClient, auth_headers: dict) -> None:
         """Test that invalid tempo (out of range) is rejected."""
         response = await client.post(
             "/api/v1/songs/",
             json={"name": "Test Song", "tempo_bpm": 500},
+            headers=auth_headers,
         )
 
         assert response.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_create_song_unauthenticated(self, client: AsyncClient) -> None:
+        """Test that creating a song without auth returns 401."""
+        response = await client.post("/api/v1/songs/", json={"name": "Test"})
+
+        assert response.status_code == 401
 
 
 class TestListSongs:
@@ -111,13 +107,14 @@ class TestListSongs:
 
     @pytest.mark.asyncio
     async def test_list_songs_with_data(
-        self, client: AsyncClient, sample_song_data: dict[str, Any]
+        self, client: AsyncClient, auth_headers: dict, sample_song_data: dict[str, Any]
     ) -> None:
         """Test listing songs after creating some."""
         # Create two songs
-        await client.post("/api/v1/songs/", json=sample_song_data)
+        await client.post("/api/v1/songs/", json=sample_song_data, headers=auth_headers)
         await client.post(
-            "/api/v1/songs/", json={"name": "Second Song", "artist": "Another Artist"}
+            "/api/v1/songs/", json={"name": "Second Song", "artist": "Another Artist"},
+            headers=auth_headers,
         )
 
         response = await client.get("/api/v1/songs/")
@@ -128,11 +125,11 @@ class TestListSongs:
 
     @pytest.mark.asyncio
     async def test_list_songs_search_by_name(
-        self, client: AsyncClient, sample_song_data: dict[str, Any]
+        self, client: AsyncClient, auth_headers: dict, sample_song_data: dict[str, Any]
     ) -> None:
         """Test searching songs by name."""
-        await client.post("/api/v1/songs/", json=sample_song_data)
-        await client.post("/api/v1/songs/", json={"name": "Different Song"})
+        await client.post("/api/v1/songs/", json=sample_song_data, headers=auth_headers)
+        await client.post("/api/v1/songs/", json={"name": "Different Song"}, headers=auth_headers)
 
         response = await client.get("/api/v1/songs/?search=amazing")
 
@@ -143,10 +140,10 @@ class TestListSongs:
 
     @pytest.mark.asyncio
     async def test_list_songs_search_by_artist(
-        self, client: AsyncClient, sample_song_data: dict[str, Any]
+        self, client: AsyncClient, auth_headers: dict, sample_song_data: dict[str, Any]
     ) -> None:
         """Test searching songs by artist."""
-        await client.post("/api/v1/songs/", json=sample_song_data)
+        await client.post("/api/v1/songs/", json=sample_song_data, headers=auth_headers)
 
         response = await client.get("/api/v1/songs/?search=newton")
 
@@ -157,12 +154,13 @@ class TestListSongs:
 
     @pytest.mark.asyncio
     async def test_list_songs_filter_by_key(
-        self, client: AsyncClient, sample_song_data: dict[str, Any]
+        self, client: AsyncClient, auth_headers: dict, sample_song_data: dict[str, Any]
     ) -> None:
         """Test filtering songs by key."""
-        await client.post("/api/v1/songs/", json=sample_song_data)
+        await client.post("/api/v1/songs/", json=sample_song_data, headers=auth_headers)
         await client.post(
-            "/api/v1/songs/", json={"name": "D Song", "original_key": "D"}
+            "/api/v1/songs/", json={"name": "D Song", "original_key": "D"},
+            headers=auth_headers,
         )
 
         # Filter by G (matches original_key)
@@ -183,12 +181,13 @@ class TestListSongs:
 
     @pytest.mark.asyncio
     async def test_list_songs_filter_by_mood(
-        self, client: AsyncClient, sample_song_data: dict[str, Any]
+        self, client: AsyncClient, auth_headers: dict, sample_song_data: dict[str, Any]
     ) -> None:
         """Test filtering songs by mood."""
-        await client.post("/api/v1/songs/", json=sample_song_data)
+        await client.post("/api/v1/songs/", json=sample_song_data, headers=auth_headers)
         await client.post(
-            "/api/v1/songs/", json={"name": "Joyful Song", "mood": "Joyful"}
+            "/api/v1/songs/", json={"name": "Joyful Song", "mood": "Joyful"},
+            headers=auth_headers,
         )
 
         response = await client.get("/api/v1/songs/?mood=Reflective")
@@ -200,12 +199,13 @@ class TestListSongs:
 
     @pytest.mark.asyncio
     async def test_list_songs_filter_by_theme(
-        self, client: AsyncClient, sample_song_data: dict[str, Any]
+        self, client: AsyncClient, auth_headers: dict, sample_song_data: dict[str, Any]
     ) -> None:
         """Test filtering songs by theme."""
-        await client.post("/api/v1/songs/", json=sample_song_data)
+        await client.post("/api/v1/songs/", json=sample_song_data, headers=auth_headers)
         await client.post(
-            "/api/v1/songs/", json={"name": "Worship Song", "themes": ["Worship"]}
+            "/api/v1/songs/", json={"name": "Worship Song", "themes": ["Worship"]},
+            headers=auth_headers,
         )
 
         response = await client.get("/api/v1/songs/?theme=Grace")
@@ -216,11 +216,11 @@ class TestListSongs:
         assert "Grace" in data[0]["themes"]
 
     @pytest.mark.asyncio
-    async def test_list_songs_pagination(self, client: AsyncClient) -> None:
+    async def test_list_songs_pagination(self, client: AsyncClient, auth_headers: dict) -> None:
         """Test pagination with skip and limit."""
         # Create 5 songs
         for i in range(5):
-            await client.post("/api/v1/songs/", json={"name": f"Song {i}"})
+            await client.post("/api/v1/songs/", json={"name": f"Song {i}"}, headers=auth_headers)
 
         # Get first 2
         response = await client.get("/api/v1/songs/?limit=2")
@@ -240,10 +240,10 @@ class TestGetSong:
 
     @pytest.mark.asyncio
     async def test_get_song_success(
-        self, client: AsyncClient, sample_song_data: dict[str, Any]
+        self, client: AsyncClient, auth_headers: dict, sample_song_data: dict[str, Any]
     ) -> None:
         """Test getting a song by ID."""
-        create_response = await client.post("/api/v1/songs/", json=sample_song_data)
+        create_response = await client.post("/api/v1/songs/", json=sample_song_data, headers=auth_headers)
         song_id = create_response.json()["id"]
 
         response = await client.get(f"/api/v1/songs/{song_id}")
@@ -276,17 +276,17 @@ class TestUpdateSong:
 
     @pytest.mark.asyncio
     async def test_update_song_success(
-        self, client: AsyncClient, sample_song_data: dict[str, Any]
+        self, client: AsyncClient, auth_headers: dict, sample_song_data: dict[str, Any]
     ) -> None:
         """Test updating a song."""
-        create_response = await client.post("/api/v1/songs/", json=sample_song_data)
+        create_response = await client.post("/api/v1/songs/", json=sample_song_data, headers=auth_headers)
         song_id = create_response.json()["id"]
 
         updated_data = sample_song_data.copy()
         updated_data["name"] = "Updated Amazing Grace"
         updated_data["tempo_bpm"] = 80
 
-        response = await client.put(f"/api/v1/songs/{song_id}", json=updated_data)
+        response = await client.put(f"/api/v1/songs/{song_id}", json=updated_data, headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -295,29 +295,42 @@ class TestUpdateSong:
 
     @pytest.mark.asyncio
     async def test_update_song_not_found(
-        self, client: AsyncClient, sample_song_data: dict[str, Any]
+        self, client: AsyncClient, auth_headers: dict, sample_song_data: dict[str, Any]
     ) -> None:
         """Test updating a non-existent song returns 404."""
         fake_id = str(uuid4())
 
-        response = await client.put(f"/api/v1/songs/{fake_id}", json=sample_song_data)
+        response = await client.put(f"/api/v1/songs/{fake_id}", json=sample_song_data, headers=auth_headers)
 
         assert response.status_code == 404
 
     @pytest.mark.asyncio
     async def test_update_song_invalid_data(
-        self, client: AsyncClient, sample_song_data: dict[str, Any]
+        self, client: AsyncClient, auth_headers: dict, sample_song_data: dict[str, Any]
     ) -> None:
         """Test updating with invalid data fails."""
-        create_response = await client.post("/api/v1/songs/", json=sample_song_data)
+        create_response = await client.post("/api/v1/songs/", json=sample_song_data, headers=auth_headers)
         song_id = create_response.json()["id"]
 
         response = await client.put(
             f"/api/v1/songs/{song_id}",
             json={"name": "Test", "mood": "InvalidMood"},
+            headers=auth_headers,
         )
 
         assert response.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_update_song_unauthenticated(
+        self, client: AsyncClient, auth_headers: dict, sample_song_data: dict[str, Any]
+    ) -> None:
+        """Test that updating a song without auth returns 401."""
+        create_response = await client.post("/api/v1/songs/", json=sample_song_data, headers=auth_headers)
+        song_id = create_response.json()["id"]
+
+        response = await client.put(f"/api/v1/songs/{song_id}", json=sample_song_data)
+
+        assert response.status_code == 401
 
 
 class TestDeleteSong:
@@ -325,14 +338,13 @@ class TestDeleteSong:
 
     @pytest.mark.asyncio
     async def test_delete_song_success(
-        self, client: AsyncClient, sample_song_data: dict[str, Any]
+        self, client: AsyncClient, auth_headers: dict, sample_song_data: dict[str, Any]
     ) -> None:
         """Test deleting a song (requires admin/leader auth)."""
-        headers = await get_admin_headers(client)
-        create_response = await client.post("/api/v1/songs/", json=sample_song_data)
+        create_response = await client.post("/api/v1/songs/", json=sample_song_data, headers=auth_headers)
         song_id = create_response.json()["id"]
 
-        response = await client.delete(f"/api/v1/songs/{song_id}", headers=headers)
+        response = await client.delete(f"/api/v1/songs/{song_id}", headers=auth_headers)
 
         assert response.status_code == 204
 
@@ -341,19 +353,17 @@ class TestDeleteSong:
         assert get_response.status_code == 404
 
     @pytest.mark.asyncio
-    async def test_delete_song_not_found(self, client: AsyncClient) -> None:
+    async def test_delete_song_not_found(self, client: AsyncClient, auth_headers: dict) -> None:
         """Test deleting a non-existent song returns 404."""
-        headers = await get_admin_headers(client)
         fake_id = str(uuid4())
 
-        response = await client.delete(f"/api/v1/songs/{fake_id}", headers=headers)
+        response = await client.delete(f"/api/v1/songs/{fake_id}", headers=auth_headers)
 
         assert response.status_code == 404
 
     @pytest.mark.asyncio
-    async def test_delete_song_invalid_id(self, client: AsyncClient) -> None:
+    async def test_delete_song_invalid_id(self, client: AsyncClient, auth_headers: dict) -> None:
         """Test deleting with invalid UUID format."""
-        headers = await get_admin_headers(client)
-        response = await client.delete("/api/v1/songs/not-a-uuid", headers=headers)
+        response = await client.delete("/api/v1/songs/not-a-uuid", headers=auth_headers)
 
         assert response.status_code == 422

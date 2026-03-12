@@ -9,7 +9,7 @@ from app.models.song import Song
 class TestCheckDuplicatesEndpoint:
     """Tests for POST /api/v1/songs/check-duplicates endpoint."""
 
-    async def test_no_duplicates_found(self, client: AsyncClient, db_session):
+    async def test_no_duplicates_found(self, client: AsyncClient, auth_headers: dict, db_session):
         """Should return empty list when no duplicates exist."""
         response = await client.post(
             "/api/v1/songs/check-duplicates",
@@ -18,6 +18,7 @@ class TestCheckDuplicatesEndpoint:
                     {"name": "Unique Song", "artist": "Unique Artist"},
                 ]
             },
+            headers=auth_headers,
         )
 
         assert response.status_code == 200
@@ -25,7 +26,7 @@ class TestCheckDuplicatesEndpoint:
         assert data["duplicates"] == []
 
     async def test_finds_exact_duplicate(
-        self, client: AsyncClient, db_session
+        self, client: AsyncClient, auth_headers: dict, db_session
     ):
         """Should find exact match on name + artist."""
         # Create existing song
@@ -41,6 +42,7 @@ class TestCheckDuplicatesEndpoint:
                     {"name": "Amazing Grace", "artist": "John Newton"},
                 ]
             },
+            headers=auth_headers,
         )
 
         assert response.status_code == 200
@@ -51,7 +53,7 @@ class TestCheckDuplicatesEndpoint:
         assert data["duplicates"][0]["existing_song"]["id"] == str(existing.id)
 
     async def test_case_insensitive_match(
-        self, client: AsyncClient, db_session
+        self, client: AsyncClient, auth_headers: dict, db_session
     ):
         """Should match regardless of case."""
         existing = Song(name="Amazing Grace", artist="John Newton")
@@ -65,6 +67,7 @@ class TestCheckDuplicatesEndpoint:
                     {"name": "AMAZING GRACE", "artist": "JOHN NEWTON"},
                 ]
             },
+            headers=auth_headers,
         )
 
         assert response.status_code == 200
@@ -72,7 +75,7 @@ class TestCheckDuplicatesEndpoint:
         assert len(data["duplicates"]) == 1
 
     async def test_different_artist_not_duplicate(
-        self, client: AsyncClient, db_session
+        self, client: AsyncClient, auth_headers: dict, db_session
     ):
         """Same song name with different artist is not a duplicate."""
         existing = Song(name="Amazing Grace", artist="John Newton")
@@ -86,6 +89,7 @@ class TestCheckDuplicatesEndpoint:
                     {"name": "Amazing Grace", "artist": "Chris Tomlin"},
                 ]
             },
+            headers=auth_headers,
         )
 
         assert response.status_code == 200
@@ -93,7 +97,7 @@ class TestCheckDuplicatesEndpoint:
         assert data["duplicates"] == []
 
     async def test_null_artist_matches_null(
-        self, client: AsyncClient, db_session
+        self, client: AsyncClient, auth_headers: dict, db_session
     ):
         """Song with no artist matches other song with no artist."""
         existing = Song(name="Amazing Grace", artist=None)
@@ -107,6 +111,7 @@ class TestCheckDuplicatesEndpoint:
                     {"name": "Amazing Grace", "artist": None},
                 ]
             },
+            headers=auth_headers,
         )
 
         assert response.status_code == 200
@@ -114,7 +119,7 @@ class TestCheckDuplicatesEndpoint:
         assert len(data["duplicates"]) == 1
 
     async def test_null_artist_does_not_match_with_artist(
-        self, client: AsyncClient, db_session
+        self, client: AsyncClient, auth_headers: dict, db_session
     ):
         """Song with no artist does not match song with artist."""
         existing = Song(name="Amazing Grace", artist="John Newton")
@@ -128,6 +133,7 @@ class TestCheckDuplicatesEndpoint:
                     {"name": "Amazing Grace", "artist": None},
                 ]
             },
+            headers=auth_headers,
         )
 
         assert response.status_code == 200
@@ -135,7 +141,7 @@ class TestCheckDuplicatesEndpoint:
         assert data["duplicates"] == []
 
     async def test_bulk_check_multiple_songs(
-        self, client: AsyncClient, db_session
+        self, client: AsyncClient, auth_headers: dict, db_session
     ):
         """Should check multiple songs and return all duplicates."""
         # Create two existing songs
@@ -153,6 +159,7 @@ class TestCheckDuplicatesEndpoint:
                     {"name": "How Great Is Our God", "artist": "Chris Tomlin"},
                 ]
             },
+            headers=auth_headers,
         )
 
         assert response.status_code == 200
@@ -165,12 +172,13 @@ class TestCheckDuplicatesEndpoint:
         assert 2 in indices
 
     async def test_empty_songs_list_rejected(
-        self, client: AsyncClient, db_session
+        self, client: AsyncClient, auth_headers: dict, db_session
     ):
         """Should reject empty songs list."""
         response = await client.post(
             "/api/v1/songs/check-duplicates",
             json={"songs": []},
+            headers=auth_headers,
         )
 
         assert response.status_code == 422
@@ -180,7 +188,7 @@ class TestImportPreviewWithDuplicates:
     """Tests for duplicate detection in import preview."""
 
     async def test_preview_includes_duplicate_info(
-        self, client: AsyncClient, db_session
+        self, client: AsyncClient, auth_headers: dict, db_session
     ):
         """Preview should include duplicate info for matching songs."""
         # Create existing song
@@ -195,6 +203,7 @@ class TestImportPreviewWithDuplicates:
         response = await client.post(
             "/api/v1/songs/import/preview",
             files=[("files", ("amazing.cho", content, "text/plain"))],
+            headers=auth_headers,
         )
 
         assert response.status_code == 200
@@ -208,7 +217,7 @@ class TestImportPreviewWithDuplicates:
         assert song["duplicate"]["name"] == "Amazing Grace"
 
     async def test_preview_no_duplicate_for_new_song(
-        self, client: AsyncClient, db_session
+        self, client: AsyncClient, auth_headers: dict, db_session
     ):
         """Preview should have null duplicate for new songs."""
         content = b"{title: Brand New Song}\n{artist: New Artist}\n[G]Lyrics"
@@ -216,6 +225,7 @@ class TestImportPreviewWithDuplicates:
         response = await client.post(
             "/api/v1/songs/import/preview",
             files=[("files", ("new.cho", content, "text/plain"))],
+            headers=auth_headers,
         )
 
         assert response.status_code == 200
@@ -227,7 +237,7 @@ class TestImportPreviewWithDuplicates:
         assert song["duplicate"] is None
 
     async def test_preview_case_insensitive_duplicate(
-        self, client: AsyncClient, db_session
+        self, client: AsyncClient, auth_headers: dict, db_session
     ):
         """Preview should detect case-insensitive duplicates."""
         existing = Song(name="Amazing Grace", artist="John Newton")
@@ -240,6 +250,7 @@ class TestImportPreviewWithDuplicates:
         response = await client.post(
             "/api/v1/songs/import/preview",
             files=[("files", ("song.cho", content, "text/plain"))],
+            headers=auth_headers,
         )
 
         assert response.status_code == 200

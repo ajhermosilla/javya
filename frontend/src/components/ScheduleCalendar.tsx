@@ -3,6 +3,13 @@ import { useTranslation } from 'react-i18next';
 import type { CalendarSetlist } from '../types/scheduling';
 import './ScheduleCalendar.css';
 
+function formatLocalDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 interface ScheduleCalendarProps {
   year: number;
   month: number;
@@ -56,7 +63,7 @@ export function ScheduleCalendar({
     for (let i = startDayOfWeek - 1; i >= 0; i--) {
       const day = prevMonth.getDate() - i;
       const date = new Date(year, month - 1, day);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = formatLocalDate(date);
       result.push({
         date: dateStr,
         dayOfMonth: day,
@@ -69,7 +76,7 @@ export function ScheduleCalendar({
     // Add days of current month
     for (let day = 1; day <= lastDay.getDate(); day++) {
       const date = new Date(year, month, day);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = formatLocalDate(date);
       result.push({
         date: dateStr,
         dayOfMonth: day,
@@ -83,7 +90,7 @@ export function ScheduleCalendar({
     const remainingDays = 42 - result.length;
     for (let i = 1; i <= remainingDays; i++) {
       const date = new Date(year, month + 1, i);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = formatLocalDate(date);
       result.push({
         date: dateStr,
         dayOfMonth: i,

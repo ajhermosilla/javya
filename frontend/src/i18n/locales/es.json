@@ -256,6 +256,9 @@
       "activate": "Activar",
       "deactivate": "Desactivar",
       "endDateBeforeStart": "La fecha de fin debe ser posterior a la fecha de inicio",
+      "errorCreate": "Error al crear el patrón. Inténtalo de nuevo.",
+      "errorUpdate": "Error al actualizar el patrón. Inténtalo de nuevo.",
+      "errorDelete": "Error al eliminar el patrón. Inténtalo de nuevo.",
       "types": {
         "weekly": "Semanal",
         "biweekly": "Quincenal",

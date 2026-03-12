@@ -26,7 +26,8 @@
   margin-bottom: 1rem;
 }
 
-.validation-error {
+.validation-error,
+.pattern-error {
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
   padding: 0.5rem 0.75rem;

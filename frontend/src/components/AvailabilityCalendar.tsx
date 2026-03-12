@@ -3,6 +3,13 @@ import { useTranslation } from 'react-i18next';
 import type { Availability, AvailabilityStatus } from '../types/availability';
 import './AvailabilityCalendar.css';
 
+function formatLocalDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 interface AvailabilityCalendarProps {
   year: number;
   month: number;
@@ -48,7 +55,7 @@ export function AvailabilityCalendar({
     for (let i = startDayOfWeek - 1; i >= 0; i--) {
       const day = prevMonth.getDate() - i;
       const date = new Date(year, month - 1, day);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = formatLocalDate(date);
       const avail = availMap.get(dateStr);
       result.push({
         date: dateStr,
@@ -63,7 +70,7 @@ export function AvailabilityCalendar({
     // Add days of current month
     for (let day = 1; day <= lastDay.getDate(); day++) {
       const date = new Date(year, month, day);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = formatLocalDate(date);
       const avail = availMap.get(dateStr);
       result.push({
         date: dateStr,
@@ -79,7 +86,7 @@ export function AvailabilityCalendar({
     const remainingDays = 42 - result.length; // 6 rows * 7 days
     for (let i = 1; i <= remainingDays; i++) {
       const date = new Date(year, month + 1, i);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = formatLocalDate(date);
       const avail = availMap.get(dateStr);
       result.push({
         date: dateStr,

@@ -50,6 +50,7 @@ def sanitize_filename(name: str, fallback_id: UUID) -> str:
 @router.post("/", response_model=SetlistDetailResponse, status_code=status.HTTP_201_CREATED)
 async def create_setlist(
     setlist_data: SetlistCreate,
+    _current_user: Annotated[User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ) -> Setlist:
     """Create a new setlist with optional songs."""
@@ -135,6 +136,7 @@ async def get_setlist(
 async def update_setlist(
     setlist_id: UUID,
     setlist_data: SetlistUpdate,
+    _current_user: Annotated[User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ) -> Setlist:
     """Update a setlist by ID, including replacing songs."""

@@ -553,7 +553,7 @@ class TestSchedulingEndpoints:
         setlist_response = await client.post(
             "/api/v1/setlists/",
             headers=admin_headers,
-            json={"name": "Sunday Service", "service_date": "2026-01-15", "event_type": "Sunday"},
+            json={"name": "Sunday Service", "service_date": "2099-01-15", "event_type": "Sunday"},
         )
         setlist_id = setlist_response.json()["id"]
 

@@ -58,22 +58,39 @@ export function PatternEditor({
     return true;
   };
 
+  const [error, setError] = useState<string | null>(null);
+
   const handleCreate = async () => {
     if (!validateDates()) return;
-    await onCreate(formData);
-    setIsCreating(false);
-    setFormData({ pattern_type: 'weekly', day_of_week: 0, status: 'available' });
+    try {
+      setError(null);
+      await onCreate(formData);
+      setIsCreating(false);
+      setFormData({ pattern_type: 'weekly', day_of_week: 0, status: 'available' });
+    } catch {
+      setError(t('availability.patterns.errorCreate'));
+    }
   };
 
   const handleUpdate = async (id: string) => {
     if (!validateDates()) return;
-    await onUpdate(id, formData);
-    setEditingId(null);
-    setFormData({ pattern_type: 'weekly', day_of_week: 0, status: 'available' });
+    try {
+      setError(null);
+      await onUpdate(id, formData);
+      setEditingId(null);
+      setFormData({ pattern_type: 'weekly', day_of_week: 0, status: 'available' });
+    } catch {
+      setError(t('availability.patterns.errorUpdate'));
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await onDelete(id);
+    try {
+      setError(null);
+      await onDelete(id);
+    } catch {
+      setError(t('availability.patterns.errorDelete'));
+    }
   };
 
   const startEdit = (pattern: AvailabilityPattern) => {
@@ -89,7 +106,12 @@ export function PatternEditor({
   };
 
   const toggleActive = async (pattern: AvailabilityPattern) => {
-    await onUpdate(pattern.id, { is_active: !pattern.is_active });
+    try {
+      setError(null);
+      await onUpdate(pattern.id, { is_active: !pattern.is_active });
+    } catch {
+      setError(t('availability.patterns.errorUpdate'));
+    }
   };
 
   const renderForm = (onSubmit: () => void, submitLabel: string) => (
@@ -226,6 +248,8 @@ export function PatternEditor({
           </button>
         )}
       </div>
+
+      {error && <div className="pattern-error">{error}</div>}
 
       {isCreating && renderForm(handleCreate, t('common.create'))}
 

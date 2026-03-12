@@ -2,15 +2,17 @@
 
 import zipfile
 from io import BytesIO
+from typing import Annotated
 from urllib.parse import urlparse
 
 import httpx
-from fastapi import APIRouter, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends
 
+from app.auth.dependencies import get_current_active_user
 from app.database import get_db
 from app.models.song import Song
+from app.models.user import User
 from app.schemas.import_song import (
     ImportConfirmRequest,
     ImportConfirmResponse,
@@ -95,6 +97,7 @@ def extract_zip_files(
 @router.post("/preview", response_model=ImportPreviewResponse)
 async def preview_import(
     files: list[UploadFile],
+    _current_user: Annotated[User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ) -> ImportPreviewResponse:
     """Parse uploaded files and return preview data.
@@ -252,6 +255,7 @@ async def preview_import(
 @router.post("/preview-url", response_model=ImportPreviewResponse)
 async def preview_url_import(
     request: UrlImportRequest,
+    _current_user: Annotated[User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ) -> ImportPreviewResponse:
     """Fetch content from a URL and return preview data.
@@ -407,6 +411,7 @@ async def preview_url_import(
 @router.post("/confirm", response_model=ImportConfirmResponse)
 async def confirm_import(
     request: ImportConfirmRequest,
+    _current_user: Annotated[User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
 ) -> ImportConfirmResponse:
     """Save selected songs from preview to the database.

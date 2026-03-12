@@ -69,6 +69,21 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     app.dependency_overrides.clear()
 
 
+@pytest_asyncio.fixture(scope="function")
+async def auth_headers(client: AsyncClient) -> dict[str, str]:
+    """Register first user (becomes admin) and return auth headers."""
+    await client.post(
+        "/api/v1/auth/register",
+        json={"email": "admin@test.com", "name": "Admin", "password": "testpassword123"},
+    )
+    login_response = await client.post(
+        "/api/v1/auth/login",
+        data={"username": "admin@test.com", "password": "testpassword123"},
+    )
+    token = login_response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
 @pytest.fixture
 def sample_song_data() -> dict[str, Any]:
     """Sample song data for testing."""
