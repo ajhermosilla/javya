@@ -107,7 +107,7 @@ Full codebase review of backend, frontend, tests, documentation, and Docker conf
 | 4 | Critical | Backend healthcheck uses curl | Fixed |
 | 5 | High | Calendar UTC date off-by-one | Fixed |
 | 6 | High | PatternEditor no error handling | Fixed |
-| 7 | High | E2E test suite broken | |
+| 7 | High | E2E test suite broken | Fixed |
 | 8 | High | HTML title says "frontend" | Fixed |
 | 9 | Medium | CONTRIBUTING.md wrong port | Fixed |
 | 10 | Medium | README.md stale "Coming Soon" | Fixed |

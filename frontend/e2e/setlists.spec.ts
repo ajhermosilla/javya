@@ -133,8 +133,7 @@ test.describe('Setlists', () => {
     await expect(page.getByText('Song For Setlist')).toBeVisible();
 
     // Add the song to setlist
-    await page.locator('.song-picker-item', { hasText: 'Song For Setlist' })
-      .getByRole('button', { name: /\+/i }).click();
+    await page.locator('.picker-item', { hasText: 'Song For Setlist' }).click();
 
     // Song should now appear in the setlist
     await expect(page.locator('.editor-songs').getByText('Song For Setlist')).toBeVisible();
@@ -159,8 +158,7 @@ test.describe('Setlists', () => {
     await page.getByText('Export Test Setlist').click();
 
     // Add song
-    await page.locator('.song-picker-item', { hasText: 'Export Test Song' })
-      .getByRole('button', { name: /\+/i }).click();
+    await page.locator('.picker-item', { hasText: 'Export Test Song' }).click();
 
     // Save
     await page.getByRole('button', { name: /save/i }).click();
