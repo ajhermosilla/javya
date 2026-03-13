@@ -44,7 +44,7 @@ Prep work so the team can start using it this Sunday.
 
 - [ ] **Seed song library** — Import existing church songs (ChordPro, OpenLyrics, or plain text)
 - [ ] **PWA support** — Add manifest.json, service worker, and app icons so team members can install it on their phones
-- [ ] **Fix HTML title** — Currently shows "frontend" instead of "Javya"
+- [x] **Fix HTML title** — Currently shows "frontend" instead of "Javya"
 - [ ] **Empty states** — Show helpful guidance on pages with no data (no songs yet, no setlists, empty calendar)
 - [ ] **First-login experience** — Admin hint on first login (e.g., "Start by adding songs or inviting your team")
 

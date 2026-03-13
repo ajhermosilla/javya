@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Javya is an open-source worship planning platform for church teams. It helps manage songs, build setlists, and export presentations. The name comes from Guaraní "javy'a" meaning "let us rejoice together."
 
-## Current Status: v0.5 Complete
+## Current Status: v0.7 Complete
 
 ### Features
 - **Authentication**: JWT-based login with bcrypt password hashing
@@ -16,13 +16,16 @@ Javya is an open-source worship planning platform for church teams. It helps man
 - **Scheduling**: Team scheduling with service role assignments
 - **Assignments**: Assign team members to setlists with confirmation workflow
 - **Songs**: Full CRUD, search/filter, detail view with lyrics/ChordPro
+- **Song Import**: Multi-format import (ChordPro, OpenLyrics, OpenSong, OnSong, Ultimate Guitar, plain text, ZIP archives, URL fetch, clipboard paste) with preview/edit before saving and duplicate detection
+- **Song Transposition**: Transpose ChordPro charts to any key with capo suggestions
 - **Setlists**: Create setlists with drag-and-drop song ordering
-- **Export**: Export setlists to FreeShow (.project) and Quelea (.qsch)
+- **Export**: Export setlists to FreeShow (.project), Quelea (.qsch), and PDF (summary + chord charts)
 - **Navigation**: Collapsible sidebar menu
 - **i18n**: English and Spanish with language switcher
 - **Backend**: FastAPI + async SQLAlchemy + PostgreSQL
 - **Frontend**: React 19 + Vite + TypeScript + dnd-kit
-- **Deployment**: Docker Compose
+- **Testing**: 362 backend tests (pytest) + 23 E2E tests (Playwright)
+- **Deployment**: Docker Compose (dev + production)
 
 ## Tech Stack
 
@@ -95,6 +98,7 @@ docker compose exec frontend npm run dev
 | GET | `/{id}` | Get song by ID |
 | PUT | `/{id}` | Update song |
 | DELETE | `/{id}` | Delete song (admin/leader only) |
+| POST | `/check-duplicates` | Check for similar songs before creating |
 
 ### Setlists (`/api/v1/setlists`)
 | Method | Endpoint | Description |
@@ -106,6 +110,14 @@ docker compose exec frontend npm run dev
 | DELETE | `/{id}` | Delete setlist (admin/leader only) |
 | GET | `/{id}/export/freeshow` | Export to FreeShow (.project) |
 | GET | `/{id}/export/quelea` | Export to Quelea (.qsch) |
+| GET | `/{id}/export/pdf` | Export to PDF (summary or chord charts via `?format=`) |
+
+### Song Import (`/api/v1/import`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/preview` | Upload files for import preview (ChordPro, OpenLyrics, OpenSong, OnSong, text, ZIP) |
+| POST | `/preview-url` | Fetch and preview song from URL |
+| POST | `/confirm` | Confirm import of previewed songs |
 
 ### Availability (`/api/v1/availability`)
 | Method | Endpoint | Description |
@@ -146,12 +158,12 @@ app/
 ├── database.py      # Async SQLAlchemy engine
 ├── models/          # SQLAlchemy ORM models (User, Song, Setlist, Availability, SetlistAssignment)
 ├── schemas/         # Pydantic request/response
-├── routers/         # API route handlers (auth, users, songs, setlists, availability, scheduling)
-├── services/        # Business logic (export generators)
+├── routers/         # API route handlers (auth, users, songs, setlists, availability, scheduling, import)
+├── services/        # Business logic (export generators, import parsers, duplicate detection, key detection)
 ├── auth/            # Security (password hashing, JWT, dependencies)
 ├── enums/           # UserRole, MusicalKey, Mood, Theme, EventType, AvailabilityStatus, ServiceRole
 alembic/             # Database migrations
-tests/               # Pytest test suite (116 tests)
+tests/               # Pytest test suite (362 tests)
 ```
 
 ### Frontend Structure (`frontend/`)
@@ -174,8 +186,9 @@ src/
 │   ├── ScheduleCalendar, ScheduleList # Scheduling views
 │   ├── SetlistAssignmentEditor # Team assignment modal
 │   ├── TeamRoster   # Team availability display
-│   ├── SongCard, SongDetail, SongForm
+│   ├── SongCard, SongDetail, SongForm, SongPicker
 │   ├── SetlistCard, SetlistForm, SetlistEditor
+│   ├── ImportWizard  # Multi-format song import with preview
 │   └── LanguageSwitcher
 ├── contexts/
 │   └── AuthContext  # Auth state provider
