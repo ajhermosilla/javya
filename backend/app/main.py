@@ -39,6 +39,7 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded) -> JSONRe
     return JSONResponse(
         status_code=429,
         content={"detail": "Too many requests. Please try again later."},
+        headers={"Retry-After": "60"},
     )
 
 # Include routers

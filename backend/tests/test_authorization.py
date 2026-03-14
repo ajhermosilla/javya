@@ -152,7 +152,7 @@ class TestMemberForbidden:
         self, client: AsyncClient, member_headers: dict
     ) -> None:
         response = await client.get(
-            "/api/v1/scheduling/availability?date=2099-01-15",
+            "/api/v1/scheduling/availability?service_date=2099-01-15",
             headers=member_headers,
         )
         assert response.status_code == 403

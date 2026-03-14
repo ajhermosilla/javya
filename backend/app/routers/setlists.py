@@ -43,8 +43,6 @@ def sanitize_filename(name: str, fallback_id: UUID) -> str:
     safe_name = "".join(c for c in name if c.isalnum() or c in " -_'").strip()
     if not safe_name:
         safe_name = f"setlist-{str(fallback_id)[:8]}"
-    # Escape quotes for Content-Disposition header safety
-    safe_name = safe_name.replace("\\", "\\\\").replace('"', '\\"')
     return safe_name
 
 
