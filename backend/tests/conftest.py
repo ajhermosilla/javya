@@ -1,6 +1,10 @@
 import asyncio
+import os
 from collections.abc import AsyncGenerator, Generator
 from typing import Any
+
+# Disable rate limiting during tests
+os.environ["RATE_LIMIT_ENABLED"] = "false"
 
 import pytest
 import pytest_asyncio
@@ -12,8 +16,6 @@ from app.main import app
 
 # Test database URL - uses a separate test database
 # Uses 'db' hostname (Docker network) when running inside container
-import os
-
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
     "postgresql+asyncpg://javya:change_me_in_production@db:5432/javya_test"
@@ -79,6 +81,21 @@ async def auth_headers(client: AsyncClient) -> dict[str, str]:
     login_response = await client.post(
         "/api/v1/auth/login",
         data={"username": "admin@test.com", "password": "testpassword123"},
+    )
+    token = login_response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest_asyncio.fixture(scope="function")
+async def member_headers(client: AsyncClient, auth_headers: dict[str, str]) -> dict[str, str]:
+    """Register a second user (becomes member) and return auth headers."""
+    await client.post(
+        "/api/v1/auth/register",
+        json={"email": "member@test.com", "name": "Member", "password": "testpassword123"},
+    )
+    login_response = await client.post(
+        "/api/v1/auth/login",
+        data={"username": "member@test.com", "password": "testpassword123"},
     )
     token = login_response.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}

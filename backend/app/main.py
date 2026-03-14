@@ -1,8 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 from app.config import settings
 from app.middleware import SecurityHeadersMiddleware
+from app.rate_limit import limiter
 from app.routers import auth, songs, setlists, users, availability, scheduling, import_songs
 
 app = FastAPI(
@@ -24,6 +28,18 @@ app.add_middleware(
 
 # Security headers middleware
 app.add_middleware(SecurityHeadersMiddleware)
+
+# Rate limiter
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
+
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Too many requests. Please try again later."},
+    )
 
 # Include routers
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
