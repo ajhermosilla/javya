@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,6 +9,7 @@ from app.auth.dependencies import get_current_active_user
 from app.auth.security import create_access_token, get_password_hash, verify_password
 from app.database import get_db
 from app.enums import UserRole
+from app.rate_limit import limiter
 from app.models.user import User
 from app.schemas.user import Token, UserCreate, UserResponse
 
@@ -16,7 +17,9 @@ router = APIRouter()
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("5/minute")
 async def register(
+    request: Request,
     user_data: UserCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> User:
@@ -49,7 +52,9 @@ async def register(
 
 
 @router.post("/login", response_model=Token)
+@limiter.limit("10/minute")
 async def login(
+    request: Request,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> Token:

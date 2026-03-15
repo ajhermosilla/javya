@@ -12,6 +12,7 @@ pydantic[email]==2.10.4
 pydantic-settings==2.7.0
 
 # Authentication
+slowapi==0.1.9
 python-jose[cryptography]==3.3.0
 passlib==1.7.4
 bcrypt==4.2.0

@@ -40,9 +40,8 @@ router = APIRouter()
 
 def sanitize_filename(name: str, fallback_id: UUID) -> str:
     """Create a safe filename from a name, using ID as fallback for uniqueness."""
-    safe_name = "".join(c for c in name if c.isalnum() or c in " -_").strip()
+    safe_name = "".join(c for c in name if c.isalnum() or c in " -_'").strip()
     if not safe_name:
-        # Use first 8 chars of UUID for uniqueness
         safe_name = f"setlist-{str(fallback_id)[:8]}"
     return safe_name
 

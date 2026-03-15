@@ -89,11 +89,11 @@ Full codebase review of backend, frontend, tests, documentation, and Docker conf
 
 ## Low — Track but don't block on
 
-- `sanitize_filename()` doesn't handle quotes in Content-Disposition headers (setlist names with apostrophes)
-- No rate limiting on auth endpoints
-- Missing authorization tests (member attempting delete should return 403)
+- ~~`sanitize_filename()` doesn't handle quotes in Content-Disposition headers~~ — Fixed: allows apostrophes, escapes quotes
+- ~~No rate limiting on auth endpoints~~ — Fixed: slowapi, 5/min register, 10/min login
+- ~~Missing authorization tests (member attempting delete should return 403)~~ — Fixed: 11 tests in test_authorization.py
 - Frontend unit test coverage is thin (~7 test files for 40+ components)
-- `CLAUDE.md` says v0.5, should say v0.7
+- ~~`CLAUDE.md` says v0.5, should say v0.7~~ — Fixed
 
 ---
 

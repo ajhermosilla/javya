@@ -24,7 +24,7 @@ Javya is an open-source worship planning platform for church teams. It helps man
 - **i18n**: English and Spanish with language switcher
 - **Backend**: FastAPI + async SQLAlchemy + PostgreSQL
 - **Frontend**: React 19 + Vite + TypeScript + dnd-kit
-- **Testing**: 362 backend tests (pytest) + 23 E2E tests (Playwright)
+- **Testing**: 369 backend tests (pytest) + 23 E2E tests (Playwright)
 - **Deployment**: Docker Compose (dev + production)
 
 ## Tech Stack
