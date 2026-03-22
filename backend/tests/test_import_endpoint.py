@@ -476,6 +476,38 @@ class TestUrlPreviewEndpoint:
 
         assert response.status_code == 422
 
+    @pytest.mark.asyncio
+    async def test_preview_url_blocks_private_ip(self, client: AsyncClient, auth_headers: dict):
+        """Should block URLs pointing to private/internal IPs."""
+        response = await client.post(
+            "/api/v1/songs/import/preview-url",
+            json={"url": "http://127.0.0.1:5432/song.cho"},
+            headers=auth_headers,
+        )
+        assert response.status_code == 400
+        assert "private" in response.json()["detail"].lower() or "internal" in response.json()["detail"].lower()
+
+    @pytest.mark.asyncio
+    async def test_preview_url_blocks_internal_hostname(self, client: AsyncClient, auth_headers: dict):
+        """Should block URLs pointing to Docker internal hostnames."""
+        response = await client.post(
+            "/api/v1/songs/import/preview-url",
+            json={"url": "http://localhost:8000/health"},
+            headers=auth_headers,
+        )
+        assert response.status_code == 400
+
+    @pytest.mark.asyncio
+    async def test_preview_url_blocks_file_scheme(self, client: AsyncClient, auth_headers: dict):
+        """Should block non-http schemes."""
+        response = await client.post(
+            "/api/v1/songs/import/preview-url",
+            json={"url": "file:///etc/passwd"},
+            headers=auth_headers,
+        )
+        # Pydantic HttpUrl rejects file:// scheme with 422
+        assert response.status_code in (400, 422)
+
 
 class TestZipImport:
     """Tests for ZIP archive import."""

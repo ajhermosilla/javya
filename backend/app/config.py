@@ -1,4 +1,11 @@
+import logging
+import secrets
+
 from pydantic_settings import BaseSettings
+
+logger = logging.getLogger(__name__)
+
+_DEFAULT_SECRET = "generate_a_random_secret_key_here"
 
 
 class Settings(BaseSettings):
@@ -9,7 +16,7 @@ class Settings(BaseSettings):
 
     # Application
     debug: bool = False
-    secret_key: str = "generate_a_random_secret_key_here"  # Override in production!
+    secret_key: str = _DEFAULT_SECRET
 
     # JWT
     jwt_algorithm: str = "HS256"
@@ -29,3 +36,10 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+if settings.secret_key == _DEFAULT_SECRET:
+    settings.secret_key = secrets.token_hex(32)
+    logger.warning(
+        "SECRET_KEY not set — using a random key. Sessions will not survive restarts. "
+        "Set SECRET_KEY in your environment for production."
+    )
