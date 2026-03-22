@@ -24,7 +24,7 @@ Javya is an open-source worship planning platform for church teams. It helps man
 - **i18n**: English and Spanish with language switcher
 - **Backend**: FastAPI + async SQLAlchemy + PostgreSQL
 - **Frontend**: React 19 + Vite + TypeScript + dnd-kit
-- **Testing**: 369 backend tests (pytest) + 23 E2E tests (Playwright)
+- **Testing**: 373 backend tests (pytest) + 23 E2E tests (Playwright)
 - **Deployment**: Docker Compose (dev + production)
 
 ## Tech Stack
@@ -112,7 +112,7 @@ docker compose exec frontend npm run dev
 | GET | `/{id}/export/quelea` | Export to Quelea (.qsch) |
 | GET | `/{id}/export/pdf` | Export to PDF (summary or chord charts via `?format=`) |
 
-### Song Import (`/api/v1/import`)
+### Song Import (`/api/v1/songs/import`)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/preview` | Upload files for import preview (ChordPro, OpenLyrics, OpenSong, OnSong, text, ZIP) |
@@ -137,7 +137,7 @@ docker compose exec frontend npm run dev
 |--------|----------|-------------|
 | GET | `/calendar` | Get setlists with assignments for date range |
 | GET | `/my-assignments` | Get current user's assignments |
-| GET | `/team-availability` | Check team availability for a date (admin/leader) |
+| GET | `/availability` | Check team availability for a date (admin/leader) |
 
 ### Setlist Assignments (`/api/v1/setlists/{id}/assignments`)
 | Method | Endpoint | Description |
@@ -153,17 +153,20 @@ docker compose exec frontend npm run dev
 ### Backend Structure (`backend/`)
 ```
 app/
-├── main.py          # FastAPI entry, CORS, routers
+├── main.py          # FastAPI entry, CORS, routers, rate limiting
 ├── config.py        # Pydantic settings (includes JWT config)
 ├── database.py      # Async SQLAlchemy engine
-├── models/          # SQLAlchemy ORM models (User, Song, Setlist, Availability, SetlistAssignment)
+├── rate_limit.py    # slowapi limiter instance
+├── middleware.py    # Security headers middleware
+├── models/          # SQLAlchemy ORM models (User, Song, Setlist, SetlistSong, Availability, AvailabilityPattern, SetlistAssignment)
 ├── schemas/         # Pydantic request/response
 ├── routers/         # API route handlers (auth, users, songs, setlists, availability, scheduling, import)
 ├── services/        # Business logic (export generators, import parsers, duplicate detection, key detection)
 ├── auth/            # Security (password hashing, JWT, dependencies)
 ├── enums/           # UserRole, MusicalKey, Mood, Theme, EventType, AvailabilityStatus, ServiceRole
+├── templates/       # Jinja2 templates for PDF export
 alembic/             # Database migrations
-tests/               # Pytest test suite (362 tests)
+tests/               # Pytest test suite (373 tests)
 ```
 
 ### Frontend Structure (`frontend/`)
@@ -238,6 +241,6 @@ Set in `.env` or docker-compose:
 | `TEST_DATABASE_URL` | Test database connection |
 | `CORS_ORIGINS` | Comma-separated allowed origins |
 | `DEBUG` | Enable SQLAlchemy query logging |
-| `JWT_SECRET_KEY` | Secret for signing JWT tokens |
+| `SECRET_KEY` | Secret for signing JWT tokens (auto-generated if not set) |
 | `JWT_ALGORITHM` | JWT algorithm (default: HS256) |
 | `JWT_EXPIRE_MINUTES` | Token expiration (default: 10080 = 7 days) |

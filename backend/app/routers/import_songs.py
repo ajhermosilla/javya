@@ -1,5 +1,7 @@
 """Router for song import endpoints."""
 
+import ipaddress
+import socket
 import zipfile
 from io import BytesIO
 from typing import Annotated
@@ -37,6 +39,28 @@ MAX_URL_CONTENT_SIZE = 1024 * 1024  # 1MB
 
 # Supported song file extensions
 SONG_EXTENSIONS = {".cho", ".crd", ".chopro", ".txt", ".xml", ".onsong"}
+
+# Allowed URL schemes for import
+ALLOWED_SCHEMES = {"http", "https"}
+
+
+def validate_url_for_ssrf(url: str) -> str | None:
+    """Validate a URL is safe to fetch. Returns error message or None if safe."""
+    parsed = urlparse(url)
+    if parsed.scheme not in ALLOWED_SCHEMES:
+        return f"URL scheme '{parsed.scheme}' is not allowed. Use http or https."
+    hostname = parsed.hostname
+    if not hostname:
+        return "Invalid URL: no hostname."
+    try:
+        resolved = socket.getaddrinfo(hostname, None)
+    except socket.gaierror:
+        return f"Cannot resolve hostname '{hostname}'."
+    for _, _, _, _, addr in resolved:
+        ip = ipaddress.ip_address(addr[0])
+        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+            return "URLs pointing to private or internal networks are not allowed."
+    return None
 
 
 def is_zip_file(content: bytes) -> bool:
@@ -268,6 +292,11 @@ async def preview_url_import(
     - 10 second timeout
     """
     url = str(request.url)
+
+    # Validate URL to prevent SSRF
+    ssrf_error = validate_url_for_ssrf(url)
+    if ssrf_error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=ssrf_error)
 
     # Extract filename from URL path
     parsed_url = urlparse(url)
